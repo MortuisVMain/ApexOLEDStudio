@@ -1,0 +1,1186 @@
+<Window x:Class="ApexOLEDStudio.UI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="clr-namespace:ApexOLEDStudio.UI.ViewModels"
+        mc:Ignorable="d"
+        Title="ASUS ROG // APEX OLED STUDIO"
+        Height="900" Width="1300"
+        MinHeight="780" MinWidth="1150"
+        WindowStartupLocation="CenterScreen"
+        Background="{StaticResource BrushVoid}"
+        FontFamily="{StaticResource RogBodyFont}">
+
+    <Window.DataContext>
+        <vm:MainViewModel />
+    </Window.DataContext>
+
+    <Grid Margin="18">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" /> <!-- Header -->
+            <RowDefinition Height="*" />    <!-- Main Tactical Tabs (Full Workspace Height) -->
+            <RowDefinition Height="Auto" /> <!-- Footer -->
+        </Grid.RowDefinitions>
+
+        <!-- ══════════════════════════════════════════════════════════════════════ -->
+        <!-- ROW 0: TOP BAR (ASUS ROG Strix Tactical Header)                       -->
+        <!-- ══════════════════════════════════════════════════════════════════════ -->
+        <Border Grid.Row="0" Margin="0,0,0,14" Padding="16,10" CornerRadius="4" BorderBrush="{StaticResource BrushCardBorder}" BorderThickness="1" ClipToBounds="True">
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                    <GradientStop Color="#141B28" Offset="0.0" />
+                    <GradientStop Color="#090D14" Offset="1.0" />
+                </LinearGradientBrush>
+            </Border.Background>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <!-- Brand Title with Vector Logo -->
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Border Width="34" Height="34" CornerRadius="4" Background="#1A0A10" BorderBrush="{StaticResource BrushAmber}" BorderThickness="1.5" Margin="0,0,10,0">
+                        <Border.Effect>
+                            <DropShadowEffect Color="#FF003C" BlurRadius="14" ShadowDepth="0" Opacity="0.5" />
+                        </Border.Effect>
+                        <Path Data="{StaticResource IconApex}" Fill="{StaticResource BrushAmber}" Stretch="Uniform" Width="18" Height="18" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <StackPanel VerticalAlignment="Center">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="/// APEX OLED STUDIO" Foreground="{StaticResource BrushTextPrimary}" FontFamily="{StaticResource RogDisplayFont}" FontWeight="ExtraBold" FontSize="15" />
+                            <Border Background="#26070E" CornerRadius="4" Padding="6,2" Margin="10,0,0,0" BorderBrush="{StaticResource BrushAmber}" BorderThickness="1">
+                                <TextBlock Text="ROG STRIX CONTROL CENTER" Foreground="{StaticResource BrushAmber}" FontFamily="{StaticResource RogDisplayFont}" FontSize="9" FontWeight="Bold" />
+                            </Border>
+                            <Border Background="#091A26" CornerRadius="4" Padding="6,2" Margin="6,0,0,0" BorderBrush="{StaticResource BrushCyan}" BorderThickness="1">
+                                <TextBlock Text="128x40 DIRECT HID" Foreground="{StaticResource BrushCyan}" FontSize="9" FontWeight="SemiBold" />
+                            </Border>
+                        </StackPanel>
+                        <TextBlock Text="Armoury-Class Low-Latency Telemetry &amp; Real-Time Hardware OLED Engine" Foreground="{StaticResource BrushTextSecondary}" FontSize="10" Margin="0,2,0,0" />
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- Center: Connection, Live Sync, Invert & Sandbox Switches -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                    <!-- Hardware Connection Status Pill -->
+                    <Border CornerRadius="8" Padding="10,4" Margin="0,0,14,0">
+                        <Border.Style>
+                            <Style TargetType="Border">
+                                <Setter Property="Background" Value="#09241B" />
+                                <Setter Property="BorderBrush" Value="#10B981" />
+                                <Setter Property="BorderThickness" Value="1" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsApexConnected}" Value="False">
+                                        <Setter Property="Background" Value="#24111A" />
+                                        <Setter Property="BorderBrush" Value="#EF4444" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Border.Style>
+                        <StackPanel Orientation="Horizontal">
+                            <Ellipse Width="7" Height="7" Margin="0,0,6,0" VerticalAlignment="Center">
+                                <Ellipse.Style>
+                                    <Style TargetType="Ellipse">
+                                        <Setter Property="Fill" Value="#10B981" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsApexConnected}" Value="False">
+                                                <Setter Property="Fill" Value="#EF4444" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Ellipse.Style>
+                            </Ellipse>
+                            <TextBlock Foreground="{StaticResource BrushTextPrimary}" FontSize="11" FontWeight="Medium">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Text" Value="Apex Pro Connected (Direct HID)" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding IsApexConnected}" Value="False">
+                                                <Setter Property="Text" Value="Apex Pro Searching..." />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Live Sync Checkbox -->
+                    <CheckBox IsChecked="{Binding IsLiveSyncEnabled}" Foreground="{StaticResource BrushTextPrimary}" VerticalAlignment="Center" Margin="0,0,12,0">
+                        <TextBlock Text="Live Sync" Foreground="{StaticResource BrushTextPrimary}" FontSize="11" />
+                    </CheckBox>
+
+                    <!-- Invert Display Checkbox -->
+                    <CheckBox IsChecked="{Binding Settings.InvertDisplay}" Foreground="{StaticResource BrushTextPrimary}" VerticalAlignment="Center" Margin="0,0,12,0" ToolTip="Invert monochrome OLED (Black on White)">
+                        <TextBlock Text="Invert OLED" Foreground="{StaticResource BrushCyan}" FontSize="11" />
+                    </CheckBox>
+
+                    <!-- Sandbox Simulator Checkbox -->
+                    <CheckBox IsChecked="{Binding IsSimulatorMode}" Foreground="{StaticResource BrushCyan}" VerticalAlignment="Center">
+                        <TextBlock Text="Sandbox Simulator" Foreground="{StaticResource BrushCyan}" FontSize="11" FontWeight="SemiBold" />
+                    </CheckBox>
+                </StackPanel>
+
+                <!-- Action Buttons & Quick Preset Selector -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                    <ComboBox ItemsSource="{Binding AvailablePresets}"
+                              SelectedItem="{Binding SelectedPresetName, UpdateSourceTrigger=PropertyChanged}"
+                              ToolTip="Select Active Layout Preset"
+                              Width="155" Height="30" Margin="0,0,8,0" />
+
+                    <Button Command="{Binding SendToKeyboardCommand}" Style="{StaticResource AmberActionButton}" Margin="0,0,8,0">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <Path Data="{StaticResource IconSend}" Fill="#06090E" Stretch="Uniform" Width="13" Height="13" Margin="0,0,6,0" />
+                            <TextBlock Text="SEND TO OLED" VerticalAlignment="Center" FontSize="11" />
+                        </StackPanel>
+                    </Button>
+                    <Button Command="{Binding SaveProfileCommand}" Style="{StaticResource CyanGhostButton}" Margin="0,0,5,0" ToolTip="Save Profile">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <Path Data="{StaticResource IconSave}" Fill="{StaticResource BrushCyan}" Stretch="Uniform" Width="12" Height="12" Margin="0,0,4,0" />
+                            <TextBlock Text="Save" FontSize="11" />
+                        </StackPanel>
+                    </Button>
+                    <Button Command="{Binding LoadProfileCommand}" Style="{StaticResource CyanGhostButton}" Margin="0,0,5,0" ToolTip="Load Profile">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <Path Data="{StaticResource IconFolder}" Fill="{StaticResource BrushCyan}" Stretch="Uniform" Width="12" Height="12" Margin="0,0,4,0" />
+                            <TextBlock Text="Load" FontSize="11" />
+                        </StackPanel>
+                    </Button>
+                    <Button Command="{Binding ResetDefaultLayoutCommand}" Style="{StaticResource CyanGhostButton}" Margin="0,0,6,0" ToolTip="Reset Layout">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <Path Data="{StaticResource IconRefresh}" Fill="{StaticResource BrushCyan}" Stretch="Uniform" Width="12" Height="12" Margin="0,0,4,0" />
+                            <TextBlock Text="Reset" FontSize="11" />
+                        </StackPanel>
+                    </Button>
+                    <Button x:Name="SettingsBtn" Click="OnToggleSettingsPanel" Style="{StaticResource CyanGhostButton}" ToolTip="Quick Settings Drawer" Padding="8,6">
+                        <Path Data="{StaticResource IconGear}" Fill="{StaticResource BrushCyan}" Stretch="Uniform" Width="14" Height="14" />
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- ══════════════════════════════════════════════════════════════════════ -->
+        <!-- ROW 1: MAIN TACTICAL WORKSPACE TABS                                  -->
+        <!-- ══════════════════════════════════════════════════════════════════════ -->
+        <TabControl x:Name="MainTabs" Grid.Row="1" Background="Transparent" BorderThickness="0" Margin="0,0,0,10">
+            
+            <!-- ────────────────────────────────────────────────────────────────── -->
+            <!-- TAB 1: SCREEN DESIGNER (PRO STUDIO 3-COLUMN WORKSPACE)             -->
+            <!-- ────────────────────────────────────────────────────────────────── -->
+            <TabItem Header="🎨 SCREEN DESIGNER" Style="{StaticResource TacticalTabItem}">
+                <Grid Margin="0,10,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="290" /> <!-- Column 0: Full-Height WIDGET LAYERS List -->
+                        <ColumnDefinition Width="*" />   <!-- Column 1: Center Studio Canvas & Quick Dock -->
+                        <ColumnDefinition Width="350" /> <!-- Column 2: Widget Inspector & Sensor Telemetry -->
+                    </Grid.ColumnDefinitions>
+
+                    <!-- ══════════════════════════════════════════════════════════════ -->
+                    <!-- COLUMN 0: WIDGET LAYERS (Full Vertical Height ~650px)         -->
+                    <!-- ══════════════════════════════════════════════════════════════ -->
+                    <Border Grid.Column="0" Style="{StaticResource TacticalCard}" Margin="0,0,10,0">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" /> <!-- Header + Count Badge -->
+                                <RowDefinition Height="Auto" /> <!-- Action Bar: Custom, Copy, Delete -->
+                                <RowDefinition Height="*" />    <!-- Full-Height Scrollable ListBox -->
+                                <RowDefinition Height="Auto" /> <!-- Batch Bar: Enable All / Disable All -->
+                            </Grid.RowDefinitions>
+
+                            <!-- Header -->
+                            <Grid Grid.Row="0" Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <TextBlock Text="WIDGET LAYERS" Foreground="{StaticResource BrushTextSecondary}" FontSize="11" FontWeight="Bold" />
+                                    <Border Background="#0E1B2C" CornerRadius="4" Padding="6,1" Margin="8,0,0,0" BorderBrush="{StaticResource BrushCardBorder}" BorderThickness="1">
+                                        <TextBlock Text="{Binding Widgets.Count, StringFormat='{}{0} active'}" Foreground="{StaticResource BrushCyan}" FontSize="9" FontWeight="Bold" />
+                                    </Border>
+                                </StackPanel>
+                            </Grid>
+
+                            <!-- Action Bar: Add Custom, Copy, Delete -->
+                            <Grid Grid.Row="1" Margin="0,0,0,10">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Button Grid.Column="0" Command="{Binding AddWidgetCommand}" Style="{StaticResource CyanGhostButton}" Margin="0,0,3,0" ToolTip="Add Custom Widget">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Path Data="{StaticResource IconPlus}" Fill="{StaticResource BrushCyan}" Stretch="Uniform" Width="10" Height="10" Margin="0,0,4,0" />
+                                        <TextBlock Text="Custom" FontSize="10" />
+                                    </StackPanel>
+                                </Button>
+                                <Button Grid.Column="1" Command="{Binding DuplicateSelectedWidgetCommand}" Style="{StaticResource CyanGhostButton}" Margin="3,0,3,0" ToolTip="Duplicate Selected Widget">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Path Data="{StaticResource IconCopy}" Fill="{StaticResource BrushCyan}" Stretch="Uniform" Width="10" Height="10" Margin="0,0,4,0" />
+                                        <TextBlock Text="Copy" FontSize="10" />
+                                    </StackPanel>
+                                </Button>
+                                <Button Grid.Column="2" Command="{Binding DeleteSelectedWidgetCommand}" Style="{StaticResource CyanGhostButton}" Margin="3,0,0,0" ToolTip="Delete Selected Widget">
+                                    <StackPanel Orientation="Horizontal">
+                                        <Path Data="{StaticResource IconTrash}" Fill="#EF4444" Stretch="Uniform" Width="10" Height="10" Margin="0,0,4,0" />
+                                        <TextBlock Text="Delete" FontSize="10" Foreground="#EF4444" />
+                                    </StackPanel>
+                                </Button>
+                            </Grid>
+
+                            <!-- Full-Height ListBox of Widgets -->
+                            <ListBox Grid.Row="2" ItemsSource="{Binding Widgets}" SelectedItem="{Binding SelectedWidget}"
+                                     Background="#080C14" BorderBrush="{StaticResource BrushCardBorder}" BorderThickness="1"
+                                     Foreground="{StaticResource BrushTextPrimary}" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <Border Padding="8,6" Margin="2,2" CornerRadius="6" Background="#0D131F" BorderBrush="{StaticResource BrushCardBorder}" BorderThickness="1">
+                                            <Border.Style>
+                                                <Style TargetType="Border">
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding Enabled}" Value="False">
+                                                            <Setter Property="Opacity" Value="0.4" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Border.Style>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="Auto" />
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <!-- Visibility Toggle CheckBox -->
+                                                <CheckBox Grid.Column="0" IsChecked="{Binding Enabled, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" Margin="0,0,8,0" ToolTip="Toggle OLED visibility" />
+                                                
+                                                <!-- Widget Name & Type -->
+                                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                    <TextBlock Text="{Binding Name}" FontWeight="SemiBold" FontSize="11" Foreground="{StaticResource BrushTextPrimary}" TextTrimming="CharacterEllipsis" />
+                                                    <TextBlock Text="{Binding Type}" FontSize="9" Foreground="{StaticResource BrushCyan}" />
+                                                </StackPanel>
+
+                                                <!-- Metric & Coordinates -->
+                                                <StackPanel Grid.Column="2" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                                    <Border Background="#121826" CornerRadius="4" Padding="5,1" BorderBrush="{StaticResource BrushCardBorder}" BorderThickness="1">
+                                                        <TextBlock Text="{Binding MetricKey}" FontSize="8" Foreground="{StaticResource BrushTextSecondary}" />
+                                                    </Border>
+                                                    <TextBlock FontSize="8" Foreground="{StaticResource BrushTextMuted}" HorizontalAlignment="Right" Margin="0,2,0,0">
+                                                        <TextBlock.Text>
+                                                            <MultiBinding StringFormat="({0}, {1})">
+                                                                <Binding Path="X" />
+                                                                <Binding Path="Y" />
+                                                            </MultiBinding>
+                                                        </TextBlock.Text>
+                                                    </TextBlock>
+                                                </StackPanel>
+                                            </Grid>
+                                        </Border>
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+
+                            <!-- Batch Controls: Enable All / Disable All -->
+                            <Grid Grid.Row="3" Margin="0,10,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Button Grid.Column="0" Command="{Binding EnableAllWidgetsCommand}" Style="{StaticResource CyanGhostButton}" Content="✓ Enable All" Margin="0,0,3,0" FontSize="10" />
+                                <Button Grid.Column="1" Command="{Binding DisableAllWidgetsCommand}" Style="{StaticResource CyanGhostButton}" Content="✕ Disable All" Margin="3,0,0,0" FontSize="10" />
+                            </Grid>
+                        </Grid>
+                    </Border>
+
+                    <!-- ══════════════════════════════════════════════════════════════ -->
+                    <!-- COLUMN 1: STUDIO CANVAS & QUICK DOCK (Center Stage)           -->
+                    <!-- ══════════════════════════════════════════════════════════════ -->
+                    <Border Grid.Column="1" Style="{StaticResource TacticalCard}" Margin="0,0,10,0" Padding="14">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                            <StackPanel HorizontalAlignment="Center">
+                                <!-- Precision Hardware Telemetry Chips (ASUS ROG Strix) -->
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,10">
+                                    <Border Background="#26070E" CornerRadius="4" Padding="8,3" Margin="0,0,8,0" BorderBrush="{StaticResource BrushAmber}" BorderThickness="1">
+                                        <StackPanel Orientation="Horizontal">
+                                            <Ellipse Width="6" Height="6" Fill="{StaticResource BrushAmber}" Margin="0,0,6,0" VerticalAlignment="Center" />
+                                            <TextBlock Text="/// LIVE OLED VIEWPORT (128x40)" Foreground="{StaticResource BrushAmber}" FontSize="9" FontWeight="Bold" />
+                                        </StackPanel>
+                                    </Border>
+                                    <Border Background="#101726" CornerRadius="4" Padding="8,3" Margin="0,0,8,0" BorderBrush="{StaticResource BrushCardBorder}" BorderThickness="1">
+                                        <TextBlock Text="SCALE 6x (768x240)" Foreground="{StaticResource BrushTextSecondary}" FontSize="9" FontWeight="SemiBold" />
+                                    </Border>
+                                    <Border Background="#101726" CornerRadius="4" Padding="8,3" Margin="0,0,8,0" BorderBrush="{StaticResource BrushCardBorder}" BorderThickness="1">
+                                        <TextBlock Text="1-BIT MONOCHROME" Foreground="{StaticResource BrushTextSecondary}" FontSize="9" FontWeight="SemiBold" />
+                                    </Border>
+                                    <Border Background="#091A26" CornerRadius="4" Padding="8,3" BorderBrush="{StaticResource BrushCyan}" BorderThickness="1">
+                                        <TextBlock Text="STEELSERIES HID" Foreground="{StaticResource BrushCyan}" FontSize="9" FontWeight="Bold" />
+                                    </Border>
+                                </StackPanel>
+
+                                <!-- ASUS ROG Strix Matte Obsidian Bezel with Crimson Ambient Glow -->
+                                <Border BorderBrush="#26070E" BorderThickness="1.5" CornerRadius="4" Background="#05070B" Padding="8" HorizontalAlignment="Center" Margin="0,0,0,12">
+                                    <Border.Effect>
+                                        <DropShadowEffect Color="#FF003C" BlurRadius="28" ShadowDepth="0" Opacity="0.38" />
+                                    </Border.Effect>
+                                    <Grid Width="768" Height="240">
+                                        <!-- Pixel Rendered Image -->
+                                        <Image Source="{Binding OledBitmap}" RenderOptions.BitmapScalingMode="NearestNeighbor" Stretch="Fill" />
+                                        <Border Background="{StaticResource EditorGridBrush}" IsHitTestVisible="False">
+                                            <Border.Style>
+                                                <Style TargetType="Border">
+                                                    <Setter Property="Visibility" Value="Visible" />
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsEditorGridVisible}" Value="False">
+                                                            <Setter Property="Visibility" Value="Collapsed" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Border.Style>
+                                        </Border>
+                                        
+                                        <!-- Transparent Interactive Selection Canvas -->
+                                        <Canvas x:Name="InteractiveCanvas" Background="Transparent"
+                                                MouseDown="OnCanvasMouseDown"
+                                                MouseMove="OnCanvasMouseMove"
+                                                MouseUp="OnCanvasMouseUp">
+                                            <!-- Bounding box highlight for selected widget -->
+                                            <Border x:Name="SelectionBorder" BorderBrush="{StaticResource BrushAmber}" BorderThickness="1.5" Background="#1AFF003C" Visibility="Collapsed" IsHitTestVisible="False">
+                                                <Border.Effect>
+                                                    <DropShadowEffect Color="#FF003C" BlurRadius="8" ShadowDepth="0" />
+                                                </Border.Effect>
+                                            </Border>
+                                        </Canvas>
+                                    </Grid>
+                                </Border>
+
+                                <!-- ROG Direct Action Bar (Send to OLED & Capture Screenshot) -->
+                                <Grid Width="768" Margin="0,0,0,12">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Button Grid.Column="0" Command="{Binding SendToKeyboardCommand}" Style="{StaticResource AmberActionButton}" Margin="0,0,6,0" Padding="16,10">
+                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                            <Path Data="{StaticResource IconSend}" Fill="#FFFFFF" Stretch="Uniform" Width="14" Height="14" Margin="0,0,8,0" />
+                                            <TextBlock Text="⚡ SEND TO KEYBOARD OLED" FontSize="11" FontWeight="Bold" />
+                                        </StackPanel>
+                                    </Button>
+                                    <Button Grid.Column="1" Command="{Binding SaveFrameScreenshotCommand}" Style="{StaticResource CyanGhostButton}" Margin="6,0,0,0" Padding="16,10">
+                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                            <Path Data="{StaticResource IconSave}" Fill="{StaticResource BrushCyan}" Stretch="Uniform" Width="13" Height="13" Margin="0,0,8,0" />
+                                            <TextBlock Text="📸 CAPTURE PNG FRAME" FontSize="11" FontWeight="Bold" Foreground="{StaticResource BrushCyan}" />
+                                        </StackPanel>
+                                    </Button>
+                                </Grid>
+
+                                <!-- 1-Click Widget Preset Shelf / Tool Dock Directly Below Canvas -->
+                                <Border Background="#090E17" CornerRadius="10" Padding="12,10" Width="768" Margin="0,0,0,12" BorderBrush="{StaticResource BrushCardBorder}" BorderThickness="1">
+                                    <StackPanel>
+                                        <Grid Margin="0,0,0,8">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                <Path Data="{StaticResource IconBolt}" Fill="{StaticResource BrushCyan}" Stretch="Uniform" Width="12" Height="12" Margin="0,0,6,0" />
+                                                <TextBlock Text="1-CLICK WIDGET SHELF" Foreground="{StaticResource BrushCyan}" FontSize="10" FontWeight="Bold" />
+                                                <TextBlock Text="· Click to add directly onto OLED" Foreground="{StaticResource BrushTextSecondary}" FontSize="10" Margin="6,0,0,0" />
+                                            </StackPanel>
+                                            <TextBlock Grid.Column="1" Text="Smart Auto-Placement" Foreground="{StaticResource BrushTextMuted}" FontSize="9" VerticalAlignment="Center" />
+                                        </Grid>
+
+                                        <!-- 2 Rows of 6 Preset Buttons (Clean, Horizontal Dock) -->
+                                        <UniformGrid Columns="6">
+                                            <!-- Row 1 -->
+                                            <Button Command="{Binding AddPresetWidgetCommand}" CommandParameter="watts_total" Style="{StaticResource TacticalPresetTileButton}" ToolTip="Add Total System Power (Watts)">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Path Data="{StaticResource IconBolt}" Fill="{StaticResource BrushCyan}" Stretch="Uniform" Width="11" Height="11" Margin="0,0,5,0" />
+                                                    <TextBlock Text="Watts" FontSize="10" />
+                                                </StackPanel>
+                                            </Button>
+                                            <Button Command="{Binding AddPresetWidgetCommand}" CommandParameter="dual_temp" Style="{StaticResource TacticalPresetTileButton}" ToolTip="Add CPU + GPU Dual Temp">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Path Data="{StaticResource IconThermometer}" Fill="{StaticResource BrushAmberActual}" Stretch="Uniform" Width="11" Height="11" Margin="0,0,5,0" />
+                                                    <TextBlock Text="Temps" FontSize="10" />
+                                                </StackPanel>
+                                            </Button>
+                                            <Button Command="{Binding AddPresetWidgetCommand}" CommandParameter="cpu_bar" Style="{StaticResource TacticalPresetTileButton}" ToolTip="Add CPU Load Bar">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Path Data="{StaticResource IconBar}" Fill="{StaticResource BrushCyan}" Stretch="Uniform" Width="11" Height="11" Margin="0,0,5,0" />
+                                                    <TextBlock Text="CPU Bar" FontSize="10" />
+                                                </StackPanel>
+                                            </Button>
+                                            <Button Command="{Binding AddPresetWidgetCommand}" CommandParameter="gpu_bar" Style="{StaticResource TacticalPresetTileButton}" ToolTip="Add GPU Load Bar">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Path Data="{StaticResource IconBar}" Fill="{StaticResource BrushTextPrimary}" Stretch="Uniform" Width="11" Height="11" Margin="0,0,5,0" />
+                                                    <TextBlock Text="GPU Bar" FontSize="10" />
+                                                </StackPanel>
+                                            </Button>
+                                            <Button Command="{Binding AddPresetWidgetCommand}" CommandParameter="power_gauge" Style="{StaticResource TacticalPresetTileButton}" ToolTip="Add Analog Power Dial">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Path Data="{StaticResource IconGauge}" Fill="{StaticResource BrushCyan}" Stretch="Uniform" Width="11" Height="11" Margin="0,0,5,0" />
+                                                    <TextBlock Text="Gauge" FontSize="10" />
+                                                </StackPanel>
+                                            </Button>
+                                            <Button Command="{Binding AddPresetWidgetCommand}" CommandParameter="cpu_graph" Style="{StaticResource TacticalPresetTileButton}" ToolTip="Add Scrolling CPU Graph">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Path Data="{StaticResource IconGraph}" Fill="{StaticResource BrushCyan}" Stretch="Uniform" Width="11" Height="11" Margin="0,0,5,0" />
+                                                    <TextBlock Text="Graph" FontSize="10" />
+                                                </StackPanel>
+                                            </Button>
+
+                                            <!-- Row 2 -->
+                                            <Button Command="{Binding AddPresetWidgetCommand}" CommandParameter="clock" Style="{StaticResource TacticalPresetTileButton}" ToolTip="Add Digital Clock">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Path Data="{StaticResource IconClock}" Fill="{StaticResource BrushTextPrimary}" Stretch="Uniform" Width="11" Height="11" Margin="0,0,5,0" />
+                                                    <TextBlock Text="Clock" FontSize="10" />
+                                                </StackPanel>
+                                            </Button>
+                                            <Button Command="{Binding AddPresetWidgetCommand}" CommandParameter="now_playing" Style="{StaticResource TacticalPresetTileButton}" ToolTip="Add Now Playing Media Track">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Path Data="{StaticResource IconMusic}" Fill="{StaticResource BrushCyan}" Stretch="Uniform" Width="11" Height="11" Margin="0,0,5,0" />
+                                                    <TextBlock Text="Media" FontSize="10" />
+                                                </StackPanel>
+                                            </Button>
+                                            <Button Command="{Binding AddPresetWidgetCommand}" CommandParameter="bongo_cat" Style="{StaticResource TacticalPresetTileButton}" ToolTip="Add Keystroke Reactive Bongo Cat">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Path Data="{StaticResource IconCat}" Fill="{StaticResource BrushTextPrimary}" Stretch="Uniform" Width="11" Height="11" Margin="0,0,5,0" />
+                                                    <TextBlock Text="Bongo" FontSize="10" />
+                                                </StackPanel>
+                                            </Button>
+                                            <Button Command="{Binding AddPresetWidgetCommand}" CommandParameter="net_speed" Style="{StaticResource TacticalPresetTileButton}" ToolTip="Add Ping &amp; Network Speed">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Path Data="{StaticResource IconNet}" Fill="{StaticResource BrushCyan}" Stretch="Uniform" Width="11" Height="11" Margin="0,0,5,0" />
+                                                    <TextBlock Text="Net" FontSize="10" />
+                                                </StackPanel>
+                                            </Button>
+                                            <Button Command="{Binding AddPresetWidgetCommand}" CommandParameter="lock_keys" Style="{StaticResource TacticalPresetTileButton}" ToolTip="Add Caps/Num Lock Status">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Path Data="{StaticResource IconKey}" Fill="{StaticResource BrushTextPrimary}" Stretch="Uniform" Width="11" Height="11" Margin="0,0,5,0" />
+                                                    <TextBlock Text="Keys" FontSize="10" />
+                                                </StackPanel>
+                                            </Button>
+                                            <Button Command="{Binding AddPresetWidgetCommand}" CommandParameter="divider_vert" Style="{StaticResource TacticalPresetTileButton}" ToolTip="Add Vertical Divider Line">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Path Data="{StaticResource IconLine}" Fill="{StaticResource BrushCardBorder}" Stretch="Uniform" Width="11" Height="11" Margin="0,0,5,0" />
+                                                    <TextBlock Text="Divider" FontSize="10" />
+                                                </StackPanel>
+                                            </Button>
+                                        </UniformGrid>
+                                    </StackPanel>
+                                </Border>
+
+                                <!-- Quick Canvas Controls Bar -->
+                                <Border Background="#0C111B" CornerRadius="8" Padding="12,6" Width="768" BorderBrush="{StaticResource BrushCardBorder}" BorderThickness="1">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                            <CheckBox IsChecked="{Binding Settings.InvertDisplay}" Foreground="{StaticResource BrushTextPrimary}" VerticalAlignment="Center" Margin="0,0,16,0" ToolTip="Invert monochrome OLED (Black on White)">
+                                                <TextBlock Text="Invert OLED" Foreground="{StaticResource BrushCyan}" FontSize="11" />
+                                            </CheckBox>
+                                            <CheckBox IsChecked="{Binding IsLiveSyncEnabled}" Foreground="{StaticResource BrushTextPrimary}" VerticalAlignment="Center" Margin="0,0,16,0" ToolTip="Push frames to keyboard in real-time">
+                                                <TextBlock Text="Live Sync" Foreground="{StaticResource BrushTextPrimary}" FontSize="11" />
+                                            </CheckBox>
+                                            <CheckBox IsChecked="{Binding IsSimulatorMode}" Foreground="{StaticResource BrushCyan}" VerticalAlignment="Center" ToolTip="Route sandbox sliders to preview">
+                                                <TextBlock Text="Sandbox Simulator" Foreground="{StaticResource BrushCyan}" FontSize="11" FontWeight="SemiBold" />
+                                            </CheckBox>
+                                        </StackPanel>
+
+                                        <Button Grid.Column="1" Command="{Binding ResetDefaultLayoutCommand}" Style="{StaticResource CyanGhostButton}" Padding="8,4" ToolTip="Reset to Default Layout">
+                                            <StackPanel Orientation="Horizontal">
+                                                <Path Data="{StaticResource IconRefresh}" Fill="{StaticResource BrushCyan}" Stretch="Uniform" Width="11" Height="11" Margin="0,0,4,0" />
+                                                <TextBlock Text="Reset Canvas" FontSize="10" />
+                                            </StackPanel>
+                                        </Button>
+                                    </Grid>
+                                </Border>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </Border>
+
+                    <!-- ══════════════════════════════════════════════════════════════ -->
+                    <!-- COLUMN 2: WIDGET PROPERTIES & TELEMETRY (Right Inspector)     -->
+                    <!-- ══════════════════════════════════════════════════════════════ -->
+                    <Border Grid.Column="2" Style="{StaticResource TacticalCard}">
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <StackPanel>
+                                <!-- WIDGET PROPERTIES -->
+                                <Grid Margin="0,0,0,12">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="WIDGET INSPECTOR" Foreground="{StaticResource BrushTextSecondary}" FontSize="11" FontWeight="Bold" VerticalAlignment="Center" />
+                                    <CheckBox Grid.Column="1" IsChecked="{Binding SelectedWidget.Enabled, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource TacticalToggleSwitch}">
+                                        <TextBlock Text="Visible on OLED" Foreground="{StaticResource BrushCyan}" FontSize="11" FontWeight="SemiBold" />
+                                    </CheckBox>
+                                </Grid>
+
+                                <!-- Widget Type -->
+                                <TextBlock Text="Widget Type" Foreground="{StaticResource BrushTextSecondary}" FontSize="10" Margin="0,0,0,4" />
+                                <ComboBox SelectedIndex="{Binding SelectedWidgetTypeIndex, UpdateSourceTrigger=PropertyChanged}" Margin="0,0,0,10">
+                                    <ComboBoxItem Content="📝  Text Label"                  />
+                                    <ComboBoxItem Content="▓▓  Progress Bar"                />
+                                    <ComboBoxItem Content="📈  Scrolling Graph"             />
+                                    <ComboBoxItem Content="─── Divider Line"                />
+                                    <ComboBoxItem Content="🕐  Analog Gauge"                />
+                                    <ComboBoxItem Content="🐱  Animated GIF / Pixel-Art"    />
+                                </ComboBox>
+
+                                <!-- Widget Name -->
+                                <TextBlock Text="Widget Name" Foreground="{StaticResource BrushTextSecondary}" FontSize="10" Margin="0,0,0,4" />
+                                <TextBox Text="{Binding SelectedWidget.Name, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource TacticalTextBox}" Margin="0,0,0,10" />
+
+                                <!-- Grid, lock and z-order -->
+                                <Grid Margin="0,0,0,10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Button Grid.Column="0" Command="{Binding ToggleEditorGridCommand}" Style="{StaticResource CyanGhostButton}" Padding="5,4" Margin="0,0,3,0">
+                                        <TextBlock Text="{Binding IsEditorGridVisible, StringFormat=Grid: {0}}" FontSize="9" />
+                                    </Button>
+                                    <Button Grid.Column="1" Command="{Binding ToggleSelectedWidgetLockCommand}" Style="{StaticResource CyanGhostButton}" Padding="5,4" Margin="0,0,3,0">
+                                        <TextBlock Text="{Binding SelectedWidget.IsLocked, StringFormat=Lock: {0}}" FontSize="9" />
+                                    </Button>
+                                    <StackPanel Grid.Column="2" Orientation="Horizontal">
+                                        <Button Command="{Binding BringSelectedWidgetFrontCommand}" Style="{StaticResource CyanGhostButton}" Padding="5,4" ToolTip="Bring selected widget to front">
+                                            <TextBlock Text="FRONT" FontSize="9" />
+                                        </Button>
+                                        <Button Command="{Binding SendSelectedWidgetBackCommand}" Style="{StaticResource CyanGhostButton}" Padding="5,4" Margin="3,0,0,0" ToolTip="Send selected widget to back">
+                                            <TextBlock Text="BACK" FontSize="9" />
+                                        </Button>
+                                    </StackPanel>
+                                </Grid>
+                                <TextBlock Text="{Binding Settings.EditorGridStep, StringFormat=GRID STEP: {0} px}" Foreground="{StaticResource BrushTextSecondary}" FontSize="9" />
+                                <Slider Minimum="1" Maximum="8" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding Settings.EditorGridStep, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource TacticalSlider}" Margin="0,0,0,8" />
+
+                                <!-- Coordinates X / Y / W / H -->
+                                <Grid Margin="0,0,0,10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0" Margin="0,0,4,0">
+                                        <TextBlock Text="X (0..127)" Foreground="{StaticResource BrushTextSecondary}" FontSize="10" />
+                                        <Slider Minimum="0" Maximum="127" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding SelectedWidget.X, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource TacticalSlider}" />
+                                        <TextBlock Text="{Binding SelectedWidget.X, StringFormat={}{0:0}}" Foreground="{StaticResource BrushCyan}" FontSize="9" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="1" Margin="0,0,4,0">
+                                        <TextBlock Text="Y (0..39)" Foreground="{StaticResource BrushTextSecondary}" FontSize="10" />
+                                        <Slider Minimum="0" Maximum="39" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding SelectedWidget.Y, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource TacticalSlider}" />
+                                        <TextBlock Text="{Binding SelectedWidget.Y, StringFormat={}{0:0}}" Foreground="{StaticResource BrushCyan}" FontSize="9" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2" Margin="0,0,4,0">
+                                        <TextBlock Text="Width" Foreground="{StaticResource BrushTextSecondary}" FontSize="10" />
+                                        <Slider Minimum="1" Maximum="128" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding SelectedWidget.Width, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource TacticalSlider}" />
+                                        <TextBlock Text="{Binding SelectedWidget.Width, StringFormat={}{0:0}}" Foreground="{StaticResource BrushCyan}" FontSize="9" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="3">
+                                        <TextBlock Text="Height" Foreground="{StaticResource BrushTextSecondary}" FontSize="10" />
+                                        <Slider Minimum="1" Maximum="40" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding SelectedWidget.Height, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource TacticalSlider}" />
+                                        <TextBlock Text="{Binding SelectedWidget.Height, StringFormat={}{0:0}}" Foreground="{StaticResource BrushCyan}" FontSize="9" />
+                                    </StackPanel>
+                                </Grid>
+
+                                <TextBlock Text="FONT SCALE" Foreground="{StaticResource BrushTextSecondary}" FontSize="10" />
+                                <Slider Minimum="1" Maximum="4" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding SelectedWidget.FontScale, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource TacticalSlider}" />
+                                <TextBlock Text="{Binding SelectedWidget.FontScale, StringFormat=Scale: {0:0}}" Foreground="{StaticResource BrushCyan}" FontSize="9" Margin="0,0,0,8" />
+
+                                <TextBlock Text="GRAPH RANGE" Foreground="{StaticResource BrushTextSecondary}" FontSize="10" />
+                                <TextBlock Text="{Binding SelectedWidget.MinValue, StringFormat=Min: {0:0.0}}" Foreground="{StaticResource BrushCyan}" FontSize="9" />
+                                <Slider Minimum="-100" Maximum="1000" TickFrequency="1" Value="{Binding SelectedWidget.MinValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource TacticalSlider}" />
+                                <TextBlock Text="{Binding SelectedWidget.MaxValue, StringFormat=Max: {0:0.0}}" Foreground="{StaticResource BrushCyan}" FontSize="9" />
+                                <Slider Minimum="1" Maximum="1000" TickFrequency="1" Value="{Binding SelectedWidget.MaxValue, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource TacticalSlider}" Margin="0,0,0,10" />
+
+                                <!-- Metric Source (including Watts!) -->
+                                <TextBlock Text="Metric Source" Foreground="{StaticResource BrushTextSecondary}" FontSize="10" Margin="0,0,0,4" />
+                                <ComboBox SelectedValue="{Binding SelectedWidget.MetricKey, UpdateSourceTrigger=PropertyChanged}"
+                                          SelectedValuePath="Tag"
+                                          Margin="0,0,0,10">
+                                    <ComboBoxItem Content="⚡ CPU Load (%)"             Tag="cpu_load"      />
+                                    <ComboBoxItem Content="🌡 CPU Temperature (°C)"     Tag="cpu_temp"      />
+                                    <ComboBoxItem Content="🔋 CPU Power (W)"            Tag="cpu_power"     />
+                                    <ComboBoxItem Content="🎮 GPU Load (%)"             Tag="gpu_load"      />
+                                    <ComboBoxItem Content="🌡 GPU Core Temp (°C)"       Tag="gpu_temp"      />
+                                    <ComboBoxItem Content="🔥 GPU Hotspot Temp (°C)"    Tag="gpu_hotspot"   />
+                                    <ComboBoxItem Content="⚡ GPU Power (W)"            Tag="gpu_power"     />
+                                    <ComboBoxItem Content="⚡ Total System Power (W)"   Tag="total_power"   />
+                                    <ComboBoxItem Content="🌡 GPU VRAM Temp (°C)"       Tag="gpu_vram_temp" />
+                                    <ComboBoxItem Content="💨 GPU Fan Speed (RPM)"      Tag="gpu_fan"       />
+                                    <ComboBoxItem Content="🧠 RAM Load (%)"             Tag="ram_percent"   />
+                                    <ComboBoxItem Content="🌐 Network Ping (ms)"        Tag="ping"          />
+                                    <ComboBoxItem Content="⬇ Net Download (KB/s)"       Tag="net_down"      />
+                                    <ComboBoxItem Content="⬆ Net Upload (KB/s)"         Tag="net_up"        />
+                                    <ComboBoxItem Content="⌨ APM (Actions/min)"         Tag="apm"           />
+                                    <ComboBoxItem Content="⌨ Total Keystrokes"          Tag="key_count"     />
+                                    <ComboBoxItem Content="🎵 Media Track Title"        Tag="media_title"   />
+                                    <ComboBoxItem Content="👤 Media Artist"             Tag="media_artist"  />
+                                    <ComboBoxItem Content="🔊 Master Volume (%)"        Tag="vol"           />
+                                    <ComboBoxItem Content="🎙 Mic Status (ON/MUTED)"    Tag="mic"           />
+                                    <ComboBoxItem Content="🔥 GPU Delta (Paste Alert)"  Tag="gpu_delta"     />
+                                    <ComboBoxItem Content="🔤 Caps Lock State"          Tag="caps"          />
+                                    <ComboBoxItem Content="🌤 Weather Temp"             Tag="weather_temp"  />
+                                </ComboBox>
+
+                                <!-- Format Template String -->
+                                <TextBlock Text="Text Format (e.g. CPU {cpu_load}%)" Foreground="{StaticResource BrushTextSecondary}" FontSize="10" Margin="0,0,0,4" />
+                                <TextBox Text="{Binding SelectedWidget.FormatTemplate, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource TacticalTextBox}" Margin="0,0,0,6" />
+
+                                <!-- Clickable Quick Insert Tokens -->
+                                <TextBlock Text="Quick Insert Tokens:" Foreground="{StaticResource BrushTextSecondary}" FontSize="9" Margin="0,0,0,4" />
+                                <WrapPanel Margin="0,0,0,10">
+                                    <Button Style="{StaticResource CyanGhostButton}" Content="{}{cpu_load}" Margin="0,0,3,3" Padding="6,3" FontSize="10" Click="OnInsertTokenClick" Tag="{}{cpu_load}" />
+                                    <Button Style="{StaticResource CyanGhostButton}" Content="{}{cpu_temp}" Margin="0,0,3,3" Padding="6,3" FontSize="10" Click="OnInsertTokenClick" Tag="{}{cpu_temp}" />
+                                    <Button Style="{StaticResource CyanGhostButton}" Content="{}{cpu_power}" Margin="0,0,3,3" Padding="6,3" FontSize="10" Click="OnInsertTokenClick" Tag="{}{cpu_power}" />
+                                    <Button Style="{StaticResource CyanGhostButton}" Content="{}{gpu_load}" Margin="0,0,3,3" Padding="6,3" FontSize="10" Click="OnInsertTokenClick" Tag="{}{gpu_load}" />
+                                    <Button Style="{StaticResource CyanGhostButton}" Content="{}{gpu_temp}" Margin="0,0,3,3" Padding="6,3" FontSize="10" Click="OnInsertTokenClick" Tag="{}{gpu_temp}" />
+                                    <Button Style="{StaticResource CyanGhostButton}" Content="{}{gpu_power}" Margin="0,0,3,3" Padding="6,3" FontSize="10" Click="OnInsertTokenClick" Tag="{}{gpu_power}" />
+                                    <Button Style="{StaticResource CyanGhostButton}" Content="{}{total_power}" Margin="0,0,3,3" Padding="6,3" FontSize="10" Click="OnInsertTokenClick" Tag="{}{total_power}" />
+                                    <Button Style="{StaticResource CyanGhostButton}" Content="{}{gpu_delta}" Margin="0,0,3,3" Padding="6,3" FontSize="10" Click="OnInsertTokenClick" Tag="{}{gpu_delta}" />
+                                    <Button Style="{StaticResource CyanGhostButton}" Content="{}{ram_percent}" Margin="0,0,3,3" Padding="6,3" FontSize="10" Click="OnInsertTokenClick" Tag="{}{ram_percent}" />
+                                    <Button Style="{StaticResource CyanGhostButton}" Content="{}{ping}" Margin="0,0,3,3" Padding="6,3" FontSize="10" Click="OnInsertTokenClick" Tag="{}{ping}" />
+                                    <Button Style="{StaticResource CyanGhostButton}" Content="{}{net_down}" Margin="0,0,3,3" Padding="6,3" FontSize="10" Click="OnInsertTokenClick" Tag="{}{net_down}" />
+                                    <Button Style="{StaticResource CyanGhostButton}" Content="{}{apm}" Margin="0,0,3,3" Padding="6,3" FontSize="10" Click="OnInsertTokenClick" Tag="{}{apm}" />
+                                    <Button Style="{StaticResource CyanGhostButton}" Content="{}{vol}" Margin="0,0,3,3" Padding="6,3" FontSize="10" Click="OnInsertTokenClick" Tag="{}{vol}" />
+                                    <Button Style="{StaticResource CyanGhostButton}" Content="{}{mic}" Margin="0,0,3,3" Padding="6,3" FontSize="10" Click="OnInsertTokenClick" Tag="{}{mic}" />
+                                    <Button Style="{StaticResource CyanGhostButton}" Content="{}{caps}" Margin="0,0,3,3" Padding="6,3" FontSize="10" Click="OnInsertTokenClick" Tag="{}{caps}" />
+                                    <Button Style="{StaticResource CyanGhostButton}" Content="{}{weather_temp}" Margin="0,0,3,3" Padding="6,3" FontSize="10" Click="OnInsertTokenClick" Tag="{}{weather_temp}" />
+                                </WrapPanel>
+
+                                <!-- Font & Border Toggles -->
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                                    <CheckBox IsChecked="{Binding SelectedWidget.CompactFont, UpdateSourceTrigger=PropertyChanged}" Content="Compact 3x5 Font" Foreground="{StaticResource BrushTextPrimary}" Margin="0,0,16,0" />
+                                    <CheckBox IsChecked="{Binding SelectedWidget.Bordered, UpdateSourceTrigger=PropertyChanged}" Content="Draw Border" Foreground="{StaticResource BrushTextPrimary}" Margin="0,0,16,0" />
+                                    <CheckBox IsChecked="{Binding SelectedWidget.EnableMarquee, UpdateSourceTrigger=PropertyChanged}" Content="Marquee Scroll" Foreground="{StaticResource BrushTextPrimary}" />
+                                </StackPanel>
+
+                                <!-- GIF / Image Path -->
+                                <TextBlock Text="GIF File Path (empty for built-in Bongo Cat)" Foreground="{StaticResource BrushTextSecondary}" FontSize="10" Margin="0,0,0,4" />
+                                <TextBox Text="{Binding SelectedWidget.GifPath, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource TacticalTextBox}" Margin="0,0,0,16" />
+
+                                <!-- ASUS ROG SENSOR TELEMETRY HUD (Armoury Crate Style) -->
+                                <Border Background="#0C121D" CornerRadius="4" Padding="12,10" BorderBrush="{StaticResource BrushCardBorder}" BorderThickness="1">
+                                    <StackPanel>
+                                        <Grid Margin="0,0,0,10">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Text="/// ROG SENSORS TELEMETRY" Foreground="{StaticResource BrushAmber}" FontSize="10" FontWeight="ExtraBold" VerticalAlignment="Center" />
+                                            <Border Grid.Column="1" Background="#26070E" CornerRadius="3" Padding="6,2" BorderBrush="{StaticResource BrushAmber}" BorderThickness="1">
+                                                <TextBlock Text="RTX 5070 Ti + i9" Foreground="{StaticResource BrushAmber}" FontSize="9" FontWeight="Bold" />
+                                            </Border>
+                                        </Grid>
+                                        
+                                        <!-- CPU -->
+                                        <Grid Margin="0,0,0,6">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Text="CPU Package" Foreground="{StaticResource BrushTextSecondary}" FontSize="10" />
+                                            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                                <TextBlock Text="{Binding LiveMetrics.CpuLoad, StringFormat={}{0:0}%}" Foreground="{StaticResource BrushTextPrimary}" FontWeight="Bold" FontSize="10" Margin="0,0,6,0" />
+                                                <TextBlock Text="{Binding LiveMetrics.CpuTemp, StringFormat={}{0:0}°C}" Foreground="{StaticResource BrushAmberActual}" FontWeight="Bold" FontSize="10" Margin="0,0,6,0" />
+                                                <TextBlock Text="{Binding LiveMetrics.CpuPower, StringFormat={}{0:0}W}" Foreground="{StaticResource BrushCyan}" FontWeight="Bold" FontSize="10" />
+                                            </StackPanel>
+                                        </Grid>
+
+                                        <!-- GPU -->
+                                        <Grid Margin="0,0,0,6">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Text="GPU Board" Foreground="{StaticResource BrushTextSecondary}" FontSize="10" />
+                                            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                                <TextBlock Text="{Binding LiveMetrics.GpuLoad, StringFormat={}{0:0}%}" Foreground="{StaticResource BrushTextPrimary}" FontWeight="Bold" FontSize="10" Margin="0,0,6,0" />
+                                                <TextBlock Text="{Binding LiveMetrics.GpuHotspot, StringFormat={}{0:0}°C}" Foreground="{StaticResource BrushAmberActual}" FontWeight="Bold" FontSize="10" Margin="0,0,6,0" />
+                                                <TextBlock Text="{Binding LiveMetrics.GpuPower, StringFormat={}{0:0}W}" Foreground="{StaticResource BrushCyan}" FontWeight="Bold" FontSize="10" />
+                                            </StackPanel>
+                                        </Grid>
+
+                                        <!-- RAM -->
+                                        <Grid Margin="0,0,0,6">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Text="System RAM" Foreground="{StaticResource BrushTextSecondary}" FontSize="10" />
+                                            <TextBlock Grid.Column="1" Text="{Binding LiveMetrics.RamPercent, StringFormat={}{0:0}%}" Foreground="{StaticResource BrushTextPrimary}" FontWeight="Bold" FontSize="10" />
+                                        </Grid>
+
+                                        <!-- Total Power -->
+                                        <Grid Margin="0,0,0,6">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Text="⚡ Total System Power" Foreground="{StaticResource BrushAmberActual}" FontWeight="SemiBold" FontSize="10" />
+                                            <TextBlock Grid.Column="1" Text="{Binding LiveMetrics.TotalPower, StringFormat={}{0:0}W}" Foreground="{StaticResource BrushAmberActual}" FontWeight="Bold" FontSize="10" />
+                                        </Grid>
+
+                                        <!-- Ping & APM -->
+                                        <Grid Margin="0,0,0,6">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Text="Net / Input" Foreground="{StaticResource BrushTextSecondary}" FontSize="10" />
+                                            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                                <TextBlock Text="{Binding LiveMetrics.PingMs, StringFormat={}{0}ms}" Foreground="{StaticResource BrushTextPrimary}" FontWeight="Bold" FontSize="10" Margin="0,0,6,0" />
+                                                <TextBlock Text="{Binding LiveMetrics.Apm, StringFormat=APM: {0}}" Foreground="{StaticResource BrushCyan}" FontWeight="Bold" FontSize="10" />
+                                            </StackPanel>
+                                        </Grid>
+
+                                        <!-- Media -->
+                                        <Grid>
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <TextBlock Text="{Binding LiveMetrics.MediaTrack}" Foreground="{StaticResource BrushTextSecondary}" FontSize="9" TextTrimming="CharacterEllipsis" MaxWidth="180" />
+                                            <TextBlock Grid.Column="1" Text="{Binding LiveMetrics.MediaStatus}" Foreground="{StaticResource BrushCyan}" FontSize="9" FontWeight="Bold" />
+                                        </Grid>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </ScrollViewer>
+                    </Border>
+                </Grid>
+            </TabItem>
+
+            <!-- ────────────────────────────────────────────────────────────────── -->
+            <!-- TAB 2: PRESET GALLERY (Illuminated Tactical Cards Rack)             -->
+            <!-- ────────────────────────────────────────────────────────────────── -->
+            <TabItem Header="🎴 PRESET GALLERY" Style="{StaticResource TacticalTabItem}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,10,0,0">
+                    <StackPanel>
+                        <TextBlock Text="TACTICAL PRESET CARDS — 1-CLICK HARDWARE STATIONS" Foreground="{StaticResource BrushTextSecondary}" FontSize="12" FontWeight="Bold" Margin="0,0,0,12" />
+
+                        <!-- Responsive WrapPanel of Presets -->
+                        <WrapPanel>
+                            <!-- Card 1: Dual CPU & GPU -->
+                            <Border Width="290" Style="{StaticResource TacticalCard}" Margin="0,0,14,14">
+                                <StackPanel>
+                                    <Border Background="#0A1C2C" BorderBrush="{StaticResource BrushCyan}" BorderThickness="1" CornerRadius="6" Padding="7,3" HorizontalAlignment="Left" Margin="0,0,0,8">
+                                        <TextBlock Text="DUAL MONITOR" Foreground="{StaticResource BrushCyan}" FontSize="9" FontWeight="Bold" />
+                                    </Border>
+                                    <TextBlock Text="Dual CPU/GPU Monitor" Foreground="{StaticResource BrushTextPrimary}" FontSize="14" FontWeight="Bold" Margin="0,0,0,4" />
+                                    <TextBlock Text="Balanced dual split showing CPU and GPU loads, package temperatures, and live progress bars." Foreground="{StaticResource BrushTextSecondary}" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,12" />
+                                    <Button Command="{Binding ApplyPresetCommand}" CommandParameter="Dual CPU/GPU" Style="{StaticResource AmberActionButton}" Content="⚡ APPLY PRESET" HorizontalAlignment="Stretch" />
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Card 2: Power Station (Watts) -->
+                            <Border Width="290" Style="{StaticResource TacticalCard}" Margin="0,0,14,14">
+                                <StackPanel>
+                                    <Border Background="#2A1A0A" BorderBrush="{StaticResource BrushAmberActual}" BorderThickness="1" CornerRadius="6" Padding="7,3" HorizontalAlignment="Left" Margin="0,0,0,8">
+                                        <TextBlock Text="POWER ⚡ (WATTS)" Foreground="{StaticResource BrushAmberActual}" FontSize="9" FontWeight="Bold" />
+                                    </Border>
+                                    <TextBlock Text="Power Station (Watts)" Foreground="{StaticResource BrushTextPrimary}" FontSize="14" FontWeight="Bold" Margin="0,0,0,4" />
+                                    <TextBlock Text="Energy consumption telemetry: Total System Power, CPU Package Watts, and GPU Board Watts with dual gauges." Foreground="{StaticResource BrushTextSecondary}" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,12" />
+                                    <Button Command="{Binding ApplyPresetCommand}" CommandParameter="Power Station (Watts)" Style="{StaticResource AmberActionButton}" Content="⚡ APPLY PRESET" HorizontalAlignment="Stretch" />
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Card 3: Gamer Pro -->
+                            <Border Width="290" Style="{StaticResource TacticalCard}" Margin="0,0,14,14">
+                                <StackPanel>
+                                    <Border Background="#082117" BorderBrush="#10B981" BorderThickness="1" CornerRadius="6" Padding="7,3" HorizontalAlignment="Left" Margin="0,0,0,8">
+                                        <TextBlock Text="ESPORTS &amp; NET" Foreground="#10B981" FontSize="9" FontWeight="Bold" />
+                                    </Border>
+                                    <TextBlock Text="Gamer Pro (Ping/Net)" Foreground="{StaticResource BrushTextPrimary}" FontSize="14" FontWeight="Bold" Margin="0,0,0,4" />
+                                    <TextBlock Text="Low-latency competitive HUD with Ping, Net download/upload speeds, APM, and GPU thermal paste alert." Foreground="{StaticResource BrushTextSecondary}" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,12" />
+                                    <Button Command="{Binding ApplyPresetCommand}" CommandParameter="Gamer Pro (Ping/Net)" Style="{StaticResource AmberActionButton}" Content="⚡ APPLY PRESET" HorizontalAlignment="Stretch" />
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Card 4: Media Station -->
+                            <Border Width="290" Style="{StaticResource TacticalCard}" Margin="0,0,14,14">
+                                <StackPanel>
+                                    <Border Background="#1A0D29" BorderBrush="#C084FC" BorderThickness="1" CornerRadius="6" Padding="7,3" HorizontalAlignment="Left" Margin="0,0,0,8">
+                                        <TextBlock Text="MEDIA &amp; AUDIO" Foreground="#C084FC" FontSize="9" FontWeight="Bold" />
+                                    </Border>
+                                    <TextBlock Text="Media Station" Foreground="{StaticResource BrushTextPrimary}" FontSize="14" FontWeight="Bold" Margin="0,0,0,4" />
+                                    <TextBlock Text="Music playback station: auto-marquee track title, artist, playback status, APM, and volume popup integration." Foreground="{StaticResource BrushTextSecondary}" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,12" />
+                                    <Button Command="{Binding ApplyPresetCommand}" CommandParameter="Media Station" Style="{StaticResource AmberActionButton}" Content="⚡ APPLY PRESET" HorizontalAlignment="Stretch" />
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Card 5: Cyber Bongo Cat -->
+                            <Border Width="290" Style="{StaticResource TacticalCard}" Margin="0,0,14,14">
+                                <StackPanel>
+                                    <Border Background="#260C17" BorderBrush="#F43F5E" BorderThickness="1" CornerRadius="6" Padding="7,3" HorizontalAlignment="Left" Margin="0,0,0,8">
+                                        <TextBlock Text="PIXEL-ART MASCOT" Foreground="#F43F5E" FontSize="9" FontWeight="Bold" />
+                                    </Border>
+                                    <TextBlock Text="Cyber Bongo Cat" Foreground="{StaticResource BrushTextPrimary}" FontSize="14" FontWeight="Bold" Margin="0,0,0,4" />
+                                    <TextBlock Text="Animated retro mascot drumming paws on keyboard with volume level bar, digital clock, and Lock status." Foreground="{StaticResource BrushTextSecondary}" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,12" />
+                                    <Button Command="{Binding ApplyPresetCommand}" CommandParameter="Cyber Bongo Cat" Style="{StaticResource AmberActionButton}" Content="⚡ APPLY PRESET" HorizontalAlignment="Stretch" />
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Card 6: Weather & Clock -->
+                            <Border Width="290" Style="{StaticResource TacticalCard}" Margin="0,0,14,14">
+                                <StackPanel>
+                                    <Border Background="#0A1C2C" BorderBrush="{StaticResource BrushCyan}" BorderThickness="1" CornerRadius="6" Padding="7,3" HorizontalAlignment="Left" Margin="0,0,0,8">
+                                        <TextBlock Text="WEATHER &amp; CLOCK" Foreground="{StaticResource BrushCyan}" FontSize="9" FontWeight="Bold" />
+                                    </Border>
+                                    <TextBlock Text="Weather &amp; Clock" Foreground="{StaticResource BrushTextPrimary}" FontSize="14" FontWeight="Bold" Margin="0,0,0,4" />
+                                    <TextBlock Text="Local temperature, weather forecast, 24h clock, and Caps/Num Lock indicators with zero bloat." Foreground="{StaticResource BrushTextSecondary}" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,12" />
+                                    <Button Command="{Binding ApplyPresetCommand}" CommandParameter="Clock &amp; Time" Style="{StaticResource AmberActionButton}" Content="⚡ APPLY PRESET" HorizontalAlignment="Stretch" />
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Card 7: Gamer Minimal -->
+                            <Border Width="290" Style="{StaticResource TacticalCard}" Margin="0,0,14,14">
+                                <StackPanel>
+                                    <Border Background="#111624" BorderBrush="{StaticResource BrushTextSecondary}" BorderThickness="1" CornerRadius="6" Padding="7,3" HorizontalAlignment="Left" Margin="0,0,0,8">
+                                        <TextBlock Text="MINIMAL HUD" Foreground="{StaticResource BrushTextSecondary}" FontSize="9" FontWeight="Bold" />
+                                    </Border>
+                                    <TextBlock Text="Gamer Minimal" Foreground="{StaticResource BrushTextPrimary}" FontSize="14" FontWeight="Bold" Margin="0,0,0,4" />
+                                    <TextBlock Text="Ultra-clean condensed telemetry for zero distraction during tournament and competitive gaming." Foreground="{StaticResource BrushTextSecondary}" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,12" />
+                                    <Button Command="{Binding ApplyPresetCommand}" CommandParameter="Gamer Minimal" Style="{StaticResource AmberActionButton}" Content="⚡ APPLY PRESET" HorizontalAlignment="Stretch" />
+                                </StackPanel>
+                            </Border>
+                        </WrapPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- ────────────────────────────────────────────────────────────────── -->
+            <!-- TAB 3: SETTINGS & MODULES HUB (Every Feature Toggleable!)           -->
+            <!-- ────────────────────────────────────────────────────────────────── -->
+            <TabItem Header="⚙️ SETTINGS &amp; MODULES" Style="{StaticResource TacticalTabItem}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,10,0,0">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Left Column: Startup, Display, Audio, Alerts -->
+                        <StackPanel Grid.Column="0" Margin="0,0,8,0">
+                            <!-- STARTUP & WINDOW -->
+                            <Border Style="{StaticResource TacticalCard}" Margin="0,0,0,12">
+                                <StackPanel>
+                                    <TextBlock Text="STARTUP &amp; WINDOW BEHAVIOR" Foreground="{StaticResource BrushCyan}" FontSize="11" FontWeight="Bold" Margin="0,0,0,8" />
+                                    <CheckBox IsChecked="{Binding Settings.AutostartWithWindows}" Style="{StaticResource TacticalToggleSwitch}" Margin="0,0,0,8">
+                                        <TextBlock Text="Autostart with Windows (HKCU Run)" Foreground="{StaticResource BrushTextPrimary}" FontSize="11" />
+                                    </CheckBox>
+                                    <CheckBox IsChecked="{Binding Settings.StartMinimized}" Style="{StaticResource TacticalToggleSwitch}" Margin="0,0,0,8">
+                                        <TextBlock Text="Start minimized to notification tray" Foreground="{StaticResource BrushTextPrimary}" FontSize="11" />
+                                    </CheckBox>
+                                    <CheckBox IsChecked="{Binding Settings.MinimizeToTrayOnClose}" Style="{StaticResource TacticalToggleSwitch}">
+                                        <TextBlock Text="Minimize to tray when clicking [✕] Close" Foreground="{StaticResource BrushTextPrimary}" FontSize="11" />
+                                    </CheckBox>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- OLED DISPLAY & BURN-IN -->
+                            <Border Style="{StaticResource TacticalCard}" Margin="0,0,0,12">
+                                <StackPanel>
+                                    <TextBlock Text="OLED DISPLAY &amp; BURN-IN PROTECTION" Foreground="{StaticResource BrushCyan}" FontSize="11" FontWeight="Bold" Margin="0,0,0,8" />
+                                    <CheckBox IsChecked="{Binding Settings.InvertDisplay}" Style="{StaticResource TacticalToggleSwitch}" Margin="0,0,0,8">
+                                        <TextBlock Text="Invert Monochrome (Black-on-White mode)" Foreground="{StaticResource BrushTextPrimary}" FontSize="11" />
+                                    </CheckBox>
+                                    <CheckBox IsChecked="{Binding Settings.BurnInProtectionEnabled}" Style="{StaticResource TacticalToggleSwitch}" Margin="0,0,0,8">
+                                        <TextBlock Text="Enable orbital pixel shift (burn-in guard)" Foreground="{StaticResource BrushTextPrimary}" FontSize="11" />
+                                    </CheckBox>
+                                    <TextBlock Text="{Binding Settings.BurnInShiftMinutes, StringFormat=Orbital shift interval: {0} minutes}" Foreground="{StaticResource BrushTextSecondary}" FontSize="10" />
+                                    <Slider Minimum="1" Maximum="30" Value="{Binding Settings.BurnInShiftMinutes}" Margin="0,2,0,8" Style="{StaticResource TacticalSlider}" />
+                                    <CheckBox IsChecked="{Binding Settings.BlankOnWindowsLock}" Style="{StaticResource TacticalToggleSwitch}">
+                                        <TextBlock Text="Blank OLED display on Win+L session lock" Foreground="{StaticResource BrushTextPrimary}" FontSize="11" />
+                                    </CheckBox>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- AUDIO & VOLUME HUD -->
+                            <Border Style="{StaticResource TacticalCard}" Margin="0,0,0,12">
+                                <StackPanel>
+                                    <TextBlock Text="AUDIO &amp; VOLUME WHEEL HUD" Foreground="{StaticResource BrushCyan}" FontSize="11" FontWeight="Bold" Margin="0,0,0,8" />
+                                    <CheckBox IsChecked="{Binding Settings.EnableVolumeOverlay}" Style="{StaticResource TacticalToggleSwitch}" Margin="0,0,0,8">
+                                        <TextBlock Text="Volume wheel pop-up HUD on OLED" Foreground="{StaticResource BrushTextPrimary}" FontSize="11" />
+                                    </CheckBox>
+                                    <TextBlock Text="{Binding Settings.VolumeOverlayDurationMs, StringFormat=Pop-up display duration: {0} ms}" Foreground="{StaticResource BrushTextSecondary}" FontSize="10" />
+                                    <Slider Minimum="500" Maximum="3000" Value="{Binding Settings.VolumeOverlayDurationMs}" Margin="0,2,0,8" Style="{StaticResource TacticalSlider}" />
+                                    <CheckBox IsChecked="{Binding Settings.EnableMicMonitor}" Style="{StaticResource TacticalToggleSwitch}">
+                                        <TextBlock Text="Monitor microphone mute status {mic}" Foreground="{StaticResource BrushTextPrimary}" FontSize="11" />
+                                    </CheckBox>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- THERMAL & HARDWARE ALERTS -->
+                            <Border Style="{StaticResource TacticalCard}">
+                                <StackPanel>
+                                    <TextBlock Text="THERMAL PASTE GUARD &amp; ALERTS" Foreground="{StaticResource BrushCyan}" FontSize="11" FontWeight="Bold" Margin="0,0,0,8" />
+                                    <CheckBox IsChecked="{Binding Settings.EnableGpuDeltaAlert}" Style="{StaticResource TacticalToggleSwitch}" Margin="0,0,0,8">
+                                        <TextBlock Text="GPU thermal paste health alert (Hotspot delta)" Foreground="{StaticResource BrushTextPrimary}" FontSize="11" />
+                                    </CheckBox>
+                                    <TextBlock Text="{Binding Settings.GpuDeltaThreshold, StringFormat=Hotspot minus Core threshold: {0:0}°C}" Foreground="{StaticResource BrushTextSecondary}" FontSize="10" />
+                                    <Slider Minimum="10" Maximum="35" Value="{Binding Settings.GpuDeltaThreshold}" Margin="0,2,0,8" Style="{StaticResource TacticalSlider}" />
+                                    <CheckBox IsChecked="{Binding Settings.EnableInvertOnThermalAlert}" Style="{StaticResource TacticalToggleSwitch}">
+                                        <TextBlock Text="Pulse OLED display inversion on overheat alarm" Foreground="{StaticResource BrushAmber}" FontSize="11" />
+                                    </CheckBox>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+
+                        <!-- Right Column: Automation, Sensors, Weather, Rates -->
+                        <StackPanel Grid.Column="1" Margin="8,0,0,0">
+                            <!-- AUTOMATION & SHORTCUTS -->
+                            <Border Style="{StaticResource TacticalCard}" Margin="0,0,0,12">
+                                <StackPanel>
+                                    <TextBlock Text="AUTOMATION &amp; SHORTCUTS" Foreground="{StaticResource BrushCyan}" FontSize="11" FontWeight="Bold" Margin="0,0,0,8" />
+                                    <CheckBox IsChecked="{Binding Settings.EnableHotkeyProfileSwitch}" Style="{StaticResource TacticalToggleSwitch}" Margin="0,0,0,8">
+                                        <TextBlock Text="Global hotkey profile switcher (Ctrl+Alt+O)" Foreground="{StaticResource BrushTextPrimary}" FontSize="11" />
+                                    </CheckBox>
+                                    <CheckBox IsChecked="{Binding Settings.EnableAutoProfileSwitch}" Style="{StaticResource TacticalToggleSwitch}" Margin="0,0,0,8">
+                                        <TextBlock Text="Auto-switch preset by game/foreground process" Foreground="{StaticResource BrushTextPrimary}" FontSize="11" />
+                                    </CheckBox>
+                                    <CheckBox IsChecked="{Binding Settings.EnableLockKeys}" Style="{StaticResource TacticalToggleSwitch}">
+                                        <TextBlock Text="Track Caps / Num / Scroll Lock states {caps}" Foreground="{StaticResource BrushTextPrimary}" FontSize="11" />
+                                    </CheckBox>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- WEATHER SERVICE -->
+                            <Border Style="{StaticResource TacticalCard}" Margin="0,0,0,12">
+                                <StackPanel>
+                                    <TextBlock Text="ONLINE WEATHER TELEMETRY" Foreground="{StaticResource BrushCyan}" FontSize="11" FontWeight="Bold" Margin="0,0,0,8" />
+                                    <CheckBox IsChecked="{Binding Settings.EnableWeather}" Style="{StaticResource TacticalToggleSwitch}" Margin="0,0,0,8">
+                                        <TextBlock Text="Fetch online weather (Open-Meteo API)" Foreground="{StaticResource BrushTextPrimary}" FontSize="11" />
+                                    </CheckBox>
+                                    <TextBlock Text="City / Location (or 'auto' for IP location):" Foreground="{StaticResource BrushTextSecondary}" FontSize="10" Margin="0,0,0,4" />
+                                    <TextBox Text="{Binding Settings.WeatherCity, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource TacticalTextBox}" Margin="0,0,0,8" />
+                                    <TextBlock Text="{Binding Settings.WeatherUpdateIntervalMinutes, StringFormat=Weather update interval: {0} min}" Foreground="{StaticResource BrushTextSecondary}" FontSize="10" />
+                                    <Slider Minimum="10" Maximum="120" Value="{Binding Settings.WeatherUpdateIntervalMinutes}" Margin="0,2,0,0" Style="{StaticResource TacticalSlider}" />
+                                </StackPanel>
+                            </Border>
+
+                            <!-- HARDWARE SENSORS MODULAR SELECTION -->
+                            <Border Style="{StaticResource TacticalCard}" Margin="0,0,0,12">
+                                <StackPanel>
+                                    <TextBlock Text="LIBREHARDWAREMONITOR SENSORS SELECTION" Foreground="{StaticResource BrushCyan}" FontSize="11" FontWeight="Bold" Margin="0,0,0,8" />
+                                    <TextBlock Text="Enable or disable sensor categories to optimize CPU cycles:" Foreground="{StaticResource BrushTextSecondary}" FontSize="10" Margin="0,0,0,8" TextWrapping="Wrap" />
+                                    <Grid Margin="0,0,0,4">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="*" />
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel Grid.Column="0">
+                                            <CheckBox IsChecked="{Binding Settings.EnableCpuMonitoring}" Style="{StaticResource TacticalToggleSwitch}" Margin="0,0,0,6">
+                                                <TextBlock Text="CPU Sensors" Foreground="{StaticResource BrushTextPrimary}" FontSize="11" />
+                                            </CheckBox>
+                                            <CheckBox IsChecked="{Binding Settings.EnableGpuMonitoring}" Style="{StaticResource TacticalToggleSwitch}" Margin="0,0,0,6">
+                                                <TextBlock Text="GPU Sensors" Foreground="{StaticResource BrushTextPrimary}" FontSize="11" />
+                                            </CheckBox>
+                                            <CheckBox IsChecked="{Binding Settings.EnableRamMonitoring}" Style="{StaticResource TacticalToggleSwitch}">
+                                                <TextBlock Text="RAM Sensors" Foreground="{StaticResource BrushTextPrimary}" FontSize="11" />
+                                            </CheckBox>
+                                        </StackPanel>
+                                        <StackPanel Grid.Column="1">
+                                            <CheckBox IsChecked="{Binding Settings.EnableNetworkMonitoring}" Style="{StaticResource TacticalToggleSwitch}" Margin="0,0,0,6">
+                                                <TextBlock Text="Network Sensors" Foreground="{StaticResource BrushTextPrimary}" FontSize="11" />
+                                            </CheckBox>
+                                            <CheckBox IsChecked="{Binding Settings.EnableStorageMonitoring}" Style="{StaticResource TacticalToggleSwitch}" Margin="0,0,0,6">
+                                                <TextBlock Text="Storage Sensors" Foreground="{StaticResource BrushTextPrimary}" FontSize="11" />
+                                            </CheckBox>
+                                            <CheckBox IsChecked="{Binding Settings.EnablePowerMonitoring}" Style="{StaticResource TacticalToggleSwitch}">
+                                                <TextBlock Text="Power (W) Sensors" Foreground="{StaticResource BrushAmber}" FontSize="11" />
+                                            </CheckBox>
+                                        </StackPanel>
+                                    </Grid>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- POLLING & SYNC RATES -->
+                            <Border Style="{StaticResource TacticalCard}" Margin="0,0,0,12">
+                                <StackPanel>
+                                    <TextBlock Text="POLLING &amp; USB HID SYNC RATES" Foreground="{StaticResource BrushCyan}" FontSize="11" FontWeight="Bold" Margin="0,0,0,8" />
+                                    <TextBlock Text="{Binding Settings.PollingIntervalMs, StringFormat=Sensor Polling Interval: {0} ms}" Foreground="{StaticResource BrushTextSecondary}" FontSize="10" />
+                                    <Slider Minimum="250" Maximum="5000" Value="{Binding Settings.PollingIntervalMs}" Margin="0,2,0,8" Style="{StaticResource TacticalSlider}" />
+                                    <TextBlock Text="{Binding Settings.HidSyncIntervalMs, StringFormat=USB HID Push Interval: {0} ms}" Foreground="{StaticResource BrushTextSecondary}" FontSize="10" />
+                                    <Slider Minimum="250" Maximum="2000" Value="{Binding Settings.HidSyncIntervalMs}" Margin="0,2,0,0" Style="{StaticResource TacticalSlider}" />
+                                </StackPanel>
+                            </Border>
+
+                            <!-- SAVE SETTINGS BUTTON -->
+                            <Button Command="{Binding SaveSettingsCommand}" Style="{StaticResource AmberActionButton}" Content="💾 SAVE &amp; APPLY SETTINGS" HorizontalAlignment="Stretch" Height="36" />
+                        </StackPanel>
+                    </Grid>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- ────────────────────────────────────────────────────────────────── -->
+            <!-- TAB 4: SANDBOX SIMULATOR (Extreme Hardware Test Bench)              -->
+            <!-- ────────────────────────────────────────────────────────────────── -->
+            <TabItem Header="🧪 SANDBOX SIMULATOR" Style="{StaticResource TacticalTabItem}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="0,10,0,0">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Left Column: CPU & GPU Sliders -->
+                        <Border Grid.Column="0" Style="{StaticResource TacticalCard}" Margin="0,0,8,0">
+                            <StackPanel>
+                                <TextBlock Text="PROCESSOR &amp; GRAPHICS SIMULATION" Foreground="{StaticResource BrushAmber}" FontSize="12" FontWeight="Bold" Margin="0,0,0,12" />
+
+                                <TextBlock Text="{Binding SimCpuLoad, StringFormat=CPU Load: {0:0}%}" Foreground="{StaticResource BrushTextPrimary}" FontSize="11" />
+                                <Slider Minimum="0" Maximum="100" Value="{Binding SimCpuLoad}" Margin="0,2,0,8" Style="{StaticResource TacticalSlider}" />
+
+                                <TextBlock Text="{Binding SimCpuTemp, StringFormat=CPU Temperature: {0:0}°C}" Foreground="{StaticResource BrushTextPrimary}" FontSize="11" />
+                                <Slider Minimum="30" Maximum="110" Value="{Binding SimCpuTemp}" Margin="0,2,0,8" Style="{StaticResource TacticalSlider}" />
+
+                                <TextBlock Text="{Binding SimCpuPower, StringFormat=CPU Package Power: {0:0}W}" Foreground="{StaticResource BrushCyan}" FontSize="11" />
+                                <Slider Minimum="0" Maximum="250" Value="{Binding SimCpuPower}" Margin="0,2,0,12" Style="{StaticResource TacticalSlider}" />
+
+                                <TextBlock Text="{Binding SimGpuLoad, StringFormat=GPU Load: {0:0}%}" Foreground="{StaticResource BrushTextPrimary}" FontSize="11" />
+                                <Slider Minimum="0" Maximum="100" Value="{Binding SimGpuLoad}" Margin="0,2,0,8" Style="{StaticResource TacticalSlider}" />
+
+                                <TextBlock Text="{Binding SimGpuTemp, StringFormat=GPU Core Temp: {0:0}°C}" Foreground="{StaticResource BrushTextPrimary}" FontSize="11" />
+                                <Slider Minimum="30" Maximum="100" Value="{Binding SimGpuTemp}" Margin="0,2,0,8" Style="{StaticResource TacticalSlider}" />
+
+                                <TextBlock Text="{Binding SimGpuHotspot, StringFormat=GPU Hotspot Temp: {0:0}°C}" Foreground="{StaticResource BrushAmber}" FontSize="11" />
+                                <Slider Minimum="30" Maximum="115" Value="{Binding SimGpuHotspot}" Margin="0,2,0,8" Style="{StaticResource TacticalSlider}" />
+
+                                <TextBlock Text="{Binding SimGpuPower, StringFormat=GPU Board Power: {0:0}W}" Foreground="{StaticResource BrushCyan}" FontSize="11" />
+                                <Slider Minimum="0" Maximum="500" Value="{Binding SimGpuPower}" Margin="0,2,0,0" Style="{StaticResource TacticalSlider}" />
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Right Column: Memory, Network, APM -->
+                        <Border Grid.Column="1" Style="{StaticResource TacticalCard}" Margin="8,0,0,0">
+                            <StackPanel>
+                                <TextBlock Text="SYSTEM MEMORY, NETWORK &amp; INPUT SIMULATION" Foreground="{StaticResource BrushAmber}" FontSize="12" FontWeight="Bold" Margin="0,0,0,12" />
+
+                                <TextBlock Text="{Binding SimRamPercent, StringFormat=System RAM Load: {0:0}%}" Foreground="{StaticResource BrushTextPrimary}" FontSize="11" />
+                                <Slider Minimum="0" Maximum="100" Value="{Binding SimRamPercent}" Margin="0,2,0,8" Style="{StaticResource TacticalSlider}" />
+
+                                <TextBlock Text="{Binding SimVramTemp, StringFormat=GPU VRAM Temp: {0:0}°C}" Foreground="{StaticResource BrushTextPrimary}" FontSize="11" />
+                                <Slider Minimum="30" Maximum="110" Value="{Binding SimVramTemp}" Margin="0,2,0,8" Style="{StaticResource TacticalSlider}" />
+
+                                <TextBlock Text="{Binding SimPing, StringFormat=Network Ping: {0:0} ms}" Foreground="{StaticResource BrushTextPrimary}" FontSize="11" />
+                                <Slider Minimum="1" Maximum="300" Value="{Binding SimPing}" Margin="0,2,0,8" Style="{StaticResource TacticalSlider}" />
+
+                                <TextBlock Text="{Binding SimApm, StringFormat=Actions Per Minute (APM): {0:0}}" Foreground="{StaticResource BrushTextPrimary}" FontSize="11" />
+                                <Slider Minimum="0" Maximum="600" Value="{Binding SimApm}" Margin="0,2,0,16" Style="{StaticResource TacticalSlider}" />
+
+                                <Border Background="#121A26" CornerRadius="8" Padding="12" BorderBrush="{StaticResource BrushCyanDark}" BorderThickness="1">
+                                    <StackPanel>
+                                        <TextBlock Text="💡 Testing Tip:" Foreground="{StaticResource BrushCyan}" FontWeight="Bold" FontSize="11" Margin="0,0,0,4" />
+                                        <TextBlock Text="Check 'Sandbox Simulator' in the top bar to route these simulated slider values directly onto the OLED preview in real time." Foreground="{StaticResource BrushTextSecondary}" FontSize="10" TextWrapping="Wrap" />
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </ScrollViewer>
+            </TabItem>
+        </TabControl>
+
+        <!-- ══════════════════════════════════════════════════════════════════════ -->
+        <!-- QUICK SETTINGS SLIDE-OUT DRAWER (Accessible via Gear icon)          -->
+        <!-- ══════════════════════════════════════════════════════════════════════ -->
+        <Border x:Name="SettingsPanel" Grid.Row="0" Grid.RowSpan="3" HorizontalAlignment="Right" Width="360"
+                Background="#090D15" BorderBrush="{StaticResource BrushCardBorder}" BorderThickness="1,0,0,0"
+                Visibility="Collapsed" Panel.ZIndex="100" Margin="0,0,-18,0">
+            <Border.Effect>
+                <DropShadowEffect Color="#000000" BlurRadius="40" ShadowDepth="8" Opacity="0.7" Direction="180" />
+            </Border.Effect>
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="20">
+                <StackPanel>
+                    <Grid Margin="0,0,0,18">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*"    />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Path Grid.Column="0" Data="{StaticResource IconGear}" Fill="{StaticResource BrushCyan}" Stretch="Uniform" Width="18" Height="18" Margin="0,0,10,0" VerticalAlignment="Center" />
+                        <TextBlock Grid.Column="1" Text="QUICK SETTINGS" Foreground="{StaticResource BrushTextPrimary}" FontSize="13" FontWeight="Bold" VerticalAlignment="Center" />
+                        <Button Grid.Column="2" x:Name="CloseSettingsBtn" Click="OnToggleSettingsPanel" Style="{StaticResource CyanGhostButton}" Content="✕" Width="28" Height="28" />
+                    </Grid>
+
+                    <TextBlock Text="STARTUP &amp; SYSTEM" Foreground="{StaticResource BrushCyan}" FontSize="11" FontWeight="Bold" Margin="0,0,0,6" />
+                    <Border Background="#0E131E" CornerRadius="8" Padding="12" Margin="0,0,0,14" BorderBrush="{StaticResource BrushCardBorder}" BorderThickness="1">
+                        <StackPanel>
+                            <CheckBox IsChecked="{Binding Settings.AutostartWithWindows}" Style="{StaticResource TacticalToggleSwitch}" Margin="0,0,0,8">
+                                <TextBlock Text="Autostart with Windows" Foreground="{StaticResource BrushTextPrimary}" FontSize="11" />
+                            </CheckBox>
+                            <CheckBox IsChecked="{Binding Settings.StartMinimized}" Style="{StaticResource TacticalToggleSwitch}" Margin="0,0,0,8">
+                                <TextBlock Text="Start minimized to tray" Foreground="{StaticResource BrushTextPrimary}" FontSize="11" />
+                            </CheckBox>
+                            <CheckBox IsChecked="{Binding Settings.MinimizeToTrayOnClose}" Style="{StaticResource TacticalToggleSwitch}">
+                                <TextBlock Text="Minimize to tray on [✕]" Foreground="{StaticResource BrushTextPrimary}" FontSize="11" />
+                            </CheckBox>
+                        </StackPanel>
+                    </Border>
+
+                    <TextBlock Text="DISPLAY MODES" Foreground="{StaticResource BrushCyan}" FontSize="11" FontWeight="Bold" Margin="0,0,0,6" />
+                    <Border Background="#0E131E" CornerRadius="8" Padding="12" Margin="0,0,0,14" BorderBrush="{StaticResource BrushCardBorder}" BorderThickness="1">
+                        <StackPanel>
+                            <CheckBox IsChecked="{Binding Settings.InvertDisplay}" Style="{StaticResource TacticalToggleSwitch}" Margin="0,0,0,8">
+                                <TextBlock Text="Invert OLED (Black on White)" Foreground="{StaticResource BrushTextPrimary}" FontSize="11" />
+                            </CheckBox>
+                            <CheckBox IsChecked="{Binding Settings.BurnInProtectionEnabled}" Style="{StaticResource TacticalToggleSwitch}">
+                                <TextBlock Text="Orbital Pixel Shift" Foreground="{StaticResource BrushTextPrimary}" FontSize="11" />
+                            </CheckBox>
+                        </StackPanel>
+                    </Border>
+
+                    <TextBlock Text="AUDIO &amp; ALERTS" Foreground="{StaticResource BrushCyan}" FontSize="11" FontWeight="Bold" Margin="0,0,0,6" />
+                    <Border Background="#0E131E" CornerRadius="8" Padding="12" Margin="0,0,0,18" BorderBrush="{StaticResource BrushCardBorder}" BorderThickness="1">
+                        <StackPanel>
+                            <CheckBox IsChecked="{Binding Settings.EnableVolumeOverlay}" Style="{StaticResource TacticalToggleSwitch}" Margin="0,0,0,8">
+                                <TextBlock Text="Volume wheel pop-up" Foreground="{StaticResource BrushTextPrimary}" FontSize="11" />
+                            </CheckBox>
+                            <CheckBox IsChecked="{Binding Settings.EnableGpuDeltaAlert}" Style="{StaticResource TacticalToggleSwitch}" Margin="0,0,0,8">
+                                <TextBlock Text="GPU thermal paste alert" Foreground="{StaticResource BrushTextPrimary}" FontSize="11" />
+                            </CheckBox>
+                            <CheckBox IsChecked="{Binding Settings.EnableMicMonitor}" Style="{StaticResource TacticalToggleSwitch}">
+                                <TextBlock Text="Monitor microphone" Foreground="{StaticResource BrushTextPrimary}" FontSize="11" />
+                            </CheckBox>
+                        </StackPanel>
+                    </Border>
+
+                    <Button Command="{Binding SaveSettingsCommand}" Style="{StaticResource AmberActionButton}" Content="💾 SAVE SETTINGS" HorizontalAlignment="Stretch" Height="36" />
+                </StackPanel>
+            </ScrollViewer>
+        </Border>
+
+        <!-- ══════════════════════════════════════════════════════════════════════ -->
+        <!-- ROW 2: FOOTER BAR (Linear Stealth Status Line)                        -->
+        <!-- ══════════════════════════════════════════════════════════════════════ -->
+        <Border Grid.Row="2" Padding="14,8" Background="{StaticResource BrushSurface}" CornerRadius="8" BorderBrush="{StaticResource BrushCardBorder}" BorderThickness="1">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <Border Background="#0A1C2C" BorderBrush="{StaticResource BrushCyan}" BorderThickness="1" CornerRadius="4" Padding="6,2" Margin="0,0,12,0">
+                        <StackPanel Orientation="Horizontal">
+                            <Ellipse Width="6" Height="6" Fill="{StaticResource BrushCyan}" Margin="0,0,6,0" VerticalAlignment="Center" />
+                            <TextBlock Text="Burn-In Guard: " Foreground="{StaticResource BrushCyan}" FontSize="10" FontWeight="Bold" />
+                            <TextBlock Text="{Binding BurnInStatus}" Foreground="{StaticResource BrushTextPrimary}" FontSize="10" />
+                        </StackPanel>
+                    </Border>
+                    <TextBlock Text="{Binding StatusMessage}" Foreground="{StaticResource BrushTextPrimary}" FontSize="11" VerticalAlignment="Center" />
+                </StackPanel>
+
+                <TextBlock Grid.Column="1" Text="Zero External Apps · Embedded LibreHardwareMonitorLib + Direct HID" Foreground="{StaticResource BrushTextSecondary}" FontSize="10" VerticalAlignment="Center" />
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

@@ -1,0 +1,568 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- ══════════════════════════════════════════════════════════════════════ -->
+    <!-- CONCEPT 1: ASUS ROG STRIX EDITION / ARMOURY CRATE v6 DESIGN SYSTEM     -->
+    <!-- ══════════════════════════════════════════════════════════════════════ -->
+
+    <!-- Color Tokens: ASUS ROG Strix Matte Obsidian, Crimson & Strix Cyan -->
+    <Color x:Key="ColorVoid">#080A0F</Color>
+    <Color x:Key="ColorSurface">#0D111A</Color>
+    <Color x:Key="ColorCard">#101520</Color>
+    <Color x:Key="ColorCardBorder">#1F293D</Color>
+    <Color x:Key="ColorCardBorderHover">#FF003C</Color>
+    <Color x:Key="ColorCyan">#00E5FF</Color>
+    <Color x:Key="ColorCyanHover">#5CFFFF</Color>
+    <Color x:Key="ColorCyanDark">#092436</Color>
+    <Color x:Key="ColorAmber">#FF003C</Color> <!-- ROG Signature Crimson Accent -->
+    <Color x:Key="ColorAmberActual">#FF003C</Color> <!-- ROG Crimson for power & alert telemetry -->
+    <Color x:Key="ColorAmberHover">#FF2E5D</Color>
+    <Color x:Key="ColorSuccess">#10B981</Color>
+    <Color x:Key="ColorTextPrimary">#F8FAFC</Color>
+    <Color x:Key="ColorTextSecondary">#8A9BB2</Color>
+    <Color x:Key="ColorTextMuted">#4A5A70</Color>
+    <Color x:Key="ColorRogDarkRed">#26070E</Color>
+
+    <SolidColorBrush x:Key="BrushVoid" Color="{StaticResource ColorVoid}" />
+    <SolidColorBrush x:Key="BrushSurface" Color="{StaticResource ColorSurface}" />
+    <SolidColorBrush x:Key="BrushCard" Color="{StaticResource ColorCard}" />
+    <SolidColorBrush x:Key="BrushCardBorder" Color="{StaticResource ColorCardBorder}" />
+    <SolidColorBrush x:Key="BrushCardBorderHover" Color="{StaticResource ColorCardBorderHover}" />
+    <SolidColorBrush x:Key="BrushCyan" Color="{StaticResource ColorCyan}" />
+    <SolidColorBrush x:Key="BrushCyanHover" Color="{StaticResource ColorCyanHover}" />
+    <SolidColorBrush x:Key="BrushCyanDark" Color="{StaticResource ColorCyanDark}" />
+    <SolidColorBrush x:Key="BrushAmber" Color="{StaticResource ColorAmber}" />
+    <SolidColorBrush x:Key="BrushAmberActual" Color="{StaticResource ColorAmberActual}" />
+    <SolidColorBrush x:Key="BrushAmberHover" Color="{StaticResource ColorAmberHover}" />
+    <SolidColorBrush x:Key="BrushSuccess" Color="{StaticResource ColorSuccess}" />
+    <SolidColorBrush x:Key="BrushTextPrimary" Color="{StaticResource ColorTextPrimary}" />
+    <SolidColorBrush x:Key="BrushTextSecondary" Color="{StaticResource ColorTextSecondary}" />
+    <SolidColorBrush x:Key="BrushTextMuted" Color="{StaticResource ColorTextMuted}" />
+    <SolidColorBrush x:Key="BrushRogDarkRed" Color="{StaticResource ColorRogDarkRed}" />
+    <DrawingBrush x:Key="EditorGridBrush" TileMode="Tile" Viewport="0,0,12,12" ViewportUnits="Absolute" Viewbox="0,0,2,2" ViewboxUnits="Absolute" Opacity="0.22">
+        <DrawingBrush.Drawing>
+            <GeometryDrawing Brush="{x:Null}" Pen="#FF003C" Geometry="M 0,0 L 0,2 M 0,0 L 2,0" />
+        </DrawingBrush.Drawing>
+    </DrawingBrush>
+    <FontFamily x:Key="RogDisplayFont">Bahnschrift SemiBold</FontFamily>
+    <FontFamily x:Key="RogBodyFont">Segoe UI</FontFamily>
+
+    <!-- ══════════════════════════════════════════════════════════════════════ -->
+    <!-- VECTOR STREAM GEOMETRY ICONS (High-DPI Razor Sharp SVG Paths)          -->
+    <!-- ══════════════════════════════════════════════════════════════════════ -->
+    <!-- Logo / Keyboard OLED -->
+    <StreamGeometry x:Key="IconApex">M2 4 L22 4 L22 20 L2 20 Z M5 7 L19 7 L19 13 L5 13 Z M5 15 L8 15 L8 17 L5 17 Z M10 15 L14 15 L14 17 L10 17 Z M16 15 L19 15 L19 17 L16 17 Z</StreamGeometry>
+    <!-- Lightning Bolt / Power Watts -->
+    <StreamGeometry x:Key="IconBolt">M13 2 L3 14 L12 14 L11 22 L21 10 L12 10 Z</StreamGeometry>
+    <!-- Thermometer -->
+    <StreamGeometry x:Key="IconThermometer">M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z</StreamGeometry>
+    <!-- CPU Chip -->
+    <StreamGeometry x:Key="IconCpu">M4 4h16v16H4z M9 9h6v6H9z M9 1v3 M15 1v3 M9 20v3 M15 20v3 M20 9h3 M20 14h3 M1 9h3 M1 14h3</StreamGeometry>
+    <!-- GPU Card -->
+    <StreamGeometry x:Key="IconGpu">M2 6h20v12H2z M6 10h4v4H6z M14 10h4v4h-4z M2 18h4 M2 6h4</StreamGeometry>
+    <!-- Gauge / Speedometer -->
+    <StreamGeometry x:Key="IconGauge">M12 2A10 10 0 1 0 22 12A10 10 0 0 0 12 2ZM12 20A8 8 0 1 1 20 12A8 8 0 0 1 12 20ZM12 6A1 1 0 0 0 11 7V11.59L13.71 14.3L15.12 12.89L13 10.77V7A1 1 0 0 0 12 6Z</StreamGeometry>
+    <!-- Telemetry Graph -->
+    <StreamGeometry x:Key="IconGraph">M3 3v18h18 M19 9l-5 5-4-4-3 3</StreamGeometry>
+    <!-- Digital Clock -->
+    <StreamGeometry x:Key="IconClock">M12 2A10 10 0 1 0 22 12A10 10 0 0 0 12 2ZM13 13H8V11H11V6H13Z</StreamGeometry>
+    <!-- Media Player Note -->
+    <StreamGeometry x:Key="IconMusic">M9 18V5l12-2v13 M6 18a3 3 0 1 0 3-3 M18 16a3 3 0 1 0 3-3</StreamGeometry>
+    <!-- Bongo Cat Mascot -->
+    <StreamGeometry x:Key="IconCat">M3 11l4-8 4 4 4-4 4 8v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z M8 13h.01 M16 13h.01</StreamGeometry>
+    <!-- Network Radar / Ping -->
+    <StreamGeometry x:Key="IconNet">M5 12.55a11 11 0 0 1 14.08 0 M1.42 9a16 16 0 0 1 21.16 0 M8.53 16.11a6 6 0 0 1 6.95 0 M12 20h.01</StreamGeometry>
+    <!-- Lock Keys -->
+    <StreamGeometry x:Key="IconKey">M2 5h20v14H2z M6 9h2v2H6z M11 9h2v2h-2z M16 9h2v2h-2z M6 14h12v2H6z</StreamGeometry>
+    <!-- Send to OLED Flight Arrow -->
+    <StreamGeometry x:Key="IconSend">M22 2L11 13 M22 2l-7 20-4-9-9-4 20-7z</StreamGeometry>
+    <!-- Settings Cog -->
+    <StreamGeometry x:Key="IconGear">M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6z M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z</StreamGeometry>
+    <!-- Plus Add -->
+    <StreamGeometry x:Key="IconPlus">M12 5v14 M5 12h14</StreamGeometry>
+    <!-- Trash Delete -->
+    <StreamGeometry x:Key="IconTrash">M3 6h18 M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6 M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2</StreamGeometry>
+    <!-- Duplicate Copy -->
+    <StreamGeometry x:Key="IconCopy">M9 7V3a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-4 M3 9a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z</StreamGeometry>
+    <!-- Save Profile -->
+    <StreamGeometry x:Key="IconSave">M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z M17 21v-8H7v8 M7 3v5h8</StreamGeometry>
+    <!-- Load Profile Folder -->
+    <StreamGeometry x:Key="IconFolder">M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z</StreamGeometry>
+    <!-- Reset Reload -->
+    <StreamGeometry x:Key="IconRefresh">M23 4v6h-6 M1 20v-6h6 M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15</StreamGeometry>
+    <!-- Divider Line -->
+    <StreamGeometry x:Key="IconLine">M2 12h20</StreamGeometry>
+    <!-- Progress Bar -->
+    <StreamGeometry x:Key="IconBar">M3 7h18v10H3z M6 10h6v4H6z</StreamGeometry>
+
+    <!-- 1-Click Widget Preset Library Tile Button -->
+    <Style x:Key="TacticalPresetTileButton" TargetType="Button">
+        <Setter Property="Foreground" Value="{StaticResource BrushTextPrimary}" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="FontSize" Value="10" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Padding" Value="6,5" />
+        <Setter Property="Margin" Value="2" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="border" CornerRadius="4" Background="#0C121C" BorderBrush="#1C273C" BorderThickness="1" Padding="{TemplateBinding Padding}">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="#172236" />
+                            <Setter TargetName="border" Property="BorderBrush" Value="{StaticResource BrushCyan}" />
+                            <Setter TargetName="border" Property="Effect">
+                                <Setter.Value>
+                                    <DropShadowEffect Color="#00E5FF" BlurRadius="8" ShadowDepth="0" Opacity="0.4" />
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="#26070E" />
+                            <Setter TargetName="border" Property="BorderBrush" Value="{StaticResource BrushAmber}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ASUS ROG Tactical Cyber Card Style -->
+    <Style x:Key="TacticalCard" TargetType="Border">
+        <Setter Property="Background">
+            <Setter.Value>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                    <GradientStop Color="#121724" Offset="0.0" />
+                    <GradientStop Color="#090D15" Offset="1.0" />
+                </LinearGradientBrush>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="BorderBrush" Value="{StaticResource BrushCardBorder}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="6" />
+        <Setter Property="Padding" Value="16" />
+        <Setter Property="Effect">
+            <Setter.Value>
+                <DropShadowEffect Color="#000000" BlurRadius="18" ShadowDepth="3" Opacity="0.55" />
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ASUS ROG High-Impact Crimson Primary Action Button -->
+    <Style x:Key="AmberActionButton" TargetType="Button">
+        <Setter Property="Foreground" Value="#FFFFFF" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <Setter Property="FontSize" Value="11" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Padding" Value="16,8" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="border" CornerRadius="4" BorderThickness="1" BorderBrush="#FF2E5D" Padding="{TemplateBinding Padding}">
+                        <Border.Background>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                <GradientStop Color="#FF003C" Offset="0.0" />
+                                <GradientStop Color="#CC0030" Offset="1.0" />
+                            </LinearGradientBrush>
+                        </Border.Background>
+                        <Border.Effect>
+                            <DropShadowEffect Color="#FF003C" BlurRadius="14" ShadowDepth="0" Opacity="0.5" />
+                        </Border.Effect>
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="border" Property="Background">
+                                <Setter.Value>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                                        <GradientStop Color="#FF2B5E" Offset="0.0" />
+                                        <GradientStop Color="#E60036" Offset="1.0" />
+                                    </LinearGradientBrush>
+                                </Setter.Value>
+                            </Setter>
+                            <Setter TargetName="border" Property="BorderBrush" Value="#FFA3B8" />
+                            <Setter TargetName="border" Property="Effect">
+                                <Setter.Value>
+                                    <DropShadowEffect Color="#FF003C" BlurRadius="20" ShadowDepth="0" Opacity="0.75" />
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="#A80026" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="border" Property="Opacity" Value="0.4" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ASUS ROG Tactical Stealth Ghost Button -->
+    <Style x:Key="CyanGhostButton" TargetType="Button">
+        <Setter Property="Foreground" Value="{StaticResource BrushTextPrimary}" />
+        <Setter Property="FontWeight" Value="SemiBold" />
+        <Setter Property="FontSize" Value="11" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Padding" Value="12,6" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="border" CornerRadius="4" Background="#101624" BorderBrush="#202D45" BorderThickness="1" Padding="{TemplateBinding Padding}">
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="#172236" />
+                            <Setter TargetName="border" Property="BorderBrush" Value="{StaticResource BrushAmber}" />
+                            <Setter Property="Foreground" Value="#FFFFFF" />
+                            <Setter TargetName="border" Property="Effect">
+                                <Setter.Value>
+                                    <DropShadowEffect Color="#FF003C" BlurRadius="10" ShadowDepth="0" Opacity="0.35" />
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="border" Property="Background" Value="#26070E" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="border" Property="Opacity" Value="0.4" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Linear Dark Glass Input Field -->
+    <Style x:Key="TacticalTextBox" TargetType="TextBox">
+        <Setter Property="Background" Value="#0A0E17" />
+        <Setter Property="Foreground" Value="{StaticResource BrushTextPrimary}" />
+        <Setter Property="BorderBrush" Value="{StaticResource BrushCardBorder}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="Padding" Value="10,6" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="CaretBrush" Value="{StaticResource BrushCyan}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="TextBox">
+                    <Border x:Name="border" CornerRadius="6" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                        <ScrollViewer x:Name="PART_ContentHost" Margin="{TemplateBinding Padding}" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="border" Property="BorderBrush" Value="{StaticResource BrushCardBorderHover}" />
+                        </Trigger>
+                        <Trigger Property="IsFocused" Value="True">
+                            <Setter TargetName="border" Property="BorderBrush" Value="{StaticResource BrushCyan}" />
+                            <Setter TargetName="border" Property="Effect">
+                                <Setter.Value>
+                                    <DropShadowEffect Color="#00D8F6" BlurRadius="8" ShadowDepth="0" Opacity="0.3" />
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Linear Precision Sliders -->
+    <Style x:Key="SliderThumbStyle" TargetType="{x:Type Thumb}">
+        <Setter Property="SnapsToDevicePixels" Value="True"/>
+        <Setter Property="OverridesDefaultStyle" Value="True"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Thumb}">
+                    <Ellipse x:Name="ellipse" Width="14" Height="14" Fill="#FFFFFF" Stroke="{StaticResource BrushCyan}" StrokeThickness="2">
+                        <Ellipse.Effect>
+                            <DropShadowEffect Color="#00D8F6" BlurRadius="6" ShadowDepth="0" Opacity="0.5"/>
+                        </Ellipse.Effect>
+                    </Ellipse>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="ellipse" Property="Fill" Value="{StaticResource BrushCyan}"/>
+                            <Setter TargetName="ellipse" Property="Stroke" Value="#FFFFFF"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="TacticalSlider" TargetType="Slider">
+        <Setter Property="Foreground" Value="{StaticResource BrushCyan}" />
+        <Setter Property="Height" Value="24" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Slider">
+                    <Grid VerticalAlignment="Center">
+                        <Border Height="4" CornerRadius="2" Background="#121826" BorderBrush="{StaticResource BrushCardBorder}" BorderThickness="1" VerticalAlignment="Center" />
+                        <Track x:Name="PART_Track">
+                            <Track.Thumb>
+                                <Thumb Style="{StaticResource SliderThumbStyle}" />
+                            </Track.Thumb>
+                        </Track>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Slim Modern ScrollBar -->
+    <Style x:Key="TacticalThumb" TargetType="{x:Type Thumb}">
+        <Setter Property="OverridesDefaultStyle" Value="True"/>
+        <Setter Property="IsTabStop" Value="False"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Thumb}">
+                    <Border CornerRadius="3" Background="#1F2C42" Margin="1" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type ScrollBar}">
+        <Setter Property="OverridesDefaultStyle" Value="True"/>
+        <Setter Property="Width" Value="6"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ScrollBar}">
+                    <Grid Background="Transparent">
+                        <Track x:Name="PART_Track" IsDirectionReversed="True">
+                            <Track.Thumb>
+                                <Thumb Style="{StaticResource TacticalThumb}"/>
+                            </Track.Thumb>
+                        </Track>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Style.Triggers>
+            <Trigger Property="Orientation" Value="Horizontal">
+                <Setter Property="Height" Value="6"/>
+                <Setter Property="Width" Value="Auto"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- Bulletproof Dark Glass ComboBox Theme -->
+    <Style x:Key="TacticalComboBoxItem" TargetType="ComboBoxItem">
+        <Setter Property="SnapsToDevicePixels" Value="True"/>
+        <Setter Property="Padding" Value="10,7"/>
+        <Setter Property="Foreground" Value="{StaticResource BrushTextPrimary}"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ComboBoxItem">
+                    <Border x:Name="ItemBorder" CornerRadius="6" Background="#090D15" Margin="2,1" Padding="{TemplateBinding Padding}" BorderThickness="0">
+                        <ContentPresenter HorizontalAlignment="Left" VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="ItemBorder" Property="Background" Value="#142032"/>
+                            <Setter Property="Foreground" Value="{StaticResource BrushCyan}"/>
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="ItemBorder" Property="Background" Value="#172842"/>
+                            <Setter Property="Foreground" Value="{StaticResource BrushCyan}"/>
+                            <Setter TargetName="ItemBorder" Property="BorderBrush" Value="{StaticResource BrushCyan}"/>
+                            <Setter TargetName="ItemBorder" Property="BorderThickness" Value="1"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="TacticalComboBoxToggle" TargetType="ToggleButton">
+        <Setter Property="OverridesDefaultStyle" Value="True"/>
+        <Setter Property="IsTabStop" Value="False"/>
+        <Setter Property="Focusable" Value="False"/>
+        <Setter Property="ClickMode" Value="Press"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ToggleButton">
+                    <Border x:Name="ToggleBorder" CornerRadius="8" Background="#0D121B" BorderBrush="{StaticResource BrushCardBorder}" BorderThickness="1">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="28"/>
+                            </Grid.ColumnDefinitions>
+                            <Path Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                  Data="M 0 0 L 4 4 L 8 0" Stroke="{StaticResource BrushCyan}" StrokeThickness="1.5"/>
+                        </Grid>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="ToggleBorder" Property="BorderBrush" Value="{StaticResource BrushCyan}"/>
+                            <Setter TargetName="ToggleBorder" Property="Background" Value="#111A29"/>
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="ToggleBorder" Property="BorderBrush" Value="{StaticResource BrushCyan}"/>
+                            <Setter TargetName="ToggleBorder" Property="Background" Value="#132136"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="TacticalComboBox" TargetType="ComboBox">
+        <Setter Property="Foreground" Value="{StaticResource BrushTextPrimary}"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="ItemContainerStyle" Value="{StaticResource TacticalComboBoxItem}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ComboBox">
+                    <Grid>
+                        <ToggleButton Style="{StaticResource TacticalComboBoxToggle}"
+                                      IsChecked="{Binding Path=IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}"/>
+                        <ContentPresenter IsHitTestVisible="False"
+                                          Content="{TemplateBinding SelectionBoxItem}"
+                                          ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                          ContentTemplateSelector="{TemplateBinding ItemTemplateSelector}"
+                                          Margin="10,0,32,0"
+                                          VerticalAlignment="Center"
+                                          HorizontalAlignment="Left"/>
+                        <Popup x:Name="PART_Popup"
+                               AllowsTransparency="True"
+                               IsOpen="{TemplateBinding IsDropDownOpen}"
+                               Placement="Bottom"
+                               PopupAnimation="Slide"
+                               Focusable="False">
+                            <Grid x:Name="DropDown"
+                                  SnapsToDevicePixels="True"
+                                  MinWidth="{TemplateBinding ActualWidth}"
+                                  MaxHeight="{TemplateBinding MaxDropDownHeight}">
+                                <Border x:Name="DropDownBorder"
+                                        CornerRadius="8"
+                                        Background="#090D15"
+                                        BorderBrush="{StaticResource BrushCardBorder}"
+                                        BorderThickness="1"
+                                        Margin="0,4,0,4">
+                                    <Border.Effect>
+                                        <DropShadowEffect Color="#00D8F6" BlurRadius="16" ShadowDepth="4" Opacity="0.25"/>
+                                    </Border.Effect>
+                                    <ScrollViewer Margin="4" SnapsToDevicePixels="True">
+                                        <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Contained"/>
+                                    </ScrollViewer>
+                                </Border>
+                            </Grid>
+                        </Popup>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="ComboBox" BasedOn="{StaticResource TacticalComboBox}" />
+    <Style TargetType="ComboBoxItem" BasedOn="{StaticResource TacticalComboBoxItem}" />
+
+    <!-- Modern Linear CheckBox -->
+    <Style x:Key="TacticalCheckBox" TargetType="CheckBox">
+        <Setter Property="Foreground" Value="{StaticResource BrushTextPrimary}"/>
+        <Setter Property="FontSize" Value="12"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="CheckBox">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <Border x:Name="Box" Width="18" Height="18" CornerRadius="4" Background="#0A0E17" BorderBrush="{StaticResource BrushCardBorder}" BorderThickness="1" Margin="0,0,8,0">
+                            <Path x:Name="Check" Data="M 3 8 L 7 12 L 14 4" Stroke="{StaticResource BrushCyan}" StrokeThickness="2" Visibility="Collapsed" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ContentPresenter VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="Box" Property="Background" Value="#0E2436"/>
+                            <Setter TargetName="Box" Property="BorderBrush" Value="{StaticResource BrushCyan}"/>
+                            <Setter TargetName="Check" Property="Visibility" Value="Visible"/>
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Box" Property="BorderBrush" Value="{StaticResource BrushCyan}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Modern Linear iOS/Pill Toggle Switch -->
+    <Style x:Key="TacticalToggleSwitch" TargetType="CheckBox">
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="CheckBox">
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                        <Border x:Name="Track" Width="38" Height="20" CornerRadius="10" Background="#121824" BorderBrush="{StaticResource BrushCardBorder}" BorderThickness="1" Margin="0,0,10,0">
+                            <Ellipse x:Name="Thumb" Width="14" Height="14" HorizontalAlignment="Left" Margin="2,0,0,0" Fill="#7B8FA6">
+                                <Ellipse.Effect>
+                                    <DropShadowEffect Color="#000000" BlurRadius="4" ShadowDepth="1" Opacity="0.5"/>
+                                </Ellipse.Effect>
+                            </Ellipse>
+                        </Border>
+                        <ContentPresenter VerticalAlignment="Center"/>
+                    </StackPanel>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="Track" Property="Background" Value="#330B14"/>
+                            <Setter TargetName="Track" Property="BorderBrush" Value="{StaticResource BrushAmber}"/>
+                            <Setter TargetName="Thumb" Property="HorizontalAlignment" Value="Right"/>
+                            <Setter TargetName="Thumb" Property="Margin" Value="0,0,2,0"/>
+                            <Setter TargetName="Thumb" Property="Fill" Value="{StaticResource BrushAmber}"/>
+                            <Setter TargetName="Thumb" Property="Effect">
+                                <Setter.Value>
+                                    <DropShadowEffect Color="#FF003C" BlurRadius="8" ShadowDepth="0" Opacity="0.8"/>
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Track" Property="BorderBrush" Value="{StaticResource BrushAmber}"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- ASUS ROG Tactical Segmented TabItem Style -->
+    <Style x:Key="TacticalTabItem" TargetType="TabItem">
+        <Setter Property="Foreground" Value="{StaticResource BrushTextSecondary}"/>
+        <Setter Property="FontSize" Value="11"/>
+        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="Padding" Value="18,9"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="TabItem">
+                    <Border x:Name="TabBorder" CornerRadius="4" Background="Transparent" Padding="{TemplateBinding Padding}" Margin="0,0,6,0" BorderThickness="1" BorderBrush="Transparent">
+                        <ContentPresenter x:Name="Content" ContentSource="Header" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Foreground" Value="{StaticResource BrushTextPrimary}"/>
+                            <Setter TargetName="TabBorder" Property="Background" Value="#101624"/>
+                            <Setter TargetName="TabBorder" Property="BorderBrush" Value="#253550"/>
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="Foreground" Value="#FFFFFF"/>
+                            <Setter TargetName="TabBorder" Property="Background" Value="#26070E"/>
+                            <Setter TargetName="TabBorder" Property="BorderBrush" Value="{StaticResource BrushAmber}"/>
+                            <Setter TargetName="TabBorder" Property="Effect">
+                                <Setter.Value>
+                                    <DropShadowEffect Color="#FF003C" BlurRadius="12" ShadowDepth="0" Opacity="0.35"/>
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+</ResourceDictionary>

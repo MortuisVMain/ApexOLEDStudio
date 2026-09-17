@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ApexOLEDStudio — Референсы и варианты дизайна</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;800&family=Rajdhani:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b0d13;
+      --card-bg: #121620;
+      --border: #222a3a;
+      --text: #f0f4f8;
+      --text-dim: #8a96a8;
+      --accent-rog: #ff003c;
+      --accent-cyan: #00e5ff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', -apple-system, sans-serif;
+      padding: 30px;
+      line-height: 1.5;
+    }
+    .header {
+      max-width: 1300px;
+      margin: 0 auto 40px auto;
+      text-align: center;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 25px;
+    }
+    .header h1 {
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+    .header h1 span {
+      color: var(--accent-rog);
+    }
+    .header p {
+      color: var(--text-dim);
+      margin-top: 8px;
+      font-size: 15px;
+    }
+    .tabs {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 25px;
+      flex-wrap: wrap;
+    }
+    .tab-btn {
+      background: #161c28;
+      color: var(--text-dim);
+      border: 1px solid var(--border);
+      padding: 10px 22px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .tab-btn:hover {
+      background: #1e2638;
+      color: #fff;
+      border-color: #3b4866;
+    }
+    .tab-btn.active {
+      background: #251218;
+      border-color: var(--accent-rog);
+      color: #fff;
+      box-shadow: 0 0 15px rgba(255, 0, 60, 0.25);
+    }
+
+    .container {
+      max-width: 1300px;
+      margin: 0 auto;
+    }
+
+    .variant-section {
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+    .variant-section.active {
+      display: block;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .variant-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 24px;
+      background: #121620;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 20px 24px;
+    }
+    .variant-header-info h2 {
+      font-size: 24px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .variant-header-info p {
+      color: var(--text-dim);
+      margin-top: 6px;
+      font-size: 14px;
+    }
+    .badges {
+      display: flex;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .badge {
+      background: #1a2233;
+      border: 1px solid #2e3b56;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 10px;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* PREVIEW CONTAINER */
+    .mockup-frame {
+      border: 1px solid #2b354a;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+      margin-bottom: 35px;
+    }
+
+    /* STYLE 1: ASUS ROG STRIX */
+    .theme-rog {
+      background: #080a0f;
+      color: #e2e8f0;
+      font-family: 'Rajdhani', sans-serif;
+      min-height: 600px;
+      position: relative;
+    }
+    .rog-topbar {
+      background: #0d111a;
+      border-bottom: 2px solid #ff003c;
+      padding: 12px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .rog-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 18px;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    .rog-slash {
+      color: #ff003c;
+      font-weight: 800;
+    }
+    .rog-status {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      background: #182030;
+      padding: 4px 12px;
+      border-left: 3px solid #00e5ff;
+      color: #00e5ff;
+    }
+    .rog-grid {
+      display: grid;
+      grid-template-columns: 280px 1fr 340px;
+      gap: 16px;
+      padding: 20px;
+    }
+    .rog-card {
+      background: #101520;
+      border: 1px solid #1f293d;
+      padding: 18px;
+      position: relative;
+      clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 0 100%);
+    }
+    .rog-card::before {
+      content: '';
+      position: absolute;
+      top: 0; right: 0;
+      width: 12px; height: 12px;
+      background: #ff003c;
+    }
+    .rog-card-title {
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: #8da2c0;
+      margin-bottom: 14px;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .rog-btn {
+      background: #141b29;
+      color: #fff;
+      border: 1px solid #283650;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 10px 16px;
+      width: 100%;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 10px;
+      transition: all 0.15s;
+    }
+    .rog-btn:hover {
+      background: #ff003c;
+      border-color: #ff003c;
+      box-shadow: 0 0 15px rgba(255, 0, 60, 0.4);
+    }
+    .rog-btn.accent {
+      background: #ff003c;
+      border-color: #ff003c;
+    }
+    .rog-gauge {
+      background: #0a0d14;
+      border: 1px solid #1c2436;
+      padding: 12px;
+      margin-bottom: 10px;
+    }
+    .rog-gauge-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .rog-bar-bg {
+      background: #161d2b;
+      height: 8px;
+      position: relative;
+      overflow: hidden;
+    }
+    .rog-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #ff003c, #00e5ff);
+    }
+
+    /* CENTER OLED DISPLAY */
+    .oled-viewport {
+      background: #050608;
+      border: 2px solid #1a2335;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border-radius: 4px;
+      box-shadow: inset 0 0 30px rgba(0,0,0,0.8);
+    }
+    .oled-screen-bezel {
+      background: #000;
+      border: 3px solid #333f56;
+      padding: 16px 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 20px rgba(0, 229, 255, 0.15);
+    }
+    .oled-pixels {
+      width: 256px;
+      height: 80px;
+      background: #000;
+      border: 1px solid #111;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+      font-family: 'JetBrains Mono', monospace;
+      color: #fff;
+      text-shadow: 0 0 4px #fff;
+    }
+    .oled-stat-box {
+      text-align: center;
+    }
+    .oled-val {
+      font-size: 20px;
+      font-weight: 800;
+    }
+    .oled-lbl {
+      font-size: 10px;
+      color: #aaa;
+    }
+
+    /* STYLE 2: NZXT CAM / MODERN TECH */
+    .theme-nzxt {
+      background: #0f1117;
+      color: #e4e7eb;
+      font-family: 'Inter', sans-serif;
+      min-height: 600px;
+    }
+    .nzxt-topbar {
+      background: #161822;
+      border-bottom: 1px solid #232736;
+      padding: 16px 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .nzxt-grid {
+      display: grid;
+      grid-template-columns: 280px 1fr 340px;
+      gap: 20px;
+      padding: 24px;
+    }
+    .nzxt-card {
+      background: #161922;
+      border: 1px solid #282e3e;
+      border-radius: 12px;
+      padding: 20px;
+    }
+    .nzxt-btn {
+      background: #202433;
+      color: #fff;
+      border: 1px solid #343b52;
+      padding: 12px 18px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 14px;
+      width: 100%;
+      cursor: pointer;
+      margin-bottom: 10px;
+      transition: all 0.2s;
+    }
+    .nzxt-btn:hover {
+      background: #6366f1;
+      border-color: #6366f1;
+    }
+    .nzxt-btn.accent {
+      background: #6366f1;
+      border-color: #6366f1;
+    }
+
+    /* STYLE 3: CYBERPUNK 2077 ARASAKA */
+    .theme-cp2077 {
+      background: #07090c;
+      color: #fce803;
+      font-family: 'Rajdhani', sans-serif;
+      min-height: 600px;
+    }
+    .cp-topbar {
+      background: #0c0f14;
+      border-bottom: 2px solid #fce803;
+      padding: 14px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .cp-grid {
+      display: grid;
+      grid-template-columns: 280px 1fr 340px;
+      gap: 16px;
+      padding: 20px;
+    }
+    .cp-card {
+      background: #0d1117;
+      border: 1px solid #2e361b;
+      border-left: 3px solid #fce803;
+      padding: 18px;
+    }
+    .cp-btn {
+      background: #141a22;
+      color: #fce803;
+      border: 1px solid #fce803;
+      padding: 10px 16px;
+      font-family: 'Rajdhani', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      width: 100%;
+      cursor: pointer;
+      margin-bottom: 10px;
+      transition: all 0.15s;
+    }
+    .cp-btn:hover {
+      background: #fce803;
+      color: #000;
+      box-shadow: 0 0 15px rgba(252, 232, 3, 0.4);
+    }
+
+    .features-list {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-top: 20px;
+    }
+    .feature-item {
+      background: #121620;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 16px;
+    }
+    .feature-item h4 {
+      font-size: 15px;
+      margin-bottom: 6px;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .feature-item p {
+      font-size: 13px;
+      color: var(--text-dim);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="header">
+    <h1>APEX OLED STUDIO <span>// ДИЗАЙН-КОНЦЕПЦИИ</span></h1>
+    <p>Реалистичные, адаптированные под WPF XAML варианты интерфейса на основе топовых платформ и стилей</p>
+    
+    <div class="tabs">
+      <button class="tab-btn active" onclick="showTab('rog')">🔴 1. ASUS ROG Strix (Armoury Crate v6)</button>
+      <button class="tab-btn" onclick="showTab('nzxt')">🟣 2. NZXT CAM / Hardware Clean Hub</button>
+      <button class="tab-btn" onclick="showTab('cp2077')">🟡 3. Cyberpunk 2077 Arasaka FUI</button>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <!-- VARIANT 1: ASUS ROG STRIX -->
+    <div id="tab-rog" class="variant-section active">
+      <div class="variant-header">
+        <div class="variant-header-info">
+          <h2>ASUS ROG Strix Edition (Armoury Crate v6)</h2>
+          <p>Агрессивный кибер-милитари стиль под ваш ноутбук ROG Strix G18. Скошенные под 45° углы, четкая иерархия, ноль размытого мыла.</p>
+          <div class="badges">
+            <span class="badge" style="color: #ff003c; border-color: #ff003c;">ROG Crimson #FF003C</span>
+            <span class="badge" style="color: #00e5ff; border-color: #00e5ff;">Cyan Neon #00E5FF</span>
+            <span class="badge">45° Chamfered Geometry</span>
+            <span class="badge">Bento Grid 3-Колонки</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="mockup-frame">
+        <div class="theme-rog">
+          <!-- TOPBAR -->
+          <div class="rog-topbar">
+            <div class="rog-logo">
+              <span class="rog-slash">///</span> APEX OLED STUDIO <span style="font-size: 12px; color: #667894;">[STRIX G18 SUITE]</span>
+            </div>
+            <div style="display: flex; gap: 12px; align-items: center;">
+              <div class="rog-status">⚡ HARDWARE LINK: ACTIVE (RTX 5070 Ti)</div>
+              <button class="rog-btn" style="width: auto; margin-bottom: 0; padding: 6px 14px; font-size: 12px;">⚙ НАСТРОЙКИ</button>
+            </div>
+          </div>
+
+          <!-- 3-COL GRID -->
+          <div class="rog-grid">
+            <!-- COL 1: PRESETS -->
+            <div class="rog-card">
+              <div class="rog-card-title"><span>▶</span> ПРОФИЛИ ЭКРАНА</div>
+              <button class="rog-btn accent">🔥 GAMING TELEMETRY</button>
+              <button class="rog-btn">⚡ CYBERPUNK HUD</button>
+              <button class="rog-btn">⌨ KEYBOARD APM / CPS</button>
+              <button class="rog-btn">🔇 STEALTH MINIMAL</button>
+
+              <div style="margin-top: 24px; border-top: 1px solid #1f293d; padding-top: 16px;">
+                <div class="rog-card-title"><span>//</span> УПРАВЛЕНИЕ</div>
+                <button class="rog-btn" style="background: #1a2538; border-color: #00e5ff; color: #00e5ff;">+ НОВЫЙ ПРОФИЛЬ</button>
+                <button class="rog-btn" style="color: #ff003c; border-color: #4a1520;">✖ СБРОСИТЬ В ДЕФОЛТ</button>
+              </div>
+            </div>
+
+            <!-- COL 2: OLED PREVIEW -->
+            <div class="rog-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+              <div>
+                <div class="rog-card-title" style="justify-content: space-between;">
+                  <span><span>◈</span> OLED LIVE VIEW (128x40)</span>
+                  <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #00e5ff;">FPS: 10 / USB: OK</span>
+                </div>
+
+                <div class="oled-viewport">
+                  <div class="oled-screen-bezel">
+                    <div class="oled-pixels">
+                      <div class="oled-stat-box">
+                        <div class="oled-val" style="color: #ff003c;">71°C</div>
+                        <div class="oled-lbl">GPU TEMP</div>
+                      </div>
+                      <div style="width: 1px; height: 35px; background: #333;"></div>
+                      <div class="oled-stat-box">
+                        <div class="oled-val" style="color: #00e5ff;">113W</div>
+                        <div class="oled-lbl">GPU PWR</div>
+                      </div>
+                      <div style="width: 1px; height: 35px; background: #333;"></div>
+                      <div class="oled-stat-box">
+                        <div class="oled-val">65%</div>
+                        <div class="oled-lbl">GPU LOAD</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div style="margin-top: 14px; font-size: 12px; color: #64748b; font-family: 'JetBrains Mono', monospace;">
+                    STEELSERIES APEX PRO TKL OLED • 128x40 MONOCHROME
+                  </div>
+                </div>
+              </div>
+
+              <!-- CONTROLS ROW (Никаких перекрытий!) -->
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px;">
+                <button class="rog-btn accent" style="margin-bottom: 0; padding: 14px;">⚡ ОТПРАВИТЬ НА КЛАВИАТУРУ</button>
+                <button class="rog-btn" style="margin-bottom: 0; padding: 14px; border-color: #00e5ff; color: #00e5ff;">📸 ТЕСТОВЫЙ СКРИНШОТ</button>
+              </div>
+            </div>
+
+            <!-- COL 3: WIDGET PALETTE -->
+            <div class="rog-card">
+              <div class="rog-card-title"><span>▲</span> ТЕЛЕМЕТРИЯ СИСТЕМЫ</div>
+              
+              <div class="rog-gauge">
+                <div class="rog-gauge-header">
+                  <span>GPU: RTX 5070 Ti</span>
+                  <span style="color: #ff003c;">71.4°C / 113W</span>
+                </div>
+                <div class="rog-bar-bg">
+                  <div class="rog-bar-fill" style="width: 65%;"></div>
+                </div>
+              </div>
+
+              <div class="rog-gauge">
+                <div class="rog-gauge-header">
+                  <span>CPU: Core i9-14900HX</span>
+                  <span style="color: #00e5ff;">76°C / 54W</span>
+                </div>
+                <div class="rog-bar-bg">
+                  <div class="rog-bar-fill" style="width: 42%; background: #00e5ff;"></div>
+                </div>
+              </div>
+
+              <div class="rog-gauge">
+                <div class="rog-gauge-header">
+                  <span>RAM USAGE</span>
+                  <span>14.2 / 31.8 GB</span>
+                </div>
+                <div class="rog-bar-bg">
+                  <div class="rog-bar-fill" style="width: 45%; background: #9d4edd;"></div>
+                </div>
+              </div>
+
+              <div style="margin-top: 20px;">
+                <div class="rog-card-title"><span>+</span> ДОБАВИТЬ ВИДЖЕТ</div>
+                <select style="width: 100%; background: #0a0d14; border: 1px solid #283650; color: #fff; padding: 10px; font-family: 'Rajdhani', sans-serif; font-size: 14px; margin-bottom: 10px; border-radius: 0;">
+                  <option>🔥 GPU Hotspot Temp</option>
+                  <option>⚡ Total System Power (161.8W)</option>
+                  <option>🎮 Keypress Counter (APM)</option>
+                  <option>⏱ System Uptime</option>
+                </select>
+                <button class="rog-btn" style="background: #1a2538; border-color: #00e5ff; color: #00e5ff;">+ ДОБАВИТЬ В МАКЕТ</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="features-list">
+        <div class="feature-item">
+          <h4>📐 Геометрия 45°</h4>
+          <p>Никаких круглых кнопок. Четкие срезы углов, фирменная косая черта ROG и технологичные акцентные уголки.</p>
+        </div>
+        <div class="feature-item">
+          <h4>🎯 Ноль перекрытий</h4>
+          <p>Кнопки управления вынесены в нижнюю фиксированную строку превью, а выбор виджетов изолирован в правой колонке со своим скроллом.</p>
+        </div>
+        <div class="feature-item">
+          <h4>💡 Идеально под Armoury Crate</h4>
+          <p>Цветовая гамма идентична софту ASUS: угольный фон, алые акценты и яркая неоновая подсветка сенсоров.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- VARIANT 2: NZXT CAM -->
+    <div id="tab-nzxt" class="variant-section">
+      <div class="variant-header">
+        <div class="variant-header-info">
+          <h2>NZXT CAM / Hardware Clean Hub</h2>
+          <p>Элегантный современный стиль премиального «железа». Закругленные матовые карточки, спокойная неоновая подсветка и фокус на читаемость цифр.</p>
+          <div class="badges">
+            <span class="badge" style="color: #6366f1; border-color: #6366f1;">Indigo #6366F1</span>
+            <span class="badge" style="color: #00b4d8; border-color: #00b4d8;">Ice Blue #00B4D8</span>
+            <span class="badge">Modern Bento Grid</span>
+            <span class="badge">Soft Radius 10px</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="mockup-frame">
+        <div class="theme-nzxt">
+          <div class="nzxt-topbar">
+            <div style="font-weight: 700; font-size: 17px; display: flex; align-items: center; gap: 8px;">
+              <span style="color: #6366f1;">●</span> Apex OLED Studio <span style="font-size: 13px; color: #8892b0; font-weight: normal;">/ Hardware Monitor</span>
+            </div>
+            <div style="display: flex; gap: 10px;">
+              <button class="nzxt-btn" style="width: auto; margin-bottom: 0; padding: 8px 16px;">Настройки</button>
+            </div>
+          </div>
+
+          <div class="nzxt-grid">
+            <div class="nzxt-card">
+              <div style="font-size: 13px; font-weight: 600; color: #8892b0; text-transform: uppercase; margin-bottom: 12px;">Профили</div>
+              <button class="nzxt-btn accent">Игровая телеметрия</button>
+              <button class="nzxt-btn">Счетчик нажатий</button>
+              <button class="nzxt-btn">Минималистичный</button>
+              <button class="nzxt-btn" style="border-style: dashed; background: transparent; color: #8892b0;">+ Добавить профиль</button>
+            </div>
+
+            <div class="nzxt-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+              <div>
+                <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; color: #8892b0; margin-bottom: 14px;">
+                  <span>ЭКРАН КЛАВИАТУРЫ</span>
+                  <span style="color: #10b981;">● Подключено</span>
+                </div>
+                <div class="oled-viewport" style="background: #0b0d13; border-color: #232736; border-radius: 10px;">
+                  <div class="oled-screen-bezel" style="border-color: #2a3144; border-radius: 10px;">
+                    <div class="oled-pixels">
+                      <div class="oled-stat-box">
+                        <div class="oled-val" style="color: #6366f1;">71°C</div>
+                        <div class="oled-lbl">GPU TEMP</div>
+                      </div>
+                      <div class="oled-stat-box">
+                        <div class="oled-val" style="color: #00b4d8;">113W</div>
+                        <div class="oled-lbl">GPU PWR</div>
+                      </div>
+                      <div class="oled-stat-box">
+                        <div class="oled-val">65%</div>
+                        <div class="oled-lbl">GPU LOAD</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px;">
+                <button class="nzxt-btn accent" style="margin-bottom: 0;">Отправить на OLED</button>
+                <button class="nzxt-btn" style="margin-bottom: 0;">Скриншот</button>
+              </div>
+            </div>
+
+            <div class="nzxt-card">
+              <div style="font-size: 13px; font-weight: 600; color: #8892b0; text-transform: uppercase; margin-bottom: 14px;">Датчики</div>
+              <div style="background: #11131c; border-radius: 8px; padding: 14px; margin-bottom: 10px;">
+                <div style="display: flex; justify-content: space-between; font-weight: 600;">
+                  <span>NVIDIA RTX 5070 Ti</span>
+                  <span style="color: #6366f1;">71.4°C</span>
+                </div>
+                <div style="font-size: 12px; color: #8892b0; margin-top: 4px;">Мощность: 113.0 W • Нагрузка: 65%</div>
+              </div>
+              <div style="background: #11131c; border-radius: 8px; padding: 14px; margin-bottom: 10px;">
+                <div style="display: flex; justify-content: space-between; font-weight: 600;">
+                  <span>Intel Core i9-14900HX</span>
+                  <span style="color: #00b4d8;">76.0°C</span>
+                </div>
+                <div style="font-size: 12px; color: #8892b0; margin-top: 4px;">Мощность: 54.0 W • Нагрузка: 42%</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="features-list">
+        <div class="feature-item">
+          <h4>✨ Минимализм и чистота</h4>
+          <p>Для тех, кто предпочитает сдержанный стиль без кричащих деталей, как в NZXT CAM и Corsair iCUE.</p>
+        </div>
+        <div class="feature-item">
+          <h4>📱 Плавные скругления</h4>
+          <p>Мягкие радиусы скругления карточек (10px) и аккуратные тени создают ощущение дорогого приложения.</p>
+        </div>
+        <div class="feature-item">
+          <h4>📊 Читаемая типографика</h4>
+          <p>Шрифт Inter с выверенной контрастностью и крупными цифровыми показателями.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- VARIANT 3: CYBERPUNK 2077 -->
+    <div id="tab-cp2077" class="variant-section">
+      <div class="variant-header">
+        <div class="variant-header-info">
+          <h2>Cyberpunk 2077 Arasaka FUI</h2>
+          <p>Трушный киберпанк из Game UI Database: кислотно-желтые и бирюзовые акценты, техническая разметка, сетки сканирования.</p>
+          <div class="badges">
+            <span class="badge" style="color: #fce803; border-color: #fce803;">Electric Yellow #FCE803</span>
+            <span class="badge" style="color: #00f0ff; border-color: #00f0ff;">Arasaka Cyan #00F0FF</span>
+            <span class="badge">Netrunner Terminal</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="mockup-frame">
+        <div class="theme-cp2077">
+          <div class="cp-topbar">
+            <div style="font-weight: 700; font-size: 18px; letter-spacing: 1px;">
+              [ARASAKA_NETRUNNER] // APEX_OLED_OS
+            </div>
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px;">
+              STATUS: BREACH_SECURE // NODE: STEELSERIES
+            </div>
+          </div>
+
+          <div class="cp-grid">
+            <div class="cp-card">
+              <div style="font-size: 14px; font-weight: 700; margin-bottom: 12px;">// MEMORY_PRESETS</div>
+              <button class="cp-btn" style="background: #fce803; color: #000;">[01] HW_OVERLOAD</button>
+              <button class="cp-btn">[02] CYBER_TELEMETRY</button>
+              <button class="cp-btn">[03] DAEMON_COUNTER</button>
+            </div>
+
+            <div class="cp-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+              <div>
+                <div style="display: flex; justify-content: space-between; font-size: 13px; font-weight: 700; margin-bottom: 12px;">
+                  <span>// VIEWPORT_SCANNER (128x40)</span>
+                  <span>FEED: LIVE</span>
+                </div>
+                <div class="oled-viewport" style="background: #000; border-color: #fce803;">
+                  <div class="oled-screen-bezel" style="border-color: #fce803;">
+                    <div class="oled-pixels" style="color: #fce803; text-shadow: 0 0 6px #fce803;">
+                      <div class="oled-stat-box">
+                        <div class="oled-val">71°C</div>
+                        <div class="oled-lbl" style="color: #fce803;">GPU_CORE</div>
+                      </div>
+                      <div class="oled-stat-box">
+                        <div class="oled-val">113W</div>
+                        <div class="oled-lbl" style="color: #fce803;">PWR_DRAW</div>
+                      </div>
+                      <div class="oled-stat-box">
+                        <div class="oled-val">65%</div>
+                        <div class="oled-lbl" style="color: #fce803;">LOAD</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px;">
+                <button class="cp-btn" style="background: #fce803; color: #000; margin-bottom: 0;">UPLOAD_TO_OLED</button>
+                <button class="cp-btn" style="margin-bottom: 0;">CAPTURE_FRAME</button>
+              </div>
+            </div>
+
+            <div class="cp-card">
+              <div style="font-size: 14px; font-weight: 700; margin-bottom: 12px;">// SENSOR_REGISTRY</div>
+              <div style="font-family: 'JetBrains Mono', monospace; font-size: 12px; line-height: 1.8;">
+                <div>> GPU: RTX 5070 Ti Laptop</div>
+                <div style="color: #fce803;">> TEMP: 71.4°C [NOMINAL]</div>
+                <div>> POWER: 113.0W</div>
+                <div>> CPU: i9-14900HX (76°C)</div>
+                <div>> SYS_PWR: 161.8W</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="features-list">
+        <div class="feature-item">
+          <h4>⚡ Атмосфера Night City</h4>
+          <p>Для фанатов киберпанка: резкий контраст черного и желтого, псевдо-терминальный вывод и стильные рамки.</p>
+        </div>
+        <div class="feature-item">
+          <h4>🔍 Высокая контрастность</h4>
+          <p>Все элементы моментально считываются боковым зрением во время напряженной игры.</p>
+        </div>
+        <div class="feature-item">
+          <h4>🎮 Игровой антураж</h4>
+          <p>Идеально сочетается с клавиатурой SteelSeries Apex Pro и кастомной RGB-подсветкой.</p>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    function showTab(name) {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.variant-section').forEach(s => s.classList.remove('active'));
+      
+      document.querySelector(`button[onclick="showTab('${name}')"]`).classList.add('active');
+      document.getElementById(`tab-${name}`).classList.add('active');
+    }
+  </script>
+</body>
+</html>

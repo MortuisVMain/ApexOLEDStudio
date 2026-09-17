@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ApexOLED Studio — 5 Концептов Дизайна</title>
+    <style>
+        :root {
+            --bg-void: #070a0f;
+            --bg-card: #0f1522;
+            --border-card: #1e293b;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --cyan: #00e5ff;
+            --amber: #f59e0b;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background-color: var(--bg-void);
+            color: var(--text-primary);
+            line-height: 1.6;
+            padding: 40px 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        .badge {
+            display: inline-block;
+            background: rgba(0, 229, 255, 0.1);
+            color: var(--cyan);
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            letter-spacing: 1px;
+        }
+        h1 {
+            font-size: 36px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, #ffffff 40%, var(--cyan) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        p.subtitle {
+            color: var(--text-secondary);
+            font-size: 16px;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        .concept-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-card);
+            border-radius: 16px;
+            margin-bottom: 50px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+        .concept-card:hover {
+            border-color: rgba(0, 229, 255, 0.4);
+            box-shadow: 0 15px 40px rgba(0, 229, 255, 0.1);
+        }
+        .image-wrapper {
+            width: 100%;
+            background: #000;
+            text-align: center;
+            border-bottom: 1px solid var(--border-card);
+        }
+        .image-wrapper img {
+            width: 100%;
+            height: auto;
+            display: block;
+            cursor: pointer;
+        }
+        .concept-body {
+            padding: 30px;
+        }
+        .concept-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .concept-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #fff;
+        }
+        .concept-tag {
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+        .tag-ref { background: rgba(245, 158, 11, 0.2); color: var(--amber); border: 1px solid var(--amber); }
+        .tag-tac { background: rgba(0, 229, 255, 0.2); color: var(--cyan); border: 1px solid var(--cyan); }
+        .tag-steam { background: rgba(200, 138, 53, 0.2); color: #e5a84b; border: 1px solid #c88a35; }
+        .tag-cyber { background: rgba(255, 0, 85, 0.2); color: #ff0055; border: 1px solid #ff0055; }
+        .tag-min { background: rgba(148, 163, 184, 0.2); color: #cbd5e1; border: 1px solid #64748b; }
+
+        .desc {
+            color: #cbd5e1;
+            font-size: 15px;
+            margin-bottom: 20px;
+            line-height: 1.7;
+        }
+        .chips-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .chips {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        .chip {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: #151d2c;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        .color-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        .open-btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            color: #070a0f;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 13px;
+            text-decoration: none;
+            transition: opacity 0.2s;
+        }
+        .open-btn:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="badge">APEXOLED STUDIO UI SHOWCASE</div>
+            <h1>5 Концептов Дизайна Приложения</h1>
+            <p class="subtitle">Выберите один из 5 вариантов стиля для интерфейса. Кликните по любой картинке для открытия в полном разрешении.</p>
+        </header>
+
+        <!-- CONCEPT 1 -->
+        <div class="concept-card">
+            <div class="image-wrapper">
+                <a href="concept1_cyber_alchemical.jpg" target="_blank">
+                    <img src="concept1_cyber_alchemical.jpg" alt="Концепт 1: Cyber-Alchemical Workshop">
+                </a>
+            </div>
+            <div class="concept-body">
+                <div class="concept-header">
+                    <div class="concept-title">Концепт 1: «Cyber-Alchemical Workshop»</div>
+                    <span class="concept-tag tag-ref">⭐ Прямое развитие вашего референса</span>
+                </div>
+                <div class="desc">
+                    Мягкое освещение от подвесных ламп накаливания сверху, благородный темный сланец с состаренной бронзой, центральный OLED-дисплей с неоновым бирюзовым свечением пикселей и ряд светящихся тактических карт внизу. Максимально точное попадание в загруженный вами образец.
+                </div>
+                <div class="chips-title">Цветовая палитра:</div>
+                <div class="chips">
+                    <div class="chip"><span class="color-dot" style="background:#0b0e14;"></span> Void Slate (#0B0E14)</div>
+                    <div class="chip"><span class="color-dot" style="background:#18202c;"></span> Aged Bronze (#18202C)</div>
+                    <div class="chip"><span class="color-dot" style="background:#f59e0b;"></span> Filament Amber (#F59E0B)</div>
+                    <div class="chip"><span class="color-dot" style="background:#00e5ff;"></span> Electric Cyan (#00E5FF)</div>
+                </div>
+                <a href="concept1_cyber_alchemical.jpg" target="_blank" class="open-btn">🔍 Открыть Концепт 1 в полном размере</a>
+            </div>
+        </div>
+
+        <!-- CONCEPT 2 -->
+        <div class="concept-card">
+            <div class="image-wrapper">
+                <a href="concept2_military_tactical.jpg" target="_blank">
+                    <img src="concept2_military_tactical.jpg" alt="Концепт 2: Military Tactical Ops">
+                </a>
+            </div>
+            <div class="concept-body">
+                <div class="concept-header">
+                    <div class="concept-title">Концепт 2: «Military Tactical Ops / Mech Command»</div>
+                    <span class="concept-tag tag-tac">Брутальный боевой мех</span>
+                </div>
+                <div class="desc">
+                    Интерфейс оператора боевого робота (Titanfall / Armored Core): скошенные под 45° углы (chamfered corners), полосы предупреждения Hazard Stripes, оружейная сталь Gunmetal, тактические прицельные сетки и брутальные карточки слотов вооружения.
+                </div>
+                <div class="chips-title">Цветовая палитра:</div>
+                <div class="chips">
+                    <div class="chip"><span class="color-dot" style="background:#12151a;"></span> Matte Gunmetal (#12151A)</div>
+                    <div class="chip"><span class="color-dot" style="background:#1e232b;"></span> Armor Plate (#1E232B)</div>
+                    <div class="chip"><span class="color-dot" style="background:#ff9900;"></span> Hazard Amber (#FF9900)</div>
+                    <div class="chip"><span class="color-dot" style="background:#00f0ff;"></span> Tactical Cyan (#00F0FF)</div>
+                </div>
+                <a href="concept2_military_tactical.jpg" target="_blank" class="open-btn">🔍 Открыть Концепт 2 в полном размере</a>
+            </div>
+        </div>
+
+        <!-- CONCEPT 3 -->
+        <div class="concept-card">
+            <div class="image-wrapper">
+                <a href="concept3_steampunk_brass.jpg" target="_blank">
+                    <img src="concept3_steampunk_brass.jpg" alt="Концепт 3: Steampunk Brass & Nixie Tubes">
+                </a>
+            </div>
+            <div class="concept-body">
+                <div class="concept-header">
+                    <div class="concept-title">Концепт 3: «Steampunk Brass & Vacuum Nixie Tubes»</div>
+                    <span class="concept-tag tag-steam">Викторианский стимпанк</span>
+                </div>
+                <div class="desc">
+                    Темное полированное дерево махагони, латунь и медь с клепками и гравировкой, стеклянные газоразрядные радиолампы Nixie Tubes для ватт и температур, а OLED экран оформлен в виде массивного латунного иллюминатора подводной лодки Наутилус.
+                </div>
+                <div class="chips-title">Цветовая палитра:</div>
+                <div class="chips">
+                    <div class="chip"><span class="color-dot" style="background:#1a120b;"></span> Dark Mahogany (#1A120B)</div>
+                    <div class="chip"><span class="color-dot" style="background:#c88a35;"></span> Polished Brass (#C88A35)</div>
+                    <div class="chip"><span class="color-dot" style="background:#ff6b1a;"></span> Nixie Orange (#FF6B1A)</div>
+                    <div class="chip"><span class="color-dot" style="background:#e5a84b;"></span> Antique Gold (#E5A84B)</div>
+                </div>
+                <a href="concept3_steampunk_brass.jpg" target="_blank" class="open-btn">🔍 Открыть Концепт 3 в полном размере</a>
+            </div>
+        </div>
+
+        <!-- CONCEPT 4 -->
+        <div class="concept-card">
+            <div class="image-wrapper">
+                <a href="concept4_cyberpunk_ripperdoc.jpg" target="_blank">
+                    <img src="concept4_cyberpunk_ripperdoc.jpg" alt="Концепт 4: Cyberpunk 2077 Ripperdoc">
+                </a>
+            </div>
+            <div class="concept-body">
+                <div class="concept-header">
+                    <div class="concept-title">Концепт 4: «Cyberpunk 2077 Night City Ripperdoc»</div>
+                    <span class="concept-tag tag-cyber">Неоновый киберпанк</span>
+                </div>
+                <div class="desc">
+                    Интерфейс подпольной кибер-клиники Риппердока из Найт-Сити: глубокий карбон, неоновый кислотный циан (#00FFF0), лазерная фуксия (#FF0055), тепловые карты GPU (Heat Maps) и голографические карточки киберимплантов.
+                </div>
+                <div class="chips-title">Цветовая палитра:</div>
+                <div class="chips">
+                    <div class="chip"><span class="color-dot" style="background:#070a0f;"></span> Deep Carbon (#070A0F)</div>
+                    <div class="chip"><span class="color-dot" style="background:#00fff0;"></span> Acid Cyan (#00FFF0)</div>
+                    <div class="chip"><span class="color-dot" style="background:#ff0055;"></span> Laser Magenta (#FF0055)</div>
+                    <div class="chip"><span class="color-dot" style="background:#ff2e93;"></span> Neon Pink (#FF2E93)</div>
+                </div>
+                <a href="concept4_cyberpunk_ripperdoc.jpg" target="_blank" class="open-btn">🔍 Открыть Концепт 4 в полном размере</a>
+            </div>
+        </div>
+
+        <!-- CONCEPT 5 -->
+        <div class="concept-card">
+            <div class="image-wrapper">
+                <a href="concept5_linear_stealth_glass.jpg" target="_blank">
+                    <img src="concept5_linear_stealth_glass.jpg" alt="Концепт 5: Modern Linear Pro Stealth Glass">
+                </a>
+            </div>
+            <div class="concept-body">
+                <div class="concept-header">
+                    <div class="concept-title">Концепт 5: «Modern Linear Pro / Stealth Dark Glass»</div>
+                    <span class="concept-tag tag-min">Премиум минимализм</span>
+                </div>
+                <div class="desc">
+                    Ультра-современный премиальный стиль Linear.app и Teenage Engineering: матовое дымчатое стекло (Frosted Glass), субтильные полупрозрачные границы 1px, моноширинные цифровые шрифты, мягкий задний свет и безупречная аскетичность.
+                </div>
+                <div class="chips-title">Цветовая палитра:</div>
+                <div class="chips">
+                    <div class="chip"><span class="color-dot" style="background:#0d0f14;"></span> Matte Obsidian (#0D0F14)</div>
+                    <div class="chip"><span class="color-dot" style="background:#151821;"></span> Smoked Glass (#151821)</div>
+                    <div class="chip"><span class="color-dot" style="background:#00d8f6;"></span> Electric Micro-Glow (#00D8F6)</div>
+                    <div class="chip"><span class="color-dot" style="background:#ffffff;"></span> Ice White (#FFFFFF)</div>
+                </div>
+                <a href="concept5_linear_stealth_glass.jpg" target="_blank" class="open-btn">🔍 Открыть Концепт 5 в полном размере</a>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>

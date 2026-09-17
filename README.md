@@ -1,0 +1,127 @@
+# 🎛️ ApexOLED Studio
+
+**ApexOLED Studio** — это современная настольная станция на **C# (.NET 10 / WPF)** для визуального конструирования и мониторинга аппаратного обеспечения на встроенных OLED-дисплеях клавиатур **SteelSeries Apex Pro, Apex 7 и Apex 5** (128×40).
+
+Интерфейс выполнен в эстетике **Cyber-Alchemical & Tactical Glass** (по референсу): глубокие обсидиановые панели, неоновые бирюзовые акценты (`#00E5FF`), теплое янтарное свечение ламп (`#F59E0B`), тактильные переключатели и галерея светящихся тактических карт пресетов.
+
+---
+
+## ⚡ Ключевые возможности
+
+1. **Интерактивный WYSIWYG Визуальный редактор (Live Preview):**
+   * Виртуальный экран клавиатуры $128 \times 40$ пикселей в масштабе **6x** (768×240 px) с имитацией пиксельной сетки OLED.
+   * Выделение любого элемента мышкой на экране, перемещение Drag-and-Drop, изменение размеров и привязка к координатам в реальном времени.
+   * **Независимое включение/отключение каждого виджета**: галочка `[✓]` у каждого виджета в списке и инспекторе мгновенно скрывает/показывает его на экране OLED. Кнопки `Enable All`, `Disable All`, `Duplicate`.
+
+2. **Вшитый сенсорный движок с замером мощности в Ваттах (W) (Zero External Apps!):**
+   * Больше **не нужно запускать сторонний софт** (Libre Hardware Monitor или HWiNFO).
+   * Библиотека `LibreHardwareMonitorLib` встроена напрямую в процесс: опрашивает температуры процессора, GPU Core, GPU Hotspot, видеопамять VRAM, энергопотребление в ваттах (**CPU Power W**, **GPU Power W**, **Total System Power W**), оперативную память и вентиляторы прямо из памяти.
+
+3. **Модульность: независимое подключение/отключение всех модулей в любых вариациях:**
+   * 🔊 **Audio Volume HUD Pop-up**: автоматический оверлей громкости при вращении колеса клавиатуры с настраиваемой длительностью (500–3000 мс).
+   * 🎙 **Microphone Monitor**: индикатор состояния микрофона (`ON` / `MUTED`).
+   * 🔒 **Lock Keys State**: отслеживание клавиш Caps Lock, Num Lock, Scroll Lock (`{caps}`).
+   * 🌡 **GPU Thermal Paste Guard**: мониторинг дельты Hotspot minus Core с тревогой и мигающей инверсией при деградации термопасты.
+   * 📜 **Marquee Auto-Scroll**: плавный горизонтальный скролл длинных названий треков и строк.
+   * 🐱 **GIF Animation & Pixel-Art Engine**: воспроизведение анимированных `.gif` файлов с dithering (включая встроенного Bongo Cat).
+   * ⌨ **Global Hotkeys**: быстрое циклическое переключение пресетов по сочетанию `Ctrl + Alt + O` прямо во время игры.
+   * 🎮 **Auto-Profile Watcher**: автоматическая смена пресета при запуске игр и программ (`cs2`, `dota2`, `spotify` и др.).
+   * 🌤 **Online Weather**: погода и температура за окном через Open-Meteo.
+   * 🛡 **Burn-In Guard**: орбитальный сдвиг пикселей и гашение при блокировке (`Win + L`).
+   * 🚀 **Системные опции**: автозапуск с Windows (HKCU Run), сворачивание в трей при закрытии [✕], запуск в свёрнутом виде.
+
+4. **Галерея тактических карт пресетов (Preset Cards Rack):**
+   * **Dual CPU & GPU**: Классический монитор нагрузок и температур.
+   * **Power Station (Watts)**: Замер потребления в ваттах (CPU W, GPU W, Total W, шкалы).
+   * **Gamer Pro (Ping/Net)**: Сетевой и игровой монитор с пингом, скоростью сети, дельтой пасты, APM.
+   * **Media Station**: Музыкальный плеер со скроллом треков, шкалой громкости и индикатором микрофона.
+   * **Cyber Bongo Cat**: Анимированный ретро-маскот, котик барабанит по клавиатуре, громкость, часы.
+   * **Weather & Clock**: Цифровые часы, дата, температура на улице, погода, статус клавиш.
+   * **Gamer Minimal**: Лаконичный ультрачистый дизайн для киберспорта.
+
+5. **Режим песочницы (Sandbox Simulator):**
+   * Полный тестовый стенд с интерактивными слайдерами (CPU %, CPU Temp, CPU Watts, GPU %, GPU Temp, GPU Hotspot, GPU Watts, RAM %, Net Ping, Volume, Caps Lock, Mic Mute).
+
+6. **Прямой драйвер Direct USB HID (Apex Pro Native):**
+   * Прямая связь по USB с контроллером клавиатуры (Vendor ID `0x1038`).
+   * Не требует запущенного тяжелого приложения **SteelSeries GG**!
+
+---
+
+## 🚀 Запуск и сборка
+
+### Быстрый запуск:
+```cmd
+run.cmd
+```
+или
+```powershell
+dotnet run --project ApexOLEDStudio.UI
+```
+
+### Release EXE (Windows x64)
+
+Self-contained single-file публикация выполняется так:
+
+```powershell
+dotnet publish ApexOLEDStudio.UI\ApexOLEDStudio.UI.csproj `
+  -c Release -r win-x64 --self-contained true `
+  -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true `
+  -p:DebugType=None -p:DebugSymbols=false `
+  -o publish\win-x64
+```
+
+Готовый файл: `publish\win-x64\ApexOLEDStudio.UI.exe`. Папки `bin`, `obj`,
+`publish` и локальные пользовательские настройки исключены из Git через
+`.gitignore`; пользовательские настройки приложения хранятся в
+`%AppData%\ApexOLEDStudio`.
+
+### Запуск тестов:
+```powershell
+dotnet test
+```
+
+### Лицензирование
+
+Собственный код ApexOLEDStudio распространяется по ограничительной
+проприетарной лицензии из `LICENSE.md`: просмотр разрешён для оценки,
+а использование, копирование, модификация, распространение, продажа и
+коммерческое применение запрещены без предварительного письменного
+разрешения правообладателя. Это не OSI-approved open-source лицензия.
+Сторонние пакеты и runtime-компоненты сохраняют собственные лицензии и
+условия. Исходный код SteelClock/GPLv3 в проект не копируется и не
+включается.
+
+---
+
+## 📁 Архитектура решения
+
+* `ApexOLEDStudio.Core/`:
+  * `Drawing/OledFrameBuffer.cs` — буфер 128×40, алгоритмы отрисовки линий, прогресс-баров, графиков, стрелочных шкал и экспорт в 640-байтный массив.
+  * `Drawing/OledFonts.cs` — монохромные шрифты (5×7 классический, 3×5 компактный).
+  * `Drivers/ApexProHidDriver.cs` — прямой Win32 HID драйвер (VID 0x1038, HID Feature Reports).
+  * `Drivers/IDisplayDeviceBackend.cs` и `Drivers/ApexProProtocolProfile.cs` — собственные расширяемые интерфейсы backend/protocol profile, capability-based проверка устройства и подготовка к нескольким типам дисплеев.
+  * `Models/HardwareMetrics.cs` & `OledLayout.cs` — модели телеметрии, ватты, токены, реактивные виджеты с `INotifyPropertyChanged`.
+  * `Services/HardwareMonitorService.cs` — встроенный опрос датчиков через `LibreHardwareMonitorLib` с возможностью отключения категорий.
+  * `Services/AudioService.cs` — CoreAudio COM-интероп без NAudio (громкость и микрофон).
+  * `Services/LockKeysService.cs` — Win32 GetKeyState для Caps/Num/Scroll Lock.
+  * `Services/AppWatcherService.cs` — трекер активного окна для автосмены пресетов.
+  * `Services/WeatherService.cs` — асинхронный клиент Open-Meteo.
+  * `Services/GifAnimationService.cs` — декодер GIF и генератор маскота Bongo Cat.
+  * `Services/BurnInGuard.cs` — орбитальная защита от выгорания OLED.
+  * `Services/AppSettings.cs` & `SettingsService.cs` — модульные настройки и реестр автозапуска.
+  * `Services/ProfileConfigurationService.cs` — переносимые JSON-профили настроек + layout для export/import.
+* `ApexOLEDStudio.UI/`:
+  * `ViewModels/MainViewModel.cs` — реактивная MVVM-модель, цикл рендеринга, горячие клавиши, системный трей.
+  * `Styles/CyberAlchemicalTheme.xaml` — темная дизайн-система с кастомными ComboBox, ScrollBar, ToggleSwitch, CheckBox и TabItem.
+  * `MainWindow.xaml` — главное окно студии: WYSIWYG дизайнер, галерея пресетов, хаб настроек и песочница симулятора.
+* `ApexOLEDStudio.Tests/`:
+  * **43 модульных теста** (100% green), тестирующих рендеринг, ватты, инверсию, сериализацию, capability validation, импорт/экспорт профилей и editor math/model.
+
+### Архитектурное ограничение первого этапа
+
+Протоколы и capability-модель разработаны самостоятельно по публичным наблюдаемым требованиям текущего 128×40 HID backend. Исходники SteelClock с GPLv3 не копируются и не включаются. Реальная проверка USB reconnect и feature reports требует физического совместимого SteelSeries устройства; без него тестируются только валидация дескрипторов, сериализация профилей и безопасное поведение backend.
+
+### Редактор виджетов
+
+ROG-редактор поддерживает двустороннее изменение выбранного виджета через sliders: координаты и размеры 128×40, масштаб шрифта и диапазон графика. Значения автоматически ограничиваются границами OLED, а `Shift` при перетаскивании включает snap-to-grid. В canvas доступна сетка с настраиваемым шагом 1–8 px, toggle `Grid`, lock виджета и команды `FRONT/BACK` для z-order. `Enabled`, `IsLocked` и `ZIndex` добавлены обратно-совместимо как новые JSON-поля; старые профили продолжают загружаться. Полноценные визуальные resize handles отложены до отдельного этапа, чтобы не нарушать текущую drag-архитектуру.

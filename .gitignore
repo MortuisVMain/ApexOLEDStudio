@@ -1,0 +1,35 @@
+# Build outputs and intermediate files
+[Bb]in/
+[Oo]bj/
+publish/
+artifacts/
+
+# Visual Studio / Rider / VS Code user state
+.vs/
+.idea/
+.vscode/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Local application data and generated profiles
+*.local.json
+settings.json
+default_profile.json
+*.corrupt-*
+
+# Test and coverage output
+TestResults/
+coverage/
+*.coverage
+*.coveragexml
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+
+# Local diagnostic logs
+crash.log
+err.txt
+out.txt

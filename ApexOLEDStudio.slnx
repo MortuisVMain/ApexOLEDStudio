@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="ApexOLEDStudio.Core/ApexOLEDStudio.Core.csproj" />
+  <Project Path="ApexOLEDStudio.Tests/ApexOLEDStudio.Tests.csproj" />
+  <Project Path="ApexOLEDStudio.UI/ApexOLEDStudio.UI.csproj" />
+</Solution>
