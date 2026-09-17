@@ -110,22 +110,25 @@ public sealed class OledFrameBuffer
         }
     }
 
-    public void DrawProgressBar(int x, int y, int w, int h, float percent, bool bordered = true, bool on = true)
+    public void DrawProgressBar(int x, int y, int w, int h, float percent, bool bordered = true, bool on = true, int scale = 1)
     {
         if (w <= 2 || h <= 2) return;
 
         float clamped = Math.Clamp(percent, 0f, 100f);
+        int border = Math.Clamp(scale, 1, 2);
 
         if (bordered)
         {
-            DrawRectangle(x, y, w, h, fill: false, on: on);
-            int innerW = w - 2;
-            int innerH = h - 2;
+            for (int i = 0; i < border; i++)
+                DrawRectangle(x + i, y + i, w - i * 2, h - i * 2, fill: false, on: on);
+            int innerW = w - border * 2;
+            int innerH = h - border * 2;
+            if (innerW <= 0 || innerH <= 0) return;
             int fillW = (int)Math.Round((clamped / 100f) * innerW);
 
-            for (int r = y + 1; r < y + 1 + innerH; r++)
+            for (int r = y + border; r < y + border + innerH; r++)
             {
-                for (int c = x + 1; c < x + 1 + fillW; c++)
+                for (int c = x + border; c < x + border + fillW; c++)
                 {
                     SetPixel(c, r, on);
                 }
@@ -138,12 +141,14 @@ public sealed class OledFrameBuffer
         }
     }
 
-    public void DrawGraph(int x, int y, int w, int h, IReadOnlyList<float> history, float min = 0, float max = 100, bool on = true)
+    public void DrawGraph(int x, int y, int w, int h, IReadOnlyList<float> history, float min = 0, float max = 100, bool on = true, int scale = 1)
     {
         if (w <= 0 || h <= 0 || history == null || history.Count == 0) return;
 
         // Draw baseline
-        DrawLine(x, y + h - 1, x + w - 1, y + h - 1, on);
+        int baselineThickness = Math.Clamp(scale, 1, 2);
+        for (int offset = 0; offset < baselineThickness && y + h - 1 - offset >= y; offset++)
+            DrawLine(x, y + h - 1 - offset, x + w - 1, y + h - 1 - offset, on);
 
         float range = max - min;
         if (range <= 0) range = 1;
@@ -165,17 +170,22 @@ public sealed class OledFrameBuffer
         }
     }
 
-    public void DrawGauge(int centerX, int centerY, int radius, float percent, bool on = true)
+    public void DrawGauge(int centerX, int centerY, int radius, float percent, bool on = true, int scale = 1)
     {
         if (radius <= 2) return;
 
         // Draw semicircular top arc (180 degrees from PI to 0)
+        int arcThickness = Math.Clamp(scale, 1, 2);
         for (int a = 180; a <= 360; a += 4)
         {
             double rad = a * Math.PI / 180.0;
-            int px = (int)Math.Round(centerX + radius * Math.Cos(rad));
-            int py = (int)Math.Round(centerY + radius * Math.Sin(rad));
-            SetPixel(px, py, on);
+            for (int offset = 0; offset < arcThickness; offset++)
+            {
+                int arcRadius = Math.Max(1, radius - offset);
+                int px = (int)Math.Round(centerX + arcRadius * Math.Cos(rad));
+                int py = (int)Math.Round(centerY + arcRadius * Math.Sin(rad));
+                SetPixel(px, py, on);
+            }
         }
 
         // Needle angle: 0% = 180 deg (left), 100% = 360 deg (right)

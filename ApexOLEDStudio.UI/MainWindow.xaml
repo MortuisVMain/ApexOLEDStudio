@@ -559,6 +559,18 @@
                                 </Grid>
                                 <TextBlock Text="{Binding Settings.EditorGridStep, StringFormat=GRID STEP: {0} px}" Foreground="{StaticResource BrushTextSecondary}" FontSize="9" />
                                 <Slider Minimum="1" Maximum="8" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding Settings.EditorGridStep, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource TacticalSlider}" Margin="0,0,0,8" />
+                                <Grid Margin="0,0,0,10">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <Button Grid.Column="0" Command="{Binding NormalizeTypographyCommand}" Style="{StaticResource CyanGhostButton}" Padding="5,4" Margin="0,0,3,0">
+                                        <TextBlock Text="NORMALIZE TYPE" FontSize="9" />
+                                    </Button>
+                                    <Button Grid.Column="1" Command="{Binding ResetSelectedWidgetDefaultsCommand}" Style="{StaticResource CyanGhostButton}" Padding="5,4" Margin="3,0,0,0">
+                                        <TextBlock Text="RESET WIDGET" FontSize="9" />
+                                    </Button>
+                                </Grid>
 
                                 <!-- Coordinates X / Y / W / H -->
                                 <Grid Margin="0,0,0,10">

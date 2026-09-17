@@ -696,4 +696,67 @@ public class LayoutTests
         Assert.Contains("1-CLICK WIDGET SHELF", xaml);
         Assert.Contains("InteractiveCanvas", xaml);
     }
+
+    [Fact]
+    public void Typography_NormalizeLayoutUsesOneScaleAndKeepsPositions()
+    {
+        var layout = new OledLayout();
+        layout.Widgets.Add(new OledWidget
+        {
+            Name = "Label",
+            Type = WidgetType.Text,
+            X = 17,
+            Y = 9,
+            Width = 30,
+            Height = 2,
+            FontScale = 4
+        });
+        layout.Widgets.Add(new OledWidget
+        {
+            Name = "Graph",
+            Type = WidgetType.Graph,
+            X = 63,
+            Y = 12,
+            Width = 40,
+            Height = 3,
+            FontScale = 3
+        });
+
+        layout.NormalizeTypography();
+
+        Assert.All(layout.Widgets, widget => Assert.Equal(WidgetTypography.BaseFontScale, widget.FontScale));
+        Assert.Equal(17, layout.Widgets[0].X);
+        Assert.Equal(9, layout.Widgets[0].Y);
+        Assert.True(layout.Widgets[0].Height >= WidgetTypography.RecommendedHeight(WidgetType.Text, false));
+        Assert.True(layout.Widgets[1].Height >= WidgetTypography.RecommendedHeight(WidgetType.Graph, false));
+    }
+
+    [Fact]
+    public void Typography_FontScaleIsClampedAndIndividualOverrideSurvives()
+    {
+        var widget = new OledWidget { FontScale = 99 };
+        Assert.Equal(WidgetTypography.MaxFontScale, widget.FontScale);
+
+        widget.FontScale = 3;
+        var layout = new OledLayout();
+        layout.Widgets.Add(widget);
+        layout.NormalizeTypography();
+        Assert.Equal(WidgetTypography.BaseFontScale, widget.FontScale);
+
+        widget.FontScale = 4;
+        Assert.Equal(4, widget.FontScale);
+        widget.ResetEditorDefaults();
+        Assert.Equal(WidgetTypography.BaseFontScale, widget.FontScale);
+    }
+
+    [Fact]
+    public void Typography_PrimitivesAcceptScaleWithoutChangingLegacyDefaults()
+    {
+        var buffer = new OledFrameBuffer();
+        buffer.DrawProgressBar(1, 1, 30, 8, 50, scale: 2);
+        buffer.DrawGraph(1, 12, 30, 10, new[] { 10f, 50f, 90f }, scale: 2);
+        buffer.DrawGauge(50, 25, 8, 50, scale: 2);
+
+        Assert.True(buffer.GetPixel(1, 1) || buffer.GetPixel(50, 25));
+    }
 }

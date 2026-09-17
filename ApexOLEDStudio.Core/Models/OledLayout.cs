@@ -18,6 +18,29 @@ public enum WidgetType
     Gif
 }
 
+public static class WidgetTypography
+{
+    public const int BaseFontScale = 1;
+    public const int MinFontScale = 1;
+    public const int MaxFontScale = 4;
+
+    public static int ClampFontScale(int scale)
+        => Math.Clamp(scale, MinFontScale, MaxFontScale);
+
+    public static int RecommendedHeight(WidgetType type, bool compactFont, int scale = BaseFontScale)
+    {
+        int normalizedScale = ClampFontScale(scale);
+        return type switch
+        {
+            WidgetType.Text => (compactFont ? 5 : 7) * normalizedScale,
+            WidgetType.ProgressBar => 6 + normalizedScale,
+            WidgetType.Graph => 8 + normalizedScale,
+            WidgetType.Gauge => 12 + normalizedScale * 2,
+            _ => 1
+        };
+    }
+}
+
 public sealed class OledWidget : INotifyPropertyChanged
 {
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -65,8 +88,20 @@ public sealed class OledWidget : INotifyPropertyChanged
     private bool _compactFont = false;
     public bool CompactFont { get => _compactFont; set { if (_compactFont != value) { _compactFont = value; OnPropertyChanged(); } } }
 
-    private int _fontScale = 1;
-    public int FontScale { get => _fontScale; set { if (_fontScale != value) { _fontScale = value; OnPropertyChanged(); } } }
+    private int _fontScale = WidgetTypography.BaseFontScale;
+    public int FontScale
+    {
+        get => _fontScale;
+        set
+        {
+            int normalized = WidgetTypography.ClampFontScale(value);
+            if (_fontScale != normalized)
+            {
+                _fontScale = normalized;
+                OnPropertyChanged();
+            }
+        }
+    }
 
     // Visual options
     private bool _bordered = true;
@@ -125,18 +160,18 @@ public sealed class OledWidget : INotifyPropertyChanged
                 break;
 
             case WidgetType.ProgressBar:
-                buffer.DrawProgressBar(X, Y, Width, Height, val, Bordered, on: true);
+                buffer.DrawProgressBar(X, Y, Width, Height, val, Bordered, on: true, scale: FontScale);
                 break;
 
             case WidgetType.Graph:
                 History.Add(val);
                 if (History.Count > Math.Max(Width, 128)) History.RemoveAt(0);
-                buffer.DrawGraph(X, Y, Width, Height, History, MinValue, MaxValue, on: true);
+                buffer.DrawGraph(X, Y, Width, Height, History, MinValue, MaxValue, on: true, scale: FontScale);
                 break;
 
             case WidgetType.Gauge:
                 int radius = Math.Min(Width, Height) / 2;
-                buffer.DrawGauge(X + radius, Y + radius, radius, val, on: true);
+                buffer.DrawGauge(X + radius, Y + radius, radius, val, on: true, scale: FontScale);
                 break;
 
             case WidgetType.Line:
@@ -161,10 +196,24 @@ public sealed class OledWidget : INotifyPropertyChanged
                                 buffer.SetPixel(X + gx, Y + gy, true);
                             }
                         }
+
                     }
                 }
                 break;
         }
+    }
+
+    public void ResetEditorDefaults()
+    {
+        Width = Type == WidgetType.Line ? Width : Math.Max(Width, Type == WidgetType.Text ? 40 : 30);
+        Height = Math.Max(Height, WidgetTypography.RecommendedHeight(Type, CompactFont));
+        FontScale = WidgetTypography.BaseFontScale;
+        MinValue = 0f;
+        MaxValue = 100f;
+        CompactFont = false;
+        Bordered = Type == WidgetType.ProgressBar;
+        EnableMarquee = false;
+        MarqueeSpeed = 1;
     }
 }
 
@@ -180,6 +229,18 @@ public sealed class OledLayout
     public bool EnableGpuDeltaAlert { get; set; } = true;
     public float GpuDeltaThreshold { get; set; } = 20f;
     public List<OledWidget> Widgets { get; set; } = new();
+
+    public void NormalizeTypography(int baseFontScale = WidgetTypography.BaseFontScale)
+    {
+        int normalizedScale = WidgetTypography.ClampFontScale(baseFontScale);
+        foreach (var widget in Widgets ?? Enumerable.Empty<OledWidget>())
+        {
+            widget.FontScale = normalizedScale;
+            int recommendedHeight = WidgetTypography.RecommendedHeight(widget.Type, widget.CompactFont, normalizedScale);
+            if (widget.Type is not WidgetType.Line and not WidgetType.Gif)
+                widget.Height = Math.Max(widget.Height, recommendedHeight);
+        }
+    }
 
     public IReadOnlyList<string> Validate()
     {

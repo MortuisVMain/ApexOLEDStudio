@@ -131,6 +131,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             StatusMessage = SettingsService.LastError;
 
         _currentLayout = OledLayout.CreateDefaultApexProSplit();
+        _currentLayout.NormalizeTypography();
         SyncWidgets();
         _selectedWidget = _widgets.Count > 0 ? _widgets[0] : null;
         SyncWidgetTypeIndex();
@@ -461,6 +462,7 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             "Clock & Time"          => OledLayout.CreateClockMedia(),
             _                       => OledLayout.CreateDefaultApexProSplit()
         };
+        CurrentLayout.NormalizeTypography();
         if (SelectedPresetName != name)
         {
             SelectedPresetName = name;
@@ -597,9 +599,26 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     public void ResetDefaultLayout()
     {
         CurrentLayout = OledLayout.CreateDefaultApexProSplit();
+        CurrentLayout.NormalizeTypography();
         SyncWidgets();
         SelectedWidget = _widgets.Count > 0 ? _widgets[0] : null;
         StatusMessage = "Reset to default dual CPU/GPU split";
+    }
+
+    [RelayCommand]
+    public void NormalizeTypography()
+    {
+        CurrentLayout.NormalizeTypography();
+        StatusMessage = "Typography normalized across the current layout";
+    }
+
+    [RelayCommand]
+    public void ResetSelectedWidgetDefaults()
+    {
+        if (SelectedWidget == null) return;
+        SelectedWidget.ResetEditorDefaults();
+        NormalizeSelectedWidget();
+        StatusMessage = $"Reset widget defaults: {SelectedWidget.Name}";
     }
 
     [RelayCommand]
