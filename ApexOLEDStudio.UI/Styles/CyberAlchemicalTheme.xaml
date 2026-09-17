@@ -41,7 +41,11 @@
     <SolidColorBrush x:Key="BrushRogDarkRed" Color="{StaticResource ColorRogDarkRed}" />
     <DrawingBrush x:Key="EditorGridBrush" TileMode="Tile" Viewport="0,0,12,12" ViewportUnits="Absolute" Viewbox="0,0,2,2" ViewboxUnits="Absolute" Opacity="0.22">
         <DrawingBrush.Drawing>
-            <GeometryDrawing Brush="{x:Null}" Pen="#FF003C" Geometry="M 0,0 L 0,2 M 0,0 L 2,0" />
+            <GeometryDrawing Brush="{x:Null}" Geometry="M 0,0 L 0,2 M 0,0 L 2,0">
+                <GeometryDrawing.Pen>
+                    <Pen Brush="#FF003C" Thickness="1" />
+                </GeometryDrawing.Pen>
+            </GeometryDrawing>
         </DrawingBrush.Drawing>
     </DrawingBrush>
     <FontFamily x:Key="RogDisplayFont">Bahnschrift SemiBold</FontFamily>
