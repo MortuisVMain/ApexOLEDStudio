@@ -18,6 +18,14 @@ public partial class MainWindow : Window
     private double _dragOffsetX;
     private double _dragOffsetY;
 
+    // Resize state
+    private bool _isResizing;
+    private double _resizeStartMouseX;
+    private double _resizeStartMouseY;
+    private int _resizeStartWidth;
+    private int _resizeStartHeight;
+    private OledWidget? _highlightTrackedWidget;
+
     // Tray & Background state
     private System.Windows.Forms.NotifyIcon? _notifyIcon;
     private bool _isExiting;
@@ -53,6 +61,21 @@ public partial class MainWindow : Window
             if (startMin)
             {
                 Hide();
+            }
+
+            if (ViewModel != null)
+            {
+                ViewModel.PropertyChanged += (vs, ve) =>
+                {
+                    if (ve.PropertyName == nameof(MainViewModel.SelectedWidget))
+                    {
+                        AttachWidgetTracking(ViewModel.SelectedWidget);
+                        UpdateSelectionHighlight(ViewModel.SelectedWidget);
+                    }
+                };
+
+                AttachWidgetTracking(ViewModel.SelectedWidget);
+                UpdateSelectionHighlight(ViewModel.SelectedWidget);
             }
         };
     }
@@ -201,6 +224,7 @@ public partial class MainWindow : Window
         if (hit != null)
         {
             ViewModel.SelectedWidget = hit;
+            AttachWidgetTracking(hit);
             UpdateSelectionHighlight(hit);
 
             if (hit.IsLocked)
@@ -217,16 +241,65 @@ public partial class MainWindow : Window
         }
         else
         {
-            SelectionBorder.Visibility = Visibility.Collapsed;
+            ViewModel.SelectedWidget = null;
+            AttachWidgetTracking(null);
+            UpdateSelectionHighlight(null);
         }
     }
 
-    // ── Drag Move ─────────────────────────────────────────────────────
+    // ── Resize Grip Start ─────────────────────────────────────────────
+    private void OnResizeGripMouseDown(object sender, MouseButtonEventArgs e)
+    {
+        if (ViewModel?.SelectedWidget == null || ViewModel.SelectedWidget.IsLocked) return;
+
+        if (ViewModel.SelectedWidget.Type == WidgetType.Text)
+        {
+            ViewModel.SelectedWidget.StretchText = true;
+        }
+
+        _isResizing = true;
+        var pos = e.GetPosition(InteractiveCanvas);
+        _resizeStartMouseX = pos.X;
+        _resizeStartMouseY = pos.Y;
+        _resizeStartWidth  = ViewModel.SelectedWidget.Width;
+        _resizeStartHeight = ViewModel.SelectedWidget.Height;
+
+        Mouse.Capture(InteractiveCanvas);
+        e.Handled = true;
+    }
+
+    // ── Drag & Resize Move ────────────────────────────────────────────
     private void OnCanvasMouseMove(object sender, System.Windows.Input.MouseEventArgs e)
     {
+        var pos = e.GetPosition(InteractiveCanvas);
+
+        if (_isResizing && ViewModel?.SelectedWidget != null)
+        {
+            double deltaPixelX = (pos.X - _resizeStartMouseX) / OledScale;
+            double deltaPixelY = (pos.Y - _resizeStartMouseY) / OledScale;
+
+            int newW = (int)Math.Round(_resizeStartWidth + deltaPixelX);
+            int newH = (int)Math.Round(_resizeStartHeight + deltaPixelY);
+
+            if (Keyboard.IsKeyDown(Key.LeftShift) || Keyboard.IsKeyDown(Key.RightShift))
+            {
+                int step = Math.Max(1, ViewModel.Settings.EditorGridStep);
+                newW = WidgetEditorMath.Snap(newW, step);
+                newH = WidgetEditorMath.Snap(newH, step);
+            }
+
+            int maxW = 128 - ViewModel.SelectedWidget.X;
+            int maxH = 40 - ViewModel.SelectedWidget.Y;
+            ViewModel.SelectedWidget.Width = Math.Clamp(newW, 4, Math.Max(4, maxW));
+            ViewModel.SelectedWidget.Height = Math.Clamp(newH, 4, Math.Max(4, maxH));
+            ResizeGripHandle.ToolTip = $"Размер: {ViewModel.SelectedWidget.Width} × {ViewModel.SelectedWidget.Height} px";
+
+            UpdateSelectionHighlight(ViewModel.SelectedWidget);
+            return;
+        }
+
         if (!_isDragging || _draggedWidget == null) return;
 
-        var pos   = e.GetPosition(InteractiveCanvas);
         int newX  = (int)Math.Round((pos.X - _dragOffsetX) / OledScale);
         int newY  = (int)Math.Round((pos.Y - _dragOffsetY) / OledScale);
 
@@ -239,9 +312,21 @@ public partial class MainWindow : Window
         UpdateSelectionHighlight(_draggedWidget);
     }
 
-    // ── Drag End ──────────────────────────────────────────────────────
+    // ── Drag & Resize End ─────────────────────────────────────────────
     private void OnCanvasMouseUp(object sender, MouseButtonEventArgs e)
     {
+        if (_isResizing)
+        {
+            _isResizing = false;
+            Mouse.Capture(null);
+            if (ViewModel?.SelectedWidget != null)
+            {
+                ViewModel.NormalizeSelectedWidget();
+                UpdateSelectionHighlight(ViewModel.SelectedWidget);
+            }
+            return;
+        }
+
         if (!_isDragging) return;
 
         _isDragging    = false;
@@ -249,14 +334,105 @@ public partial class MainWindow : Window
         Mouse.Capture(null); // Release mouse capture
     }
 
-    // ── Helpers ───────────────────────────────────────────────────────
-    private void UpdateSelectionHighlight(OledWidget widget)
+    // ── Helpers & Selection Highlight ─────────────────────────────────
+    private void AttachWidgetTracking(OledWidget? widget)
     {
-        Canvas.SetLeft(SelectionBorder, widget.X * OledScale - 2);
-        Canvas.SetTop(SelectionBorder,  widget.Y * OledScale - 2);
-        SelectionBorder.Width  = Math.Max(widget.Width,  20) * OledScale + 4;
-        SelectionBorder.Height = Math.Max(widget.Height,  8) * OledScale + 4;
+        if (_highlightTrackedWidget != null)
+            _highlightTrackedWidget.PropertyChanged -= OnWidgetPropertyChanged;
+
+        _highlightTrackedWidget = widget;
+        if (_highlightTrackedWidget != null)
+            _highlightTrackedWidget.PropertyChanged += OnWidgetPropertyChanged;
+    }
+
+    private void OnWidgetPropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (sender is OledWidget w && w == ViewModel?.SelectedWidget)
+        {
+            if (e.PropertyName is nameof(OledWidget.X) or nameof(OledWidget.Y) or nameof(OledWidget.Width) or nameof(OledWidget.Height) or nameof(OledWidget.IsLocked))
+            {
+                UpdateSelectionHighlight(w);
+            }
+        }
+    }
+
+    private void UpdateSelectionHighlight(OledWidget? widget)
+    {
+        if (widget == null)
+        {
+            SelectionBorder.Visibility = Visibility.Collapsed;
+            ResizeGripHandle.Visibility = Visibility.Collapsed;
+            return;
+        }
+
+        double left = widget.X * OledScale;
+        double top = widget.Y * OledScale;
+        double w = Math.Max(widget.Width, 4) * OledScale;
+        double h = Math.Max(widget.Height, 4) * OledScale;
+
+        Canvas.SetLeft(SelectionBorder, left - 2);
+        Canvas.SetTop(SelectionBorder,  top - 2);
+        SelectionBorder.Width  = w + 4;
+        SelectionBorder.Height = h + 4;
         SelectionBorder.Visibility = Visibility.Visible;
+
+        // Position resize grip handle at bottom-right corner (centered on 14x14 handle)
+        Canvas.SetLeft(ResizeGripHandle, left + w - 7);
+        Canvas.SetTop(ResizeGripHandle,  top + h - 7);
+        ResizeGripHandle.ToolTip = $"Размер: {widget.Width} × {widget.Height} px (Тяните для изменения размера)";
+        ResizeGripHandle.Visibility = widget.IsLocked ? Visibility.Collapsed : Visibility.Visible;
+    }
+
+    protected override void OnPreviewKeyDown(System.Windows.Input.KeyEventArgs e)
+    {
+        base.OnPreviewKeyDown(e);
+
+        if (e.OriginalSource is System.Windows.Controls.TextBox)
+            return;
+
+        if (ViewModel?.SelectedWidget == null || ViewModel.SelectedWidget.IsLocked)
+            return;
+
+        bool isShift = (Keyboard.Modifiers & ModifierKeys.Shift) != 0;
+
+        switch (e.Key)
+        {
+            case Key.Left:
+                if (isShift)
+                    ViewModel.NudgeWidth(-1);
+                else
+                    ViewModel.NudgeX(-1);
+                UpdateSelectionHighlight(ViewModel.SelectedWidget);
+                e.Handled = true;
+                break;
+
+            case Key.Right:
+                if (isShift)
+                    ViewModel.NudgeWidth(1);
+                else
+                    ViewModel.NudgeX(1);
+                UpdateSelectionHighlight(ViewModel.SelectedWidget);
+                e.Handled = true;
+                break;
+
+            case Key.Up:
+                if (isShift)
+                    ViewModel.NudgeHeight(-1);
+                else
+                    ViewModel.NudgeY(-1);
+                UpdateSelectionHighlight(ViewModel.SelectedWidget);
+                e.Handled = true;
+                break;
+
+            case Key.Down:
+                if (isShift)
+                    ViewModel.NudgeHeight(1);
+                else
+                    ViewModel.NudgeY(1);
+                UpdateSelectionHighlight(ViewModel.SelectedWidget);
+                e.Handled = true;
+                break;
+        }
     }
 
     private void OnInsertTokenClick(object sender, RoutedEventArgs e)

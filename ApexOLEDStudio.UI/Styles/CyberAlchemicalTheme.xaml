@@ -534,6 +534,46 @@
         </Setter>
     </Style>
 
+    <!-- Default CheckBox using TacticalCheckBox -->
+    <Style TargetType="CheckBox" BasedOn="{StaticResource TacticalCheckBox}" />
+
+    <!-- Bespoke Tactical ListBoxItem Style (Eliminates ugly Windows blue selection rectangle) -->
+    <Style TargetType="ListBoxItem">
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="OverridesDefaultStyle" Value="True" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Margin" Value="0,1" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ListBoxItem">
+                    <Border x:Name="ItemContainer"
+                            Background="Transparent"
+                            BorderBrush="Transparent"
+                            BorderThickness="1"
+                            CornerRadius="6">
+                        <ContentPresenter />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="ItemContainer" Property="Background" Value="#121A28" />
+                            <Setter TargetName="ItemContainer" Property="BorderBrush" Value="#253A5A" />
+                        </Trigger>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter TargetName="ItemContainer" Property="Background" Value="#102235" />
+                            <Setter TargetName="ItemContainer" Property="BorderBrush" Value="{StaticResource BrushCyan}" />
+                            <Setter TargetName="ItemContainer" Property="Effect">
+                                <Setter.Value>
+                                    <DropShadowEffect Color="#00E5FF" BlurRadius="10" ShadowDepth="0" Opacity="0.35" />
+                                </Setter.Value>
+                            </Setter>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <!-- ASUS ROG Tactical Segmented TabItem Style -->
     <Style x:Key="TacticalTabItem" TargetType="TabItem">
         <Setter Property="Foreground" Value="{StaticResource BrushTextSecondary}"/>

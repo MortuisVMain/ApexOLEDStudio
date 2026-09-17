@@ -350,6 +350,20 @@
                                                     <DropShadowEffect Color="#FF003C" BlurRadius="8" ShadowDepth="0" />
                                                 </Border.Effect>
                                             </Border>
+
+                                            <!-- Tactical Resize Grip Thumb (Bottom-Right Corner) -->
+                                            <Border x:Name="ResizeGripHandle" Width="14" Height="14"
+                                                    Background="{StaticResource BrushCyan}"
+                                                    BorderBrush="#05070B" BorderThickness="2"
+                                                    CornerRadius="2"
+                                                    Cursor="SizeNWSE"
+                                                    Visibility="Collapsed"
+                                                    MouseDown="OnResizeGripMouseDown"
+                                                    ToolTip="Drag to resize widget pixel-by-pixel (Hold Shift for Grid Snap)">
+                                                <Border.Effect>
+                                                    <DropShadowEffect Color="#00E5FF" BlurRadius="8" ShadowDepth="0" Opacity="0.95" />
+                                                </Border.Effect>
+                                            </Border>
                                         </Canvas>
                                     </Grid>
                                 </Border>
@@ -467,6 +481,44 @@
                                                     <TextBlock Text="Divider" FontSize="10" />
                                                 </StackPanel>
                                             </Button>
+
+                                            <!-- Row 3: Clocks, Frequencies & Volume -->
+                                            <Button Command="{Binding AddPresetWidgetCommand}" CommandParameter="cpu_clock" Style="{StaticResource TacticalPresetTileButton}" ToolTip="Add CPU Clock Frequency (GHz/MHz)">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Path Data="{StaticResource IconCpu}" Fill="{StaticResource BrushCyan}" Stretch="Uniform" Width="11" Height="11" Margin="0,0,5,0" />
+                                                    <TextBlock Text="CPU GHz" FontSize="10" />
+                                                </StackPanel>
+                                            </Button>
+                                            <Button Command="{Binding AddPresetWidgetCommand}" CommandParameter="gpu_clock" Style="{StaticResource TacticalPresetTileButton}" ToolTip="Add GPU Core Clock Frequency (MHz)">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Path Data="{StaticResource IconGpu}" Fill="{StaticResource BrushAmberActual}" Stretch="Uniform" Width="11" Height="11" Margin="0,0,5,0" />
+                                                    <TextBlock Text="GPU MHz" FontSize="10" />
+                                                </StackPanel>
+                                            </Button>
+                                            <Button Command="{Binding AddPresetWidgetCommand}" CommandParameter="ram_clock" Style="{StaticResource TacticalPresetTileButton}" ToolTip="Add RAM Frequency (MT/s)">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Path Data="{StaticResource IconCpu}" Fill="{StaticResource BrushTextPrimary}" Stretch="Uniform" Width="11" Height="11" Margin="0,0,5,0" />
+                                                    <TextBlock Text="RAM MT/s" FontSize="10" />
+                                                </StackPanel>
+                                            </Button>
+                                            <Button Command="{Binding AddPresetWidgetCommand}" CommandParameter="vol" Style="{StaticResource TacticalPresetTileButton}" ToolTip="Add Master Volume Widget">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Path Data="{StaticResource IconMusic}" Fill="{StaticResource BrushCyan}" Stretch="Uniform" Width="11" Height="11" Margin="0,0,5,0" />
+                                                    <TextBlock Text="Volume" FontSize="10" />
+                                                </StackPanel>
+                                            </Button>
+                                            <Button Command="{Binding AddPresetWidgetCommand}" CommandParameter="weather" Style="{StaticResource TacticalPresetTileButton}" ToolTip="Add Weather Widget">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Path Data="{StaticResource IconThermometer}" Fill="{StaticResource BrushCyan}" Stretch="Uniform" Width="11" Height="11" Margin="0,0,5,0" />
+                                                    <TextBlock Text="Weather" FontSize="10" />
+                                                </StackPanel>
+                                            </Button>
+                                            <Button Command="{Binding AddPresetWidgetCommand}" CommandParameter="divider_horiz" Style="{StaticResource TacticalPresetTileButton}" ToolTip="Add Horizontal Split Line">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Path Data="{StaticResource IconLine}" Fill="{StaticResource BrushCardBorder}" Stretch="Uniform" Width="11" Height="11" Margin="0,0,5,0" />
+                                                    <TextBlock Text="H-Line" FontSize="10" />
+                                                </StackPanel>
+                                            </Button>
                                         </UniformGrid>
                                     </StackPanel>
                                 </Border>
@@ -559,52 +611,304 @@
                                 </Grid>
                                 <TextBlock Text="{Binding Settings.EditorGridStep, StringFormat=GRID STEP: {0} px}" Foreground="{StaticResource BrushTextSecondary}" FontSize="9" />
                                 <Slider Minimum="1" Maximum="8" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding Settings.EditorGridStep, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource TacticalSlider}" Margin="0,0,0,8" />
-                                <Grid Margin="0,0,0,10">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <Button Grid.Column="0" Command="{Binding NormalizeTypographyCommand}" Style="{StaticResource CyanGhostButton}" Padding="5,4" Margin="0,0,3,0">
-                                        <TextBlock Text="NORMALIZE TYPE" FontSize="9" />
-                                    </Button>
-                                    <Button Grid.Column="1" Command="{Binding ResetSelectedWidgetDefaultsCommand}" Style="{StaticResource CyanGhostButton}" Padding="5,4" Margin="3,0,0,0">
-                                        <TextBlock Text="RESET WIDGET" FontSize="9" />
-                                    </Button>
-                                </Grid>
+                                <!-- ── ЕДИНАЯ ПАНЕЛЬ: РАЗМЕРЫ И РАСТЯЖЕНИЕ (W × H) ──────────────── -->
+                                <Border Background="#0C121E" BorderBrush="{StaticResource BrushCardBorder}" BorderThickness="1" CornerRadius="6" Padding="10,8" Margin="0,0,0,10">
+                                    <StackPanel>
+                                        <!-- Header: Title + Big Size Badge + Auto-fit + Reset -->
+                                        <Grid Margin="0,0,0,8">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                <TextBlock Text="📐 РАЗМЕРЫ И РАСТЯЖЕНИЕ" Foreground="{StaticResource BrushCyan}" FontSize="10" FontWeight="Bold" />
+                                                <Border Background="{StaticResource BrushCard}" CornerRadius="3" Padding="6,1" Margin="6,0,0,0" BorderBrush="{StaticResource BrushCardBorder}" BorderThickness="1">
+                                                    <TextBlock Text="{Binding SelectedWidget.DimensionsSummary}" Foreground="{StaticResource BrushAmberActual}" FontWeight="Bold" FontSize="9" />
+                                                </Border>
+                                            </StackPanel>
+                                            <Button Grid.Column="1" Command="{Binding AutoFitSelectedWidgetCommand}" Style="{StaticResource AmberActionButton}" Padding="6,3" Margin="0,0,4,0" ToolTip="Автоматически подогнать ширину и высоту рамки под длину текста шаблона">
+                                                <TextBlock Text="⚡ АВТО-РАЗМЕР" FontSize="8" FontWeight="Bold" />
+                                            </Button>
+                                            <Button Grid.Column="2" Command="{Binding ResetSelectedWidgetDefaultsCommand}" Style="{StaticResource CyanGhostButton}" Padding="5,2" ToolTip="Сбросить выбранный виджет к стандартным габаритам">
+                                                <TextBlock Text="СБРОС" FontSize="8" />
+                                            </Button>
+                                        </Grid>
 
-                                <!-- Coordinates X / Y / W / H -->
-                                <Grid Margin="0,0,0,10">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="*" />
-                                        <ColumnDefinition Width="*" />
-                                    </Grid.ColumnDefinitions>
-                                    <StackPanel Grid.Column="0" Margin="0,0,4,0">
-                                        <TextBlock Text="X (0..127)" Foreground="{StaticResource BrushTextSecondary}" FontSize="10" />
-                                        <Slider Minimum="0" Maximum="127" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding SelectedWidget.X, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource TacticalSlider}" />
-                                        <TextBlock Text="{Binding SelectedWidget.X, StringFormat={}{0:0}}" Foreground="{StaticResource BrushCyan}" FontSize="9" />
-                                    </StackPanel>
-                                    <StackPanel Grid.Column="1" Margin="0,0,4,0">
-                                        <TextBlock Text="Y (0..39)" Foreground="{StaticResource BrushTextSecondary}" FontSize="10" />
-                                        <Slider Minimum="0" Maximum="39" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding SelectedWidget.Y, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource TacticalSlider}" />
-                                        <TextBlock Text="{Binding SelectedWidget.Y, StringFormat={}{0:0}}" Foreground="{StaticResource BrushCyan}" FontSize="9" />
-                                    </StackPanel>
-                                    <StackPanel Grid.Column="2" Margin="0,0,4,0">
-                                        <TextBlock Text="Width" Foreground="{StaticResource BrushTextSecondary}" FontSize="10" />
-                                        <Slider Minimum="1" Maximum="128" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding SelectedWidget.Width, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource TacticalSlider}" />
-                                        <TextBlock Text="{Binding SelectedWidget.Width, StringFormat={}{0:0}}" Foreground="{StaticResource BrushCyan}" FontSize="9" />
-                                    </StackPanel>
-                                    <StackPanel Grid.Column="3">
-                                        <TextBlock Text="Height" Foreground="{StaticResource BrushTextSecondary}" FontSize="10" />
-                                        <Slider Minimum="1" Maximum="40" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding SelectedWidget.Height, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource TacticalSlider}" />
-                                        <TextBlock Text="{Binding SelectedWidget.Height, StringFormat={}{0:0}}" Foreground="{StaticResource BrushCyan}" FontSize="9" />
-                                    </StackPanel>
-                                </Grid>
+                                        <!-- 3 Mode Buttons (Visible for Text Widgets) -->
+                                        <Border Background="#080C14" BorderBrush="{StaticResource BrushCardBorder}" BorderThickness="1" CornerRadius="4" Padding="6,5" Margin="0,0,0,8">
+                                            <StackPanel>
+                                                <Grid Margin="0,0,0,4">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Text="РЕЖИМ МАСШТАБИРОВАНИЯ ТЕКСТА:" Foreground="{StaticResource BrushTextSecondary}" FontSize="8" FontWeight="SemiBold" />
+                                                    <TextBlock Grid.Column="1" Text="{Binding SelectedWidget.StretchModeDisplayName}" Foreground="{StaticResource BrushCyan}" FontSize="8" FontWeight="Bold" />
+                                                </Grid>
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="3" />
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="3" />
+                                                        <ColumnDefinition Width="*" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <!-- Mode 1: Free Stretch -->
+                                                    <Button Grid.Column="0" Command="{Binding SetStretchModeCommand}" CommandParameter="free" Padding="2,4" ToolTip="Тянуть текст по пикселям на всю ширину и высоту рамки (W x H)">
+                                                        <Button.Style>
+                                                            <Style TargetType="Button" BasedOn="{StaticResource CyanGhostButton}">
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding SelectedWidget.IsFreeStretchActive}" Value="True">
+                                                                        <Setter Property="BorderBrush" Value="{StaticResource BrushCyan}" />
+                                                                        <Setter Property="Background" Value="#092436" />
+                                                                        <Setter Property="Foreground" Value="{StaticResource BrushCyan}" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </Button.Style>
+                                                        <StackPanel HorizontalAlignment="Center">
+                                                            <TextBlock Text="⚡ СВОБОДНО" FontSize="9" FontWeight="Bold" HorizontalAlignment="Center" />
+                                                            <TextBlock Text="Тянуть W×H" FontSize="7" Foreground="{StaticResource BrushTextMuted}" HorizontalAlignment="Center" />
+                                                        </StackPanel>
+                                                    </Button>
 
-                                <TextBlock Text="FONT SCALE" Foreground="{StaticResource BrushTextSecondary}" FontSize="10" />
-                                <Slider Minimum="1" Maximum="4" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding SelectedWidget.FontScale, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource TacticalSlider}" />
-                                <TextBlock Text="{Binding SelectedWidget.FontScale, StringFormat=Scale: {0:0}}" Foreground="{StaticResource BrushCyan}" FontSize="9" Margin="0,0,0,8" />
+                                                    <!-- Mode 2: Proportional -->
+                                                    <Button Grid.Column="2" Command="{Binding SetStretchModeCommand}" CommandParameter="proportional" Padding="2,4" ToolTip="Масштабировать текст с сохранением пропорций букв">
+                                                        <Button.Style>
+                                                            <Style TargetType="Button" BasedOn="{StaticResource CyanGhostButton}">
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding SelectedWidget.IsProportionalActive}" Value="True">
+                                                                        <Setter Property="BorderBrush" Value="{StaticResource BrushCyan}" />
+                                                                        <Setter Property="Background" Value="#092436" />
+                                                                        <Setter Property="Foreground" Value="{StaticResource BrushCyan}" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </Button.Style>
+                                                        <StackPanel HorizontalAlignment="Center">
+                                                            <TextBlock Text="📐 ПРОПОРЦИИ" FontSize="9" FontWeight="Bold" HorizontalAlignment="Center" />
+                                                            <TextBlock Text="По высоте" FontSize="7" Foreground="{StaticResource BrushTextMuted}" HorizontalAlignment="Center" />
+                                                        </StackPanel>
+                                                    </Button>
+
+                                                    <!-- Mode 3: Fixed Font Scale -->
+                                                    <Button Grid.Column="4" Command="{Binding SetStretchModeCommand}" CommandParameter="fixed" Padding="2,4" ToolTip="Классический пиксельный шрифт 5x7 без растяжения">
+                                                        <Button.Style>
+                                                            <Style TargetType="Button" BasedOn="{StaticResource CyanGhostButton}">
+                                                                <Style.Triggers>
+                                                                    <DataTrigger Binding="{Binding SelectedWidget.IsFixedScaleActive}" Value="True">
+                                                                        <Setter Property="BorderBrush" Value="{StaticResource BrushAmberActual}" />
+                                                                        <Setter Property="Background" Value="#26070E" />
+                                                                        <Setter Property="Foreground" Value="{StaticResource BrushAmberActual}" />
+                                                                    </DataTrigger>
+                                                                </Style.Triggers>
+                                                            </Style>
+                                                        </Button.Style>
+                                                        <StackPanel HorizontalAlignment="Center">
+                                                            <TextBlock Text="🔤 КЛАССИКА" FontSize="9" FontWeight="Bold" HorizontalAlignment="Center" />
+                                                            <TextBlock Text="Точечный 5x7" FontSize="7" Foreground="{StaticResource BrushTextMuted}" HorizontalAlignment="Center" />
+                                                        </StackPanel>
+                                                    </Button>
+                                                </Grid>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <!-- Width & Height Sliders & Steppers -->
+                                        <!-- 1. Width W -->
+                                        <Border Background="#090E17" BorderBrush="{StaticResource BrushCardBorder}" BorderThickness="1" CornerRadius="4" Padding="6,5" Margin="0,0,0,6">
+                                            <StackPanel>
+                                                <Grid Margin="0,0,0,2">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Text="ШИРИНА (W):" Foreground="{StaticResource BrushTextSecondary}" FontSize="9" FontWeight="SemiBold" VerticalAlignment="Center" />
+                                                    <TextBlock Grid.Column="1" Text="{Binding SelectedWidget.Width, StringFormat={}{0} px}" Foreground="{StaticResource BrushCyan}" FontSize="9" FontWeight="Bold" Margin="6,0,0,0" VerticalAlignment="Center" />
+                                                    <StackPanel Grid.Column="2" Orientation="Horizontal">
+                                                        <Button Command="{Binding NudgeWidthCommand}" CommandParameter="-10" Style="{StaticResource CyanGhostButton}" Padding="4,1" Margin="0,0,2,0" ToolTip="-10 px">
+                                                            <TextBlock Text="-10" FontSize="8" />
+                                                        </Button>
+                                                        <Button Command="{Binding NudgeWidthCommand}" CommandParameter="-1" Style="{StaticResource CyanGhostButton}" Padding="4,1" Margin="0,0,2,0" ToolTip="-1 px">
+                                                            <TextBlock Text="-1" FontSize="8" FontWeight="Bold" />
+                                                        </Button>
+                                                        <Button Command="{Binding NudgeWidthCommand}" CommandParameter="1" Style="{StaticResource CyanGhostButton}" Padding="4,1" Margin="0,0,2,0" ToolTip="+1 px">
+                                                            <TextBlock Text="+1" FontSize="8" FontWeight="Bold" />
+                                                        </Button>
+                                                        <Button Command="{Binding NudgeWidthCommand}" CommandParameter="10" Style="{StaticResource CyanGhostButton}" Padding="4,1" ToolTip="+10 px">
+                                                            <TextBlock Text="+10" FontSize="8" />
+                                                        </Button>
+                                                    </StackPanel>
+                                                </Grid>
+                                                <Slider Minimum="4" Maximum="128" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding SelectedWidget.Width, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource TacticalSlider}" Margin="0,2,0,4" />
+                                                <UniformGrid Columns="4">
+                                                    <Button Command="{Binding SetExactWidthCommand}" CommandParameter="30" Style="{StaticResource CyanGhostButton}" Padding="2,2" Margin="0,0,1,0" ToolTip="30 px">
+                                                        <TextBlock Text="30 px" FontSize="8" />
+                                                    </Button>
+                                                    <Button Command="{Binding SetExactWidthCommand}" CommandParameter="58" Style="{StaticResource CyanGhostButton}" Padding="2,2" Margin="1,0,1,0" ToolTip="58 px (1/2 экрана)">
+                                                        <TextBlock Text="58 px (½)" FontSize="8" />
+                                                    </Button>
+                                                    <Button Command="{Binding SetExactWidthCommand}" CommandParameter="64" Style="{StaticResource CyanGhostButton}" Padding="2,2" Margin="1,0,1,0" ToolTip="64 px">
+                                                        <TextBlock Text="64 px" FontSize="8" />
+                                                    </Button>
+                                                    <Button Command="{Binding SetExactWidthCommand}" CommandParameter="128" Style="{StaticResource CyanGhostButton}" Padding="2,2" Margin="1,0,0,0" ToolTip="128 px (Вся ширина)">
+                                                        <TextBlock Text="128 (MAX)" FontSize="8" FontWeight="Bold" />
+                                                    </Button>
+                                                </UniformGrid>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <!-- 2. Height H -->
+                                        <Border Background="#090E17" BorderBrush="{StaticResource BrushCardBorder}" BorderThickness="1" CornerRadius="4" Padding="6,5" Margin="0,0,0,6">
+                                            <StackPanel>
+                                                <Grid Margin="0,0,0,2">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="Auto" />
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Text="ВЫСОТА (H):" Foreground="{StaticResource BrushTextSecondary}" FontSize="9" FontWeight="SemiBold" VerticalAlignment="Center" />
+                                                    <TextBlock Grid.Column="1" Text="{Binding SelectedWidget.Height, StringFormat={}{0} px}" Foreground="{StaticResource BrushCyan}" FontSize="9" FontWeight="Bold" Margin="6,0,0,0" VerticalAlignment="Center" />
+                                                    <StackPanel Grid.Column="2" Orientation="Horizontal">
+                                                        <Button Command="{Binding NudgeHeightCommand}" CommandParameter="-5" Style="{StaticResource CyanGhostButton}" Padding="4,1" Margin="0,0,2,0" ToolTip="-5 px">
+                                                            <TextBlock Text="-5" FontSize="8" />
+                                                        </Button>
+                                                        <Button Command="{Binding NudgeHeightCommand}" CommandParameter="-1" Style="{StaticResource CyanGhostButton}" Padding="4,1" Margin="0,0,2,0" ToolTip="-1 px">
+                                                            <TextBlock Text="-1" FontSize="8" FontWeight="Bold" />
+                                                        </Button>
+                                                        <Button Command="{Binding NudgeHeightCommand}" CommandParameter="1" Style="{StaticResource CyanGhostButton}" Padding="4,1" Margin="0,0,2,0" ToolTip="+1 px">
+                                                            <TextBlock Text="+1" FontSize="8" FontWeight="Bold" />
+                                                        </Button>
+                                                        <Button Command="{Binding NudgeHeightCommand}" CommandParameter="5" Style="{StaticResource CyanGhostButton}" Padding="4,1" ToolTip="+5 px">
+                                                            <TextBlock Text="+5" FontSize="8" />
+                                                        </Button>
+                                                    </StackPanel>
+                                                </Grid>
+                                                <Slider Minimum="4" Maximum="40" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding SelectedWidget.Height, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource TacticalSlider}" Margin="0,2,0,4" />
+                                                <UniformGrid Columns="4">
+                                                    <Button Command="{Binding SetExactHeightCommand}" CommandParameter="7" Style="{StaticResource CyanGhostButton}" Padding="2,2" Margin="0,0,1,0" ToolTip="7 px (1x Standard)">
+                                                        <TextBlock Text="7 px (1x)" FontSize="8" />
+                                                    </Button>
+                                                    <Button Command="{Binding SetExactHeightCommand}" CommandParameter="14" Style="{StaticResource CyanGhostButton}" Padding="2,2" Margin="1,0,1,0" ToolTip="14 px (2x Large)">
+                                                        <TextBlock Text="14 px (2x)" FontSize="8" />
+                                                    </Button>
+                                                    <Button Command="{Binding SetExactHeightCommand}" CommandParameter="20" Style="{StaticResource CyanGhostButton}" Padding="2,2" Margin="1,0,1,0" ToolTip="20 px (1/2 экрана)">
+                                                        <TextBlock Text="20 px (½)" FontSize="8" />
+                                                    </Button>
+                                                    <Button Command="{Binding SetExactHeightCommand}" CommandParameter="40" Style="{StaticResource CyanGhostButton}" Padding="2,2" Margin="1,0,0,0" ToolTip="40 px (Вся высота)">
+                                                        <TextBlock Text="40 (MAX)" FontSize="8" FontWeight="Bold" />
+                                                    </Button>
+                                                </UniformGrid>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <!-- 3. Position X & Y + Alignment -->
+                                        <Border Background="#090E17" BorderBrush="{StaticResource BrushCardBorder}" BorderThickness="1" CornerRadius="4" Padding="6,5" Margin="0,0,0,6">
+                                            <Grid>
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition Width="*" />
+                                                    <ColumnDefinition Width="8" />
+                                                    <ColumnDefinition Width="*" />
+                                                </Grid.ColumnDefinitions>
+
+                                                <!-- Left: X Position -->
+                                                <StackPanel Grid.Column="0">
+                                                    <Grid Margin="0,0,0,2">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*" />
+                                                            <ColumnDefinition Width="Auto" />
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock Text="{Binding SelectedWidget.X, StringFormat=X: {0} px}" Foreground="{StaticResource BrushCyan}" FontSize="9" FontWeight="SemiBold" VerticalAlignment="Center" />
+                                                        <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                                            <Button Command="{Binding NudgeXCommand}" CommandParameter="-1" Style="{StaticResource CyanGhostButton}" Padding="4,1" Margin="0,0,2,0" ToolTip="-1 px">
+                                                                <TextBlock Text="-" FontSize="8" FontWeight="Bold" />
+                                                            </Button>
+                                                            <Button Command="{Binding NudgeXCommand}" CommandParameter="1" Style="{StaticResource CyanGhostButton}" Padding="4,1" ToolTip="+1 px">
+                                                                <TextBlock Text="+" FontSize="8" FontWeight="Bold" />
+                                                            </Button>
+                                                        </StackPanel>
+                                                    </Grid>
+                                                    <Slider Minimum="0" Maximum="127" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding SelectedWidget.X, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource TacticalSlider}" Margin="0,1,0,3" />
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*" />
+                                                            <ColumnDefinition Width="*" />
+                                                            <ColumnDefinition Width="*" />
+                                                        </Grid.ColumnDefinitions>
+                                                        <Button Grid.Column="0" Command="{Binding AlignSelectedWidgetCommand}" CommandParameter="left" Style="{StaticResource CyanGhostButton}" Padding="1,2" Margin="0,0,1,0" ToolTip="К левому краю">
+                                                            <TextBlock Text="Лево" FontSize="7" />
+                                                        </Button>
+                                                        <Button Grid.Column="1" Command="{Binding AlignSelectedWidgetCommand}" CommandParameter="center_x" Style="{StaticResource CyanGhostButton}" Padding="1,2" Margin="1,0,1,0" ToolTip="По центру X">
+                                                            <TextBlock Text="Центр" FontSize="7" />
+                                                        </Button>
+                                                        <Button Grid.Column="2" Command="{Binding AlignSelectedWidgetCommand}" CommandParameter="right" Style="{StaticResource CyanGhostButton}" Padding="1,2" Margin="1,0,0,0" ToolTip="К правому краю">
+                                                            <TextBlock Text="Право" FontSize="7" />
+                                                        </Button>
+                                                    </Grid>
+                                                </StackPanel>
+
+                                                <!-- Right: Y Position -->
+                                                <StackPanel Grid.Column="2">
+                                                    <Grid Margin="0,0,0,2">
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*" />
+                                                            <ColumnDefinition Width="Auto" />
+                                                        </Grid.ColumnDefinitions>
+                                                        <TextBlock Text="{Binding SelectedWidget.Y, StringFormat=Y: {0} px}" Foreground="{StaticResource BrushCyan}" FontSize="9" FontWeight="SemiBold" VerticalAlignment="Center" />
+                                                        <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                                            <Button Command="{Binding NudgeYCommand}" CommandParameter="-1" Style="{StaticResource CyanGhostButton}" Padding="4,1" Margin="0,0,2,0" ToolTip="-1 px">
+                                                                <TextBlock Text="-" FontSize="8" FontWeight="Bold" />
+                                                            </Button>
+                                                            <Button Command="{Binding NudgeYCommand}" CommandParameter="1" Style="{StaticResource CyanGhostButton}" Padding="4,1" ToolTip="+1 px">
+                                                                <TextBlock Text="+" FontSize="8" FontWeight="Bold" />
+                                                            </Button>
+                                                        </StackPanel>
+                                                    </Grid>
+                                                    <Slider Minimum="0" Maximum="39" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding SelectedWidget.Y, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource TacticalSlider}" Margin="0,1,0,3" />
+                                                    <Grid>
+                                                        <Grid.ColumnDefinitions>
+                                                            <ColumnDefinition Width="*" />
+                                                            <ColumnDefinition Width="*" />
+                                                            <ColumnDefinition Width="*" />
+                                                        </Grid.ColumnDefinitions>
+                                                        <Button Grid.Column="0" Command="{Binding AlignSelectedWidgetCommand}" CommandParameter="top" Style="{StaticResource CyanGhostButton}" Padding="1,2" Margin="0,0,1,0" ToolTip="К верхнему краю">
+                                                            <TextBlock Text="Верх" FontSize="7" />
+                                                        </Button>
+                                                        <Button Grid.Column="1" Command="{Binding AlignSelectedWidgetCommand}" CommandParameter="center_y" Style="{StaticResource CyanGhostButton}" Padding="1,2" Margin="1,0,1,0" ToolTip="По центру Y">
+                                                            <TextBlock Text="Центр" FontSize="7" />
+                                                        </Button>
+                                                        <Button Grid.Column="2" Command="{Binding AlignSelectedWidgetCommand}" CommandParameter="bottom" Style="{StaticResource CyanGhostButton}" Padding="1,2" Margin="1,0,0,0" ToolTip="К нижнему краю">
+                                                            <TextBlock Text="Низ" FontSize="7" />
+                                                        </Button>
+                                                    </Grid>
+                                                </StackPanel>
+                                            </Grid>
+                                        </Border>
+
+                                        <!-- Quick Screen Layout Presets & Font Options -->
+                                        <Grid Margin="0,2,0,0">
+                                            <Grid.ColumnDefinitions>
+                                                <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
+                                            </Grid.ColumnDefinitions>
+                                            <UniformGrid Columns="3">
+                                                <Button Command="{Binding ApplyStretchPresetCommand}" CommandParameter="full_width" Style="{StaticResource CyanGhostButton}" Padding="2,3" Margin="0,0,2,0" ToolTip="Растянуть по всей доступной ширине">
+                                                    <TextBlock Text="ПО ШИРИНЕ" FontSize="8" />
+                                                </Button>
+                                                <Button Command="{Binding ApplyStretchPresetCommand}" CommandParameter="fullscreen" Style="{StaticResource CyanGhostButton}" Padding="2,3" Margin="1,0,2,0" ToolTip="Растянуть на весь OLED-экран (128x40)">
+                                                    <TextBlock Text="ВЕСЬ ЭКРАН" FontSize="8" />
+                                                </Button>
+                                                <Button Command="{Binding ApplyStretchPresetCommand}" CommandParameter="big_badge" Style="{StaticResource CyanGhostButton}" Padding="2,3" Margin="1,0,0,0" ToolTip="Крупный блок 60x20">
+                                                    <TextBlock Text="БЛОК 60x20" FontSize="8" />
+                                                </Button>
+                                            </UniformGrid>
+                                            <CheckBox Grid.Column="1" IsChecked="{Binding SelectedWidget.CompactFont, UpdateSourceTrigger=PropertyChanged}" Margin="6,0,0,0" ToolTip="Микро-шрифт 3x5">
+                                                <TextBlock Text="3x5 Микро" FontSize="9" Foreground="{StaticResource BrushTextSecondary}" />
+                                            </CheckBox>
+                                        </Grid>
+                                    </StackPanel>
+                                </Border>
 
                                 <TextBlock Text="GRAPH RANGE" Foreground="{StaticResource BrushTextSecondary}" FontSize="10" />
                                 <TextBlock Text="{Binding SelectedWidget.MinValue, StringFormat=Min: {0:0.0}}" Foreground="{StaticResource BrushCyan}" FontSize="9" />
@@ -639,6 +943,12 @@
                                     <ComboBoxItem Content="🎙 Mic Status (ON/MUTED)"    Tag="mic"           />
                                     <ComboBoxItem Content="🔥 GPU Delta (Paste Alert)"  Tag="gpu_delta"     />
                                     <ComboBoxItem Content="🔤 Caps Lock State"          Tag="caps"          />
+                                    <ComboBoxItem Content="⚡ CPU Frequency (MHz)"     Tag="cpu_clock"     />
+                                    <ComboBoxItem Content="🔋 CPU Voltage (mV)"        Tag="cpu_volt"      />
+                                    <ComboBoxItem Content="⚡ GPU Core Clock (MHz)"     Tag="gpu_clock"     />
+                                    <ComboBoxItem Content="💾 GPU Memory Clock (MHz)"    Tag="gpu_mem_clock" />
+                                    <ComboBoxItem Content="🔋 GPU Voltage (mV)"        Tag="gpu_volt"      />
+                                    <ComboBoxItem Content="🧠 RAM Frequency (MT/s)"     Tag="ram_clock"     />
                                     <ComboBoxItem Content="🌤 Weather Temp"             Tag="weather_temp"  />
                                 </ComboBox>
 
@@ -646,26 +956,57 @@
                                 <TextBlock Text="Text Format (e.g. CPU {cpu_load}%)" Foreground="{StaticResource BrushTextSecondary}" FontSize="10" Margin="0,0,0,4" />
                                 <TextBox Text="{Binding SelectedWidget.FormatTemplate, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource TacticalTextBox}" Margin="0,0,0,6" />
 
-                                <!-- Clickable Quick Insert Tokens -->
-                                <TextBlock Text="Quick Insert Tokens:" Foreground="{StaticResource BrushTextSecondary}" FontSize="9" Margin="0,0,0,4" />
-                                <WrapPanel Margin="0,0,0,10">
-                                    <Button Style="{StaticResource CyanGhostButton}" Content="{}{cpu_load}" Margin="0,0,3,3" Padding="6,3" FontSize="10" Click="OnInsertTokenClick" Tag="{}{cpu_load}" />
-                                    <Button Style="{StaticResource CyanGhostButton}" Content="{}{cpu_temp}" Margin="0,0,3,3" Padding="6,3" FontSize="10" Click="OnInsertTokenClick" Tag="{}{cpu_temp}" />
-                                    <Button Style="{StaticResource CyanGhostButton}" Content="{}{cpu_power}" Margin="0,0,3,3" Padding="6,3" FontSize="10" Click="OnInsertTokenClick" Tag="{}{cpu_power}" />
-                                    <Button Style="{StaticResource CyanGhostButton}" Content="{}{gpu_load}" Margin="0,0,3,3" Padding="6,3" FontSize="10" Click="OnInsertTokenClick" Tag="{}{gpu_load}" />
-                                    <Button Style="{StaticResource CyanGhostButton}" Content="{}{gpu_temp}" Margin="0,0,3,3" Padding="6,3" FontSize="10" Click="OnInsertTokenClick" Tag="{}{gpu_temp}" />
-                                    <Button Style="{StaticResource CyanGhostButton}" Content="{}{gpu_power}" Margin="0,0,3,3" Padding="6,3" FontSize="10" Click="OnInsertTokenClick" Tag="{}{gpu_power}" />
-                                    <Button Style="{StaticResource CyanGhostButton}" Content="{}{total_power}" Margin="0,0,3,3" Padding="6,3" FontSize="10" Click="OnInsertTokenClick" Tag="{}{total_power}" />
-                                    <Button Style="{StaticResource CyanGhostButton}" Content="{}{gpu_delta}" Margin="0,0,3,3" Padding="6,3" FontSize="10" Click="OnInsertTokenClick" Tag="{}{gpu_delta}" />
-                                    <Button Style="{StaticResource CyanGhostButton}" Content="{}{ram_percent}" Margin="0,0,3,3" Padding="6,3" FontSize="10" Click="OnInsertTokenClick" Tag="{}{ram_percent}" />
-                                    <Button Style="{StaticResource CyanGhostButton}" Content="{}{ping}" Margin="0,0,3,3" Padding="6,3" FontSize="10" Click="OnInsertTokenClick" Tag="{}{ping}" />
-                                    <Button Style="{StaticResource CyanGhostButton}" Content="{}{net_down}" Margin="0,0,3,3" Padding="6,3" FontSize="10" Click="OnInsertTokenClick" Tag="{}{net_down}" />
-                                    <Button Style="{StaticResource CyanGhostButton}" Content="{}{apm}" Margin="0,0,3,3" Padding="6,3" FontSize="10" Click="OnInsertTokenClick" Tag="{}{apm}" />
-                                    <Button Style="{StaticResource CyanGhostButton}" Content="{}{vol}" Margin="0,0,3,3" Padding="6,3" FontSize="10" Click="OnInsertTokenClick" Tag="{}{vol}" />
-                                    <Button Style="{StaticResource CyanGhostButton}" Content="{}{mic}" Margin="0,0,3,3" Padding="6,3" FontSize="10" Click="OnInsertTokenClick" Tag="{}{mic}" />
-                                    <Button Style="{StaticResource CyanGhostButton}" Content="{}{caps}" Margin="0,0,3,3" Padding="6,3" FontSize="10" Click="OnInsertTokenClick" Tag="{}{caps}" />
-                                    <Button Style="{StaticResource CyanGhostButton}" Content="{}{weather_temp}" Margin="0,0,3,3" Padding="6,3" FontSize="10" Click="OnInsertTokenClick" Tag="{}{weather_temp}" />
-                                </WrapPanel>
+                                <!-- Clickable Quick Insert Tokens (Categorized Tactical Chips) -->
+                                <Border Background="#090E17" BorderBrush="{StaticResource BrushCardBorder}" BorderThickness="1" CornerRadius="4" Padding="6,5" Margin="0,0,0,10">
+                                    <StackPanel>
+                                        <TextBlock Text="БЫСТРАЯ ВСТАВКА ДАТЧИКОВ В ТЕКСТ:" Foreground="{StaticResource BrushTextSecondary}" FontSize="8" FontWeight="Bold" Margin="0,0,0,4" />
+
+                                        <!-- 1. Clocks & Volts -->
+                                        <TextBlock Text="⚡ Частоты и Напряжение:" Foreground="{StaticResource BrushCyan}" FontSize="8" FontWeight="SemiBold" Margin="0,2,0,2" />
+                                        <WrapPanel Margin="0,0,0,4">
+                                            <Button Style="{StaticResource CyanGhostButton}" Content="{}{cpu_clock}" Margin="0,0,2,2" Padding="5,2" FontSize="9" Click="OnInsertTokenClick" Tag="{}{cpu_clock}" ToolTip="Частота CPU в МГц (напр. 4810)" />
+                                            <Button Style="{StaticResource CyanGhostButton}" Content="{}{cpu_clock_ghz}" Margin="0,0,2,2" Padding="5,2" FontSize="9" Click="OnInsertTokenClick" Tag="{}{cpu_clock_ghz}" ToolTip="Частота CPU в ГГц (напр. 4.8)" />
+                                            <Button Style="{StaticResource CyanGhostButton}" Content="{}{cpu_volt}" Margin="0,0,2,2" Padding="5,2" FontSize="9" Click="OnInsertTokenClick" Tag="{}{cpu_volt}" ToolTip="Напряжение CPU в мВ" />
+                                            <Button Style="{StaticResource CyanGhostButton}" Content="{}{gpu_clock}" Margin="0,0,2,2" Padding="5,2" FontSize="9" Click="OnInsertTokenClick" Tag="{}{gpu_clock}" ToolTip="Частота ядра GPU в МГц" />
+                                            <Button Style="{StaticResource CyanGhostButton}" Content="{}{gpu_mem_clock}" Margin="0,0,2,2" Padding="5,2" FontSize="9" Click="OnInsertTokenClick" Tag="{}{gpu_mem_clock}" ToolTip="Частота памяти VRAM в МГц" />
+                                            <Button Style="{StaticResource CyanGhostButton}" Content="{}{gpu_volt}" Margin="0,0,2,2" Padding="5,2" FontSize="9" Click="OnInsertTokenClick" Tag="{}{gpu_volt}" ToolTip="Напряжение GPU в мВ" />
+                                            <Button Style="{StaticResource CyanGhostButton}" Content="{}{ram_clock}" Margin="0,0,2,2" Padding="5,2" FontSize="9" Click="OnInsertTokenClick" Tag="{}{ram_clock}" ToolTip="Частота RAM в MT/s (напр. 5600)" />
+                                        </WrapPanel>
+
+                                        <!-- 2. Temps & Power -->
+                                        <TextBlock Text="🌡 Температуры и Ватты:" Foreground="{StaticResource BrushAmberActual}" FontSize="8" FontWeight="SemiBold" Margin="0,2,0,2" />
+                                        <WrapPanel Margin="0,0,0,4">
+                                            <Button Style="{StaticResource CyanGhostButton}" Content="{}{cpu_temp}" Margin="0,0,2,2" Padding="5,2" FontSize="9" Click="OnInsertTokenClick" Tag="{}{cpu_temp}" />
+                                            <Button Style="{StaticResource CyanGhostButton}" Content="{}{gpu_temp}" Margin="0,0,2,2" Padding="5,2" FontSize="9" Click="OnInsertTokenClick" Tag="{}{gpu_temp}" />
+                                            <Button Style="{StaticResource CyanGhostButton}" Content="{}{cpu_power}" Margin="0,0,2,2" Padding="5,2" FontSize="9" Click="OnInsertTokenClick" Tag="{}{cpu_power}" />
+                                            <Button Style="{StaticResource CyanGhostButton}" Content="{}{gpu_power}" Margin="0,0,2,2" Padding="5,2" FontSize="9" Click="OnInsertTokenClick" Tag="{}{gpu_power}" />
+                                            <Button Style="{StaticResource CyanGhostButton}" Content="{}{total_power}" Margin="0,0,2,2" Padding="5,2" FontSize="9" Click="OnInsertTokenClick" Tag="{}{total_power}" />
+                                            <Button Style="{StaticResource CyanGhostButton}" Content="{}{gpu_delta}" Margin="0,0,2,2" Padding="5,2" FontSize="9" Click="OnInsertTokenClick" Tag="{}{gpu_delta}" ToolTip="Дельта Hotspot - Core (Термопаста)" />
+                                        </WrapPanel>
+
+                                        <!-- 3. Loads & Network -->
+                                        <TextBlock Text="📊 Нагрузка и Сеть:" Foreground="{StaticResource BrushTextSecondary}" FontSize="8" FontWeight="SemiBold" Margin="0,2,0,2" />
+                                        <WrapPanel Margin="0,0,0,4">
+                                            <Button Style="{StaticResource CyanGhostButton}" Content="{}{cpu_load}" Margin="0,0,2,2" Padding="5,2" FontSize="9" Click="OnInsertTokenClick" Tag="{}{cpu_load}" />
+                                            <Button Style="{StaticResource CyanGhostButton}" Content="{}{gpu_load}" Margin="0,0,2,2" Padding="5,2" FontSize="9" Click="OnInsertTokenClick" Tag="{}{gpu_load}" />
+                                            <Button Style="{StaticResource CyanGhostButton}" Content="{}{ram_percent}" Margin="0,0,2,2" Padding="5,2" FontSize="9" Click="OnInsertTokenClick" Tag="{}{ram_percent}" />
+                                            <Button Style="{StaticResource CyanGhostButton}" Content="{}{ping}" Margin="0,0,2,2" Padding="5,2" FontSize="9" Click="OnInsertTokenClick" Tag="{}{ping}" />
+                                            <Button Style="{StaticResource CyanGhostButton}" Content="{}{net_down}" Margin="0,0,2,2" Padding="5,2" FontSize="9" Click="OnInsertTokenClick" Tag="{}{net_down}" />
+                                            <Button Style="{StaticResource CyanGhostButton}" Content="{}{net_up}" Margin="0,0,2,2" Padding="5,2" FontSize="9" Click="OnInsertTokenClick" Tag="{}{net_up}" />
+                                        </WrapPanel>
+
+                                        <!-- 4. Media & System -->
+                                        <TextBlock Text="🎵 Медиа и Индикаторы:" Foreground="{StaticResource BrushTextSecondary}" FontSize="8" FontWeight="SemiBold" Margin="0,2,0,2" />
+                                        <WrapPanel>
+                                            <Button Style="{StaticResource CyanGhostButton}" Content="{}{media_title}" Margin="0,0,2,2" Padding="5,2" FontSize="9" Click="OnInsertTokenClick" Tag="{}{media_title}" />
+                                            <Button Style="{StaticResource CyanGhostButton}" Content="{}{vol}" Margin="0,0,2,2" Padding="5,2" FontSize="9" Click="OnInsertTokenClick" Tag="{}{vol}" />
+                                            <Button Style="{StaticResource CyanGhostButton}" Content="{}{mic}" Margin="0,0,2,2" Padding="5,2" FontSize="9" Click="OnInsertTokenClick" Tag="{}{mic}" />
+                                            <Button Style="{StaticResource CyanGhostButton}" Content="{}{caps}" Margin="0,0,2,2" Padding="5,2" FontSize="9" Click="OnInsertTokenClick" Tag="{}{caps}" />
+                                            <Button Style="{StaticResource CyanGhostButton}" Content="{}{apm}" Margin="0,0,2,2" Padding="5,2" FontSize="9" Click="OnInsertTokenClick" Tag="{}{apm}" />
+                                            <Button Style="{StaticResource CyanGhostButton}" Content="{}{weather_temp}" Margin="0,0,2,2" Padding="5,2" FontSize="9" Click="OnInsertTokenClick" Tag="{}{weather_temp}" />
+                                        </WrapPanel>
+                                    </StackPanel>
+                                </Border>
 
                                 <!-- Font & Border Toggles -->
                                 <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
@@ -698,7 +1039,10 @@
                                                 <ColumnDefinition Width="*" />
                                                 <ColumnDefinition Width="Auto" />
                                             </Grid.ColumnDefinitions>
-                                            <TextBlock Text="CPU Package" Foreground="{StaticResource BrushTextSecondary}" FontSize="10" />
+                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                <TextBlock Text="CPU Package" Foreground="{StaticResource BrushTextSecondary}" FontSize="10" />
+                                                <TextBlock Text="{Binding LiveMetrics.CpuClock, StringFormat=' ({0:0} MHz)'}" Foreground="{StaticResource BrushTextMuted}" FontSize="9" />
+                                            </StackPanel>
                                             <StackPanel Grid.Column="1" Orientation="Horizontal">
                                                 <TextBlock Text="{Binding LiveMetrics.CpuLoad, StringFormat={}{0:0}%}" Foreground="{StaticResource BrushTextPrimary}" FontWeight="Bold" FontSize="10" Margin="0,0,6,0" />
                                                 <TextBlock Text="{Binding LiveMetrics.CpuTemp, StringFormat={}{0:0}°C}" Foreground="{StaticResource BrushAmberActual}" FontWeight="Bold" FontSize="10" Margin="0,0,6,0" />
@@ -712,7 +1056,10 @@
                                                 <ColumnDefinition Width="*" />
                                                 <ColumnDefinition Width="Auto" />
                                             </Grid.ColumnDefinitions>
-                                            <TextBlock Text="GPU Board" Foreground="{StaticResource BrushTextSecondary}" FontSize="10" />
+                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                <TextBlock Text="GPU Board" Foreground="{StaticResource BrushTextSecondary}" FontSize="10" />
+                                                <TextBlock Text="{Binding LiveMetrics.GpuClock, StringFormat=' ({0:0} MHz)'}" Foreground="{StaticResource BrushTextMuted}" FontSize="9" />
+                                            </StackPanel>
                                             <StackPanel Grid.Column="1" Orientation="Horizontal">
                                                 <TextBlock Text="{Binding LiveMetrics.GpuLoad, StringFormat={}{0:0}%}" Foreground="{StaticResource BrushTextPrimary}" FontWeight="Bold" FontSize="10" Margin="0,0,6,0" />
                                                 <TextBlock Text="{Binding LiveMetrics.GpuHotspot, StringFormat={}{0:0}°C}" Foreground="{StaticResource BrushAmberActual}" FontWeight="Bold" FontSize="10" Margin="0,0,6,0" />
@@ -726,8 +1073,15 @@
                                                 <ColumnDefinition Width="*" />
                                                 <ColumnDefinition Width="Auto" />
                                             </Grid.ColumnDefinitions>
-                                            <TextBlock Text="System RAM" Foreground="{StaticResource BrushTextSecondary}" FontSize="10" />
-                                            <TextBlock Grid.Column="1" Text="{Binding LiveMetrics.RamPercent, StringFormat={}{0:0}%}" Foreground="{StaticResource BrushTextPrimary}" FontWeight="Bold" FontSize="10" />
+                                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                                <TextBlock Text="System RAM" Foreground="{StaticResource BrushTextSecondary}" FontSize="10" />
+                                                <TextBlock Text="{Binding LiveMetrics.RamClock, StringFormat=' ({0:0} MT/s)'}" Foreground="{StaticResource BrushTextMuted}" FontSize="9" />
+                                            </StackPanel>
+                                            <StackPanel Grid.Column="1" Orientation="Horizontal">
+                                                <TextBlock Text="{Binding LiveMetrics.RamUsedGb, StringFormat={}{0:0.0}G / }" Foreground="{StaticResource BrushTextPrimary}" FontSize="10" />
+                                                <TextBlock Text="{Binding LiveMetrics.RamTotalGb, StringFormat={}{0:0.0}G}" Foreground="{StaticResource BrushTextSecondary}" FontSize="10" Margin="0,0,6,0" />
+                                                <TextBlock Text="{Binding LiveMetrics.RamPercent, StringFormat={}{0:0}%}" Foreground="{StaticResource BrushCyan}" FontWeight="Bold" FontSize="10" />
+                                            </StackPanel>
                                         </Grid>
 
                                         <!-- Total Power -->

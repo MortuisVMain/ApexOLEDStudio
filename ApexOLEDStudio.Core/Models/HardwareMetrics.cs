@@ -16,6 +16,9 @@ public sealed class HardwareMetrics
     public float CpuPackageTemp { get; set; } // °C
     public float CpuPower { get; set; } // Watts
     public float CpuClock { get; set; } // MHz
+    public float CpuVoltage { get; set; } // mV
+    public float CpuFanRpm { get; set; } // RPM
+    public float MidFanRpm { get; set; } // RPM
 
     // GPU Metrics
     public string GpuName { get; set; } = "GPU";
@@ -24,6 +27,9 @@ public sealed class HardwareMetrics
     public float GpuHotspot { get; set; } // Hotspot °C
     public float GpuVramTemp { get; set; } // VRAM °C
     public float GpuPower { get; set; } // Watts
+    public float GpuClock { get; set; } // Core MHz
+    public float GpuMemoryClock { get; set; } // VRAM MHz
+    public float GpuVoltage { get; set; } // mV
     public string PowerSource { get; set; } = "Unavailable";
     public bool PowerIsEstimated { get; set; }
     public float GpuFanRpm { get; set; } // RPM or %
@@ -34,6 +40,7 @@ public sealed class HardwareMetrics
     public float RamUsedGb { get; set; } // GB
     public float RamTotalGb { get; set; } // GB
     public float RamPercent { get; set; } // %
+    public float RamClock { get; set; } = 5600f; // MHz or MT/s
 
     // ── Network Metrics ────────────────────────────────────────────────
     public int PingMs { get; set; } = 0;
@@ -108,11 +115,20 @@ public sealed class HardwareMetrics
             .Replace("{cpu_load}",       Math.Round(CpuLoad).ToString(),                                        StringComparison.OrdinalIgnoreCase)
             .Replace("{cpu_temp}",       Math.Round(CpuTemp > 0 ? CpuTemp : CpuPackageTemp).ToString(),        StringComparison.OrdinalIgnoreCase)
             .Replace("{cpu_power}",      Math.Round(CpuPower).ToString(),                                       StringComparison.OrdinalIgnoreCase)
+            .Replace("{cpu_clock}",      Math.Round(CpuClock).ToString(),                                       StringComparison.OrdinalIgnoreCase)
+            .Replace("{cpu_clock_ghz}",  (CpuClock / 1000f).ToString("0.0", inv),                               StringComparison.OrdinalIgnoreCase)
+            .Replace("{cpu_volt}",       Math.Round(CpuVoltage).ToString(),                                     StringComparison.OrdinalIgnoreCase)
+            .Replace("{cpu_fan}",        Math.Round(CpuFanRpm).ToString(),                                      StringComparison.OrdinalIgnoreCase)
+            .Replace("{mid_fan}",        Math.Round(MidFanRpm).ToString(),                                      StringComparison.OrdinalIgnoreCase)
             .Replace("{gpu_load}",       Math.Round(GpuLoad).ToString(),                                        StringComparison.OrdinalIgnoreCase)
             .Replace("{gpu_temp}",       Math.Round(GpuTemp).ToString(),                                        StringComparison.OrdinalIgnoreCase)
             .Replace("{gpu_hotspot}",    Math.Round(GpuHotspot > 0 ? GpuHotspot : GpuTemp).ToString(),         StringComparison.OrdinalIgnoreCase)
             .Replace("{gpu_delta}",      Math.Round(GpuDelta).ToString() + "°C",                                StringComparison.OrdinalIgnoreCase)
             .Replace("{gpu_power}",      Math.Round(GpuPower).ToString(),                                       StringComparison.OrdinalIgnoreCase)
+            .Replace("{gpu_clock}",      Math.Round(GpuClock).ToString(),                                       StringComparison.OrdinalIgnoreCase)
+            .Replace("{gpu_clock_ghz}",  (GpuClock / 1000f).ToString("0.0", inv),                               StringComparison.OrdinalIgnoreCase)
+            .Replace("{gpu_mem_clock}",  Math.Round(GpuMemoryClock).ToString(),                                StringComparison.OrdinalIgnoreCase)
+            .Replace("{gpu_volt}",       Math.Round(GpuVoltage).ToString(),                                     StringComparison.OrdinalIgnoreCase)
             .Replace("{total_power}",    Math.Round(TotalPower).ToString(),                                      StringComparison.OrdinalIgnoreCase)
             .Replace("{power_source}",   PowerSource,                                                           StringComparison.OrdinalIgnoreCase)
             .Replace("{gpu_vram_temp}",  Math.Round(GpuVramTemp).ToString(),                                    StringComparison.OrdinalIgnoreCase)
@@ -121,6 +137,7 @@ public sealed class HardwareMetrics
             .Replace("{ram_percent}",    Math.Round(RamPercent).ToString(),                                     StringComparison.OrdinalIgnoreCase)
             .Replace("{ram_used}",       RamUsedGb.ToString("0.0", inv),                                         StringComparison.OrdinalIgnoreCase)
             .Replace("{ram_total}",      Math.Round(RamTotalGb).ToString(),                                     StringComparison.OrdinalIgnoreCase)
+            .Replace("{ram_clock}",      Math.Round(RamClock).ToString(),                                       StringComparison.OrdinalIgnoreCase)
             .Replace("{ping}",           PingMs >= 0 ? PingMs.ToString() : "OFF",                               StringComparison.OrdinalIgnoreCase)
             .Replace("{net_down}",       netDown,                                                               StringComparison.OrdinalIgnoreCase)
             .Replace("{net_up}",         netUp,                                                                 StringComparison.OrdinalIgnoreCase)
@@ -147,15 +164,23 @@ public sealed class HardwareMetrics
         "cpu_load"      => CpuLoad,
         "cpu_temp"      => CpuTemp > 0 ? CpuTemp : CpuPackageTemp,
         "cpu_power"     => CpuPower,
+        "cpu_clock"     => CpuClock,
+        "cpu_volt"      => CpuVoltage,
+        "cpu_fan"       => CpuFanRpm,
+        "mid_fan"       => MidFanRpm,
         "gpu_load"      => GpuLoad,
         "gpu_temp"      => GpuTemp,
         "gpu_hotspot"   => GpuHotspot > 0 ? GpuHotspot : GpuTemp,
         "gpu_delta"     => GpuDelta,
         "gpu_power"     => GpuPower,
+        "gpu_clock"     => GpuClock,
+        "gpu_mem_clock" => GpuMemoryClock,
+        "gpu_volt"      => GpuVoltage,
         "total_power"   => TotalPower,
         "gpu_vram_temp" => GpuVramTemp,
         "gpu_fan"       => GpuFanRpm,
         "ram_percent"   => RamPercent,
+        "ram_clock"     => RamClock,
         "ping"          => PingMs >= 0 ? PingMs : 0,
         "net_down"      => DownloadSpeedKBs,
         "net_up"        => UploadSpeedKBs,

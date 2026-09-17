@@ -665,8 +665,70 @@ public class LayoutTests
             var w2 = vm.CurrentLayout.Widgets[1];
             Assert.Equal("cpu_temp", w2.MetricKey);
 
+            vm.AddPresetWidget("cpu_clock");
+            Assert.Equal(3, vm.CurrentLayout.Widgets.Count);
+            var w3 = vm.CurrentLayout.Widgets[2];
+            Assert.Equal("cpu_clock", w3.MetricKey);
+            Assert.Equal("{cpu_clock_ghz}G", w3.FormatTemplate);
+
+            vm.AddPresetWidget("gpu_clock");
+            Assert.Equal(4, vm.CurrentLayout.Widgets.Count);
+            var w4 = vm.CurrentLayout.Widgets[3];
+            Assert.Equal("gpu_clock", w4.MetricKey);
+
             // Verify smart placement prevents exact coordinate collision
             Assert.False(w.X == w2.X && w.Y == w2.Y, "Widgets must not overlap at identical coordinates");
+        });
+        t.SetApartmentState(ApartmentState.STA);
+        t.Start();
+        t.Join();
+    }
+
+    [Fact]
+    public void MainViewModel_SizingCommands_ExecuteCleanly()
+    {
+        var t = new Thread(() =>
+        {
+            using var vm = new ApexOLEDStudio.UI.ViewModels.MainViewModel();
+            var widget = new OledWidget
+            {
+                Name = "TestWidget",
+                Type = WidgetType.Text,
+                X = 10,
+                Y = 10,
+                Width = 20,
+                Height = 8,
+                FormatTemplate = "TEST"
+            };
+            vm.CurrentLayout.Widgets.Clear();
+            vm.CurrentLayout.Widgets.Add(widget);
+            vm.SelectedWidget = widget;
+
+            // Test SetExactWidthCommand
+            vm.SetExactWidthCommand.Execute(64);
+            Assert.Equal(64, widget.Width);
+
+            // Test SetExactHeightCommand
+            vm.SetExactHeightCommand.Execute(14);
+            Assert.Equal(14, widget.Height);
+
+            // Test AlignSelectedWidgetCommand (center_x, center_y, right, bottom)
+            vm.AlignSelectedWidgetCommand.Execute("center_x");
+            Assert.Equal((128 - 64) / 2, widget.X);
+
+            vm.AlignSelectedWidgetCommand.Execute("center_y");
+            Assert.Equal((40 - 14) / 2, widget.Y);
+
+            vm.AlignSelectedWidgetCommand.Execute("right");
+            Assert.Equal(128 - 64, widget.X);
+
+            vm.AlignSelectedWidgetCommand.Execute("bottom");
+            Assert.Equal(40 - 14, widget.Y);
+
+            // Test AutoFitSelectedWidgetCommand
+            vm.AutoFitSelectedWidgetCommand.Execute(null);
+            Assert.Equal(23, widget.Width); // 4 * 5 + 3 = 23 px
+            Assert.Equal(7, widget.Height);
         });
         t.SetApartmentState(ApartmentState.STA);
         t.Start();
@@ -695,6 +757,36 @@ public class LayoutTests
         // 4. Center column must contain the 1-Click Widget Shelf directly under canvas
         Assert.Contains("1-CLICK WIDGET SHELF", xaml);
         Assert.Contains("InteractiveCanvas", xaml);
+    }
+
+    [Fact]
+    public void MainWindow_Xaml_AllStaticResourcesExistInTheme()
+    {
+        string xamlPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "ApexOLEDStudio.UI", "MainWindow.xaml");
+        string themePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "..", "..", "..", "..", "ApexOLEDStudio.UI", "Styles", "CyberAlchemicalTheme.xaml");
+        Assert.True(File.Exists(xamlPath), $"MainWindow.xaml must exist at {xamlPath}");
+        Assert.True(File.Exists(themePath), $"CyberAlchemicalTheme.xaml must exist at {themePath}");
+
+        string xaml = File.ReadAllText(xamlPath);
+        string theme = File.ReadAllText(themePath);
+
+        var themeKeys = new HashSet<string>();
+        foreach (System.Text.RegularExpressions.Match m in System.Text.RegularExpressions.Regex.Matches(theme, @"x:Key=""([^""]+)"""))
+        {
+            themeKeys.Add(m.Groups[1].Value);
+        }
+
+        var missing = new List<string>();
+        foreach (System.Text.RegularExpressions.Match m in System.Text.RegularExpressions.Regex.Matches(xaml, @"\{StaticResource\s+([^,\}\s]+)"))
+        {
+            string key = m.Groups[1].Value;
+            if (!themeKeys.Contains(key))
+            {
+                missing.Add(key);
+            }
+        }
+
+        Assert.Empty(missing);
     }
 
     [Fact]
@@ -759,4 +851,366 @@ public class LayoutTests
 
         Assert.True(buffer.GetPixel(1, 1) || buffer.GetPixel(50, 25));
     }
+
+    [Fact]
+    public void Typography_NormalizeEnforcesUniformFontAndCompactFontFalse()
+    {
+        var layout = new OledLayout();
+        layout.Widgets.Add(new OledWidget
+        {
+            Name = "MicroText",
+            Type = WidgetType.Text,
+            CompactFont = true,
+            FontScale = 3
+        });
+        layout.Widgets.Add(new OledWidget
+        {
+            Name = "Bar",
+            Type = WidgetType.ProgressBar,
+            CompactFont = true,
+            FontScale = 2
+        });
+
+        layout.NormalizeTypography();
+
+        Assert.All(layout.Widgets, w =>
+        {
+            Assert.Equal(WidgetTypography.BaseFontScale, w.FontScale);
+            Assert.False(w.CompactFont);
+        });
+    }
+
+    [Fact]
+    public void Presets_AllPresetsHaveUniformFontScaleAndCleanFont()
+    {
+        var presets = new List<OledLayout>
+        {
+            OledLayout.CreateDefaultApexProSplit(),
+            OledLayout.CreatePowerStation(),
+            OledLayout.CreateGamerMinimal(),
+            OledLayout.CreateDevMode(),
+            OledLayout.CreateClockMedia(),
+            OledLayout.CreateGamerPro(),
+            OledLayout.CreateMediaStation()
+        };
+
+        foreach (var layout in presets)
+        {
+            var textWidgets = layout.Widgets.Where(w => w.Type == WidgetType.Text).ToList();
+            Assert.NotEmpty(textWidgets);
+            foreach (var widget in textWidgets)
+            {
+                Assert.Equal(1, widget.FontScale);
+                Assert.False(widget.CompactFont, $"Widget '{widget.Name}' in layout '{layout.Name}' should use standard font.");
+            }
+        }
+    }
+
+    [Fact]
+    public void WidgetEditorMath_ResizeAndNudge_RespectsOledScreenBoundaries()
+    {
+        var widget = new OledWidget
+        {
+            X = 10,
+            Y = 5,
+            Width = 30,
+            Height = 10
+        };
+
+        // Resize larger than remaining width
+        WidgetEditorMath.Resize(widget, 500, 500);
+        Assert.Equal(118, widget.Width);  // 128 - 10
+        Assert.Equal(35, widget.Height);  // 40 - 5
+
+        // Resize smaller than minimum (minW = 4, minH = 4)
+        WidgetEditorMath.Resize(widget, -500, -500, minW: 4, minH: 4);
+        Assert.Equal(4, widget.Width);
+        Assert.Equal(4, widget.Height);
+
+        // Nudge position
+        WidgetEditorMath.Nudge(widget, 10, 5);
+        Assert.Equal(20, widget.X);
+        Assert.Equal(10, widget.Y);
+
+        // Nudge beyond screen bounds
+        WidgetEditorMath.Nudge(widget, 500, 500);
+        Assert.Equal(124, widget.X); // 128 - 4
+        Assert.Equal(36, widget.Y);  // 40 - 4
+
+        // Negative nudge clamps to 0
+        WidgetEditorMath.Nudge(widget, -500, -500);
+        Assert.Equal(0, widget.X);
+        Assert.Equal(0, widget.Y);
+    }
+
+    [Fact]
+    public void TextWidget_HeightChange_DynamicallyScalesFontScale()
+    {
+        var widget = new OledWidget
+        {
+            Name = "Clock",
+            Type = WidgetType.Text,
+            Width = 60,
+            Height = 8
+        };
+
+        Assert.Equal(1, widget.FontScale);
+        Assert.Equal("7 px (1x Standard)", widget.FontScaleDisplayName);
+
+        // Resizing height to 14px activates 2x font
+        widget.Height = 14;
+        Assert.Equal(2, widget.FontScale);
+        Assert.Equal("14 px (2x Large)", widget.FontScaleDisplayName);
+
+        // Resizing height to 21px activates 3x font
+        widget.Height = 21;
+        Assert.Equal(3, widget.FontScale);
+        Assert.Equal("21 px (3x Huge)", widget.FontScaleDisplayName);
+
+        // Resizing height to 28px activates 4x font
+        widget.Height = 28;
+        Assert.Equal(4, widget.FontScale);
+        Assert.Equal("28 px (4x Giant)", widget.FontScaleDisplayName);
+
+        // Height change on non-text widget does not change FontScale
+        var barWidget = new OledWidget
+        {
+            Name = "CpuBar",
+            Type = WidgetType.ProgressBar,
+            Width = 60,
+            Height = 8,
+            FontScale = 1
+        };
+        barWidget.Height = 20;
+        Assert.Equal(1, barWidget.FontScale);
+    }
+
+    [Fact]
+    public void TextWidget_FontScaleChange_ExpandsHeightToFitGlyphs()
+    {
+        var widget = new OledWidget
+        {
+            Name = "MetricsText",
+            Type = WidgetType.Text,
+            Width = 60,
+            Height = 8
+        };
+
+        // Explicitly changing FontScale to 2 expands Height to at least 14
+        widget.FontScale = 2;
+        Assert.True(widget.Height >= 14, $"Expected Height >= 14, got {widget.Height}");
+
+        // Changing to 3 expands Height to at least 21
+        widget.FontScale = 3;
+        Assert.True(widget.Height >= 21, $"Expected Height >= 21, got {widget.Height}");
+
+        // Changing to 4 expands Height to at least 28
+        widget.FontScale = 4;
+        Assert.True(widget.Height >= 28, $"Expected Height >= 28, got {widget.Height}");
+    }
+
+    [Fact]
+    public void TextWidget_SetTextScale_ConfiguresScaleAndDisplayName()
+    {
+        var widget = new OledWidget
+        {
+            Name = "Speed",
+            Type = WidgetType.Text,
+            Width = 40,
+            Height = 8
+        };
+
+        widget.SetTextScale(2);
+        Assert.Equal(2, widget.FontScale);
+        Assert.True(widget.Height >= 14);
+        Assert.Equal("14 px (2x Large)", widget.FontScaleDisplayName);
+
+        widget.SetTextScale(1);
+        Assert.Equal(1, widget.FontScale);
+        Assert.Equal("7 px (1x Standard)", widget.FontScaleDisplayName);
+    }
+
+    [Fact]
+    public void DrawTextStretched_RendersPixelsWithinExactTargetDimensions()
+    {
+        var buffer = new OledFrameBuffer();
+        int targetW = 50;
+        int targetH = 15;
+
+        buffer.DrawTextStretched(0, 0, targetW, targetH, "CPU 45%", compact: false, on: true);
+
+        // Verify pixels are set inside the box
+        bool hasInsidePixels = false;
+        for (int y = 0; y < targetH; y++)
+        {
+            for (int x = 0; x < targetW; x++)
+            {
+                if (buffer.GetPixel(x, y))
+                {
+                    hasInsidePixels = true;
+                    break;
+                }
+            }
+        }
+        Assert.True(hasInsidePixels, "DrawTextStretched should render pixels inside target dimensions.");
+
+        // Verify NO pixels are set outside the target box
+        for (int y = targetH; y < OledFrameBuffer.Height; y++)
+        {
+            for (int x = 0; x < OledFrameBuffer.Width; x++)
+            {
+                Assert.False(buffer.GetPixel(x, y), $"Pixel set outside target height at ({x}, {y})");
+            }
+        }
+
+        for (int y = 0; y < targetH; y++)
+        {
+            for (int x = targetW; x < OledFrameBuffer.Width; x++)
+            {
+                Assert.False(buffer.GetPixel(x, y), $"Pixel set outside target width at ({x}, {y})");
+            }
+        }
+    }
+
+    [Fact]
+    public void TextWidget_StretchMode_RendersStretchedTextAndUpdatesSummary()
+    {
+        var widget = new OledWidget
+        {
+            Name = "StretchedClock",
+            Type = WidgetType.Text,
+            X = 5,
+            Y = 5,
+            Width = 60,
+            Height = 20,
+            StretchText = true,
+            KeepAspectRatio = false,
+            FormatTemplate = "18:45"
+        };
+
+        Assert.Equal("60 × 20 px", widget.DimensionsSummary);
+        Assert.Equal("60×20 px (Растянут)", widget.StretchModeDisplayName);
+
+        var buffer = new OledFrameBuffer();
+        var metrics = new HardwareMetrics();
+        widget.Render(buffer, metrics);
+
+        // Check that pixels were drawn within the widget bounds
+        bool hasPixels = false;
+        for (int y = 5; y < 25; y++)
+        {
+            for (int x = 5; x < 65; x++)
+            {
+                if (buffer.GetPixel(x, y))
+                {
+                    hasPixels = true;
+                    break;
+                }
+            }
+        }
+        Assert.True(hasPixels, "Widget in StretchText mode must render pixels across stretched bounds.");
+
+        // Switch to proportional
+        widget.KeepAspectRatio = true;
+        Assert.Equal("60×20 (Пропорции)", widget.StretchModeDisplayName);
+
+        // Switch to fixed font
+        widget.StretchText = false;
+        Assert.Equal("Шрифт 5x7", widget.StretchModeDisplayName);
+    }
+
+    [Fact]
+    public void Widget_SizeMode_TogglesPropertiesCorrectly()
+    {
+        var widget = new OledWidget { Type = WidgetType.Text };
+
+        widget.SizeMode = TextSizeMode.FreeStretch;
+        Assert.True(widget.StretchText);
+        Assert.False(widget.KeepAspectRatio);
+        Assert.True(widget.IsFreeStretchActive);
+        Assert.False(widget.IsProportionalActive);
+        Assert.False(widget.IsFixedScaleActive);
+
+        widget.SizeMode = TextSizeMode.Proportional;
+        Assert.True(widget.StretchText);
+        Assert.True(widget.KeepAspectRatio);
+        Assert.False(widget.IsFreeStretchActive);
+        Assert.True(widget.IsProportionalActive);
+        Assert.False(widget.IsFixedScaleActive);
+
+        widget.SizeMode = TextSizeMode.FixedScale;
+        Assert.False(widget.StretchText);
+        Assert.False(widget.IsFreeStretchActive);
+        Assert.False(widget.IsProportionalActive);
+        Assert.True(widget.IsFixedScaleActive);
+    }
+
+    [Fact]
+    public void Widget_AutoFitToContent_CalculatesExactBounds()
+    {
+        var widget = new OledWidget
+        {
+            Type = WidgetType.Text,
+            FormatTemplate = "CPU 45%", // 7 chars: 7*5 + 6 = 41 px wide, 7 px high at scale 1
+            CompactFont = false,
+            FontScale = 1
+        };
+
+        widget.AutoFitToContent(targetFontScale: 1);
+
+        Assert.Equal(41, widget.Width);
+        Assert.Equal(7, widget.Height);
+
+        // Compact font: 7 chars: 7*3 + 6 = 27 px wide, 5 px high
+        widget.CompactFont = true;
+        widget.AutoFitToContent(targetFontScale: 1);
+        Assert.Equal(27, widget.Width);
+        Assert.Equal(5, widget.Height);
+    }
+
+    [Fact]
+    public void WidgetEditorMath_CalculateTextBounds_WorksForStandardAndCompact()
+    {
+        var (wStd, hStd) = WidgetEditorMath.CalculateTextBounds("HELLO", compact: false, scale: 1);
+        // 5 chars * 5 px + 4 spacing = 29 px width, 7 px height
+        Assert.Equal(29, wStd);
+        Assert.Equal(7, hStd);
+
+        var (wComp, hComp) = WidgetEditorMath.CalculateTextBounds("HELLO", compact: true, scale: 1);
+        // 5 chars * 3 px + 4 spacing = 19 px width, 5 px height
+        Assert.Equal(19, wComp);
+        Assert.Equal(5, hComp);
+
+        var (wScaled, hScaled) = WidgetEditorMath.CalculateTextBounds("HI", compact: false, scale: 2);
+        // 2 chars * 10 px + 1 spacing (2px) = 22 px width, 14 px height
+        Assert.Equal(22, wScaled);
+        Assert.Equal(14, hScaled);
+    }
+
+    [Fact]
+    public void OledFrameBuffer_DrawTextStretched_RendersToRightMargin()
+    {
+        var buffer = new OledFrameBuffer();
+        // Stretched text inside a 50x12 box at (0,0)
+        buffer.DrawTextStretched(0, 0, 50, 12, "MAX", keepAspectRatio: false);
+
+        // Check that pixels are rendered near the right edge (x >= 40)
+        bool hasRightEdgePixels = false;
+        for (int x = 40; x < 50; x++)
+        {
+            for (int y = 0; y < 12; y++)
+            {
+                if (buffer.GetPixel(x, y))
+                {
+                    hasRightEdgePixels = true;
+                    break;
+                }
+            }
+            if (hasRightEdgePixels) break;
+        }
+
+        Assert.True(hasRightEdgePixels, "DrawTextStretched must utilize width up to the right border.");
+    }
 }
+
+

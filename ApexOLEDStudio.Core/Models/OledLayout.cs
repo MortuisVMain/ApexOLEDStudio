@@ -18,6 +18,13 @@ public enum WidgetType
     Gif
 }
 
+public enum TextSizeMode
+{
+    FreeStretch,
+    Proportional,
+    FixedScale
+}
+
 public static class WidgetTypography
 {
     public const int BaseFontScale = 1;
@@ -73,10 +80,53 @@ public sealed class OledWidget : INotifyPropertyChanged
     public int Y { get => _y; set { if (_y != value) { _y = value; OnPropertyChanged(); } } }
 
     private int _width = 30;
-    public int Width { get => _width; set { if (_width != value) { _width = value; OnPropertyChanged(); } } }
+    public int Width
+    {
+        get => _width;
+        set
+        {
+            if (_width != value)
+            {
+                _width = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(DimensionsSummary));
+                OnPropertyChanged(nameof(StretchModeDisplayName));
+                OnPropertyChanged(nameof(IsFreeStretchActive));
+                OnPropertyChanged(nameof(IsProportionalActive));
+                OnPropertyChanged(nameof(IsFixedScaleActive));
+            }
+        }
+    }
 
     private int _height = 10;
-    public int Height { get => _height; set { if (_height != value) { _height = value; OnPropertyChanged(); } } }
+    public int Height
+    {
+        get => _height;
+        set
+        {
+            if (_height != value)
+            {
+                _height = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(DimensionsSummary));
+                OnPropertyChanged(nameof(StretchModeDisplayName));
+                OnPropertyChanged(nameof(IsFreeStretchActive));
+                OnPropertyChanged(nameof(IsProportionalActive));
+                OnPropertyChanged(nameof(IsFixedScaleActive));
+                if (Type == WidgetType.Text)
+                {
+                    int baseCharHeight = CompactFont ? 5 : 7;
+                    int calculatedScale = Math.Clamp(_height / baseCharHeight, WidgetTypography.MinFontScale, WidgetTypography.MaxFontScale);
+                    if (_fontScale != calculatedScale && _height >= baseCharHeight)
+                    {
+                        _fontScale = calculatedScale;
+                        OnPropertyChanged(nameof(FontScale));
+                        OnPropertyChanged(nameof(FontScaleDisplayName));
+                    }
+                }
+            }
+        }
+    }
 
     // Data Binding
     private string _metricKey = "cpu_load";
@@ -86,7 +136,19 @@ public sealed class OledWidget : INotifyPropertyChanged
     public string FormatTemplate { get => _formatTemplate; set { if (_formatTemplate != value) { _formatTemplate = value; OnPropertyChanged(); } } }
 
     private bool _compactFont = false;
-    public bool CompactFont { get => _compactFont; set { if (_compactFont != value) { _compactFont = value; OnPropertyChanged(); } } }
+    public bool CompactFont
+    {
+        get => _compactFont;
+        set
+        {
+            if (_compactFont != value)
+            {
+                _compactFont = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(FontScaleDisplayName));
+            }
+        }
+    }
 
     private int _fontScale = WidgetTypography.BaseFontScale;
     public int FontScale
@@ -99,8 +161,145 @@ public sealed class OledWidget : INotifyPropertyChanged
             {
                 _fontScale = normalized;
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(FontScaleDisplayName));
+                if (Type == WidgetType.Text)
+                {
+                    int recH = WidgetTypography.RecommendedHeight(Type, CompactFont, normalized);
+                    if (_height < recH)
+                    {
+                        _height = recH;
+                        OnPropertyChanged(nameof(Height));
+                        OnPropertyChanged(nameof(DimensionsSummary));
+                        OnPropertyChanged(nameof(StretchModeDisplayName));
+                    }
+                }
             }
         }
+    }
+
+    private bool _stretchText = true;
+    public bool StretchText
+    {
+        get => _stretchText;
+        set
+        {
+            if (_stretchText != value)
+            {
+                _stretchText = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(StretchModeDisplayName));
+                OnPropertyChanged(nameof(SizeMode));
+                OnPropertyChanged(nameof(IsFreeStretchActive));
+                OnPropertyChanged(nameof(IsProportionalActive));
+                OnPropertyChanged(nameof(IsFixedScaleActive));
+            }
+        }
+    }
+
+    private bool _keepAspectRatio = false;
+    public bool KeepAspectRatio
+    {
+        get => _keepAspectRatio;
+        set
+        {
+            if (_keepAspectRatio != value)
+            {
+                _keepAspectRatio = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(StretchModeDisplayName));
+                OnPropertyChanged(nameof(SizeMode));
+                OnPropertyChanged(nameof(IsFreeStretchActive));
+                OnPropertyChanged(nameof(IsProportionalActive));
+                OnPropertyChanged(nameof(IsFixedScaleActive));
+            }
+        }
+    }
+
+    [JsonIgnore]
+    public TextSizeMode SizeMode
+    {
+        get => !StretchText ? TextSizeMode.FixedScale : (KeepAspectRatio ? TextSizeMode.Proportional : TextSizeMode.FreeStretch);
+        set
+        {
+            switch (value)
+            {
+                case TextSizeMode.FreeStretch:
+                    StretchText = true;
+                    KeepAspectRatio = false;
+                    break;
+                case TextSizeMode.Proportional:
+                    StretchText = true;
+                    KeepAspectRatio = true;
+                    break;
+                case TextSizeMode.FixedScale:
+                    StretchText = false;
+                    KeepAspectRatio = false;
+                    break;
+            }
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(StretchText));
+            OnPropertyChanged(nameof(KeepAspectRatio));
+            OnPropertyChanged(nameof(StretchModeDisplayName));
+            OnPropertyChanged(nameof(IsFreeStretchActive));
+            OnPropertyChanged(nameof(IsProportionalActive));
+            OnPropertyChanged(nameof(IsFixedScaleActive));
+        }
+    }
+
+    [JsonIgnore]
+    public bool IsFreeStretchActive => StretchText && !KeepAspectRatio;
+
+    [JsonIgnore]
+    public bool IsProportionalActive => StretchText && KeepAspectRatio;
+
+    [JsonIgnore]
+    public bool IsFixedScaleActive => !StretchText;
+
+    [JsonIgnore]
+    public string DimensionsSummary => $"{Width} × {Height} px";
+
+    [JsonIgnore]
+    public string StretchModeDisplayName =>
+        !StretchText ? "Шрифт 5x7" :
+        KeepAspectRatio ? $"{Width}×{Height} (Пропорции)" :
+        $"{Width}×{Height} px (Растянут)";
+
+    [JsonIgnore]
+    public string FontScaleDisplayName => FontScale switch
+    {
+        1 => CompactFont ? "5 px (XS Micro)" : "7 px (1x Standard)",
+        2 => "14 px (2x Large)",
+        3 => "21 px (3x Huge)",
+        4 => "28 px (4x Giant)",
+        _ => $"{FontScale}x"
+    };
+
+    public void AutoFitToContent(int targetFontScale = 1)
+    {
+        if (Type != WidgetType.Text) return;
+        int scale = targetFontScale > 0 ? targetFontScale : Math.Max(1, FontScale);
+        int charW = (CompactFont ? 3 : 5) * scale;
+        int charH = (CompactFont ? 5 : 7) * scale;
+        int spacing = 1 * scale;
+        string sample = string.IsNullOrEmpty(FormatTemplate) ? (Name ?? "Text") : FormatTemplate;
+        string estimated = System.Text.RegularExpressions.Regex.Replace(sample, @"\{[^\}]+\}", "000");
+        int len = Math.Max(1, estimated.Length);
+        int neededW = len * charW + Math.Max(0, len - 1) * spacing;
+        int neededH = charH;
+
+        Width = Math.Clamp(neededW, 4, 128 - X);
+        Height = Math.Clamp(neededH, 4, 40 - Y);
+    }
+
+    public void SetTextScale(int scale)
+    {
+        StretchText = false;
+        FontScale = scale;
+        int recH = WidgetTypography.RecommendedHeight(Type, CompactFont, FontScale);
+        Height = Math.Max(Height, recH);
+        int minCharWidth = (CompactFont ? 4 : 6) * FontScale;
+        int approxLen = string.IsNullOrEmpty(FormatTemplate) ? 6 : Math.Max(4, FormatTemplate.Length);
+        Width = Math.Clamp(Math.Max(Width, minCharWidth * approxLen), 10, 128 - X);
     }
 
     // Visual options
@@ -156,7 +355,15 @@ public sealed class OledWidget : INotifyPropertyChanged
                         break;
                     }
                 }
-                buffer.DrawText(X, Y, text, CompactFont, FontScale, on: true);
+
+                if (StretchText)
+                {
+                    buffer.DrawTextStretched(X, Y, Width, Height, text, CompactFont, on: true, keepAspectRatio: KeepAspectRatio);
+                }
+                else
+                {
+                    buffer.DrawText(X, Y, text, CompactFont, FontScale, on: true);
+                }
                 break;
 
             case WidgetType.ProgressBar:
@@ -205,12 +412,12 @@ public sealed class OledWidget : INotifyPropertyChanged
 
     public void ResetEditorDefaults()
     {
-        Width = Type == WidgetType.Line ? Width : Math.Max(Width, Type == WidgetType.Text ? 40 : 30);
-        Height = Math.Max(Height, WidgetTypography.RecommendedHeight(Type, CompactFont));
+        CompactFont = false;
         FontScale = WidgetTypography.BaseFontScale;
+        Width = Type == WidgetType.Line ? Width : Math.Max(Width, Type == WidgetType.Text ? 40 : 30);
+        Height = Math.Max(Height, WidgetTypography.RecommendedHeight(Type, CompactFont, FontScale));
         MinValue = 0f;
         MaxValue = 100f;
-        CompactFont = false;
         Bordered = Type == WidgetType.ProgressBar;
         EnableMarquee = false;
         MarqueeSpeed = 1;
@@ -230,12 +437,16 @@ public sealed class OledLayout
     public float GpuDeltaThreshold { get; set; } = 20f;
     public List<OledWidget> Widgets { get; set; } = new();
 
-    public void NormalizeTypography(int baseFontScale = WidgetTypography.BaseFontScale)
+    public void NormalizeTypography(int baseFontScale = WidgetTypography.BaseFontScale, bool unifyToStandardFont = true)
     {
         int normalizedScale = WidgetTypography.ClampFontScale(baseFontScale);
         foreach (var widget in Widgets ?? Enumerable.Empty<OledWidget>())
         {
             widget.FontScale = normalizedScale;
+            if (unifyToStandardFont)
+            {
+                widget.CompactFont = false;
+            }
             int recommendedHeight = WidgetTypography.RecommendedHeight(widget.Type, widget.CompactFont, normalizedScale);
             if (widget.Type is not WidgetType.Line and not WidgetType.Gif)
                 widget.Height = Math.Max(widget.Height, recommendedHeight);
@@ -298,9 +509,12 @@ public sealed class OledLayout
             Type = WidgetType.Text,
             X = 2,
             Y = 2,
+            Width = 58,
+            Height = 8,
             MetricKey = "cpu_load",
             FormatTemplate = "CPU {cpu_load}%",
             CompactFont = false,
+            StretchText = true,
             FontScale = 1
         });
 
@@ -309,10 +523,13 @@ public sealed class OledLayout
             Name = "CPU Temp",
             Type = WidgetType.Text,
             X = 2,
-            Y = 12,
+            Y = 11,
+            Width = 58,
+            Height = 9,
             MetricKey = "cpu_temp",
             FormatTemplate = "{cpu_temp}°C",
-            CompactFont = true,
+            CompactFont = false,
+            StretchText = true,
             FontScale = 1
         });
 
@@ -346,9 +563,12 @@ public sealed class OledLayout
             Type = WidgetType.Text,
             X = 68,
             Y = 2,
+            Width = 58,
+            Height = 8,
             MetricKey = "gpu_load",
             FormatTemplate = "GPU {gpu_load}%",
             CompactFont = false,
+            StretchText = true,
             FontScale = 1
         });
 
@@ -357,10 +577,13 @@ public sealed class OledLayout
             Name = "GPU Temp",
             Type = WidgetType.Text,
             X = 68,
-            Y = 12,
+            Y = 11,
+            Width = 58,
+            Height = 9,
             MetricKey = "gpu_temp",
             FormatTemplate = "{gpu_temp}°C",
-            CompactFont = true,
+            CompactFont = false,
+            StretchText = true,
             FontScale = 1
         });
 
@@ -408,7 +631,7 @@ public sealed class OledLayout
             Y = 12,
             MetricKey = "cpu_power",
             FormatTemplate = "CPU {cpu_power}W",
-            CompactFont = true,
+            CompactFont = false,
             FontScale = 1
         });
 
@@ -446,7 +669,7 @@ public sealed class OledLayout
             Y = 12,
             MetricKey = "gpu_power",
             FormatTemplate = "GPU {gpu_power}W",
-            CompactFont = true,
+            CompactFont = false,
             FontScale = 1
         });
 
@@ -495,7 +718,7 @@ public sealed class OledLayout
             Y = 12,
             MetricKey = "gpu_hotspot",
             FormatTemplate = "HS:{gpu_hotspot}°C",
-            CompactFont = true,
+            CompactFont = false,
             FontScale = 1
         });
 
@@ -531,7 +754,7 @@ public sealed class OledLayout
             Y = 2,
             MetricKey = "gpu_fan",
             FormatTemplate = "{gpu_fan} RPM",
-            CompactFont = true,
+            CompactFont = false,
             FontScale = 1
         });
 
@@ -543,7 +766,7 @@ public sealed class OledLayout
             Y = 12,
             MetricKey = "gpu_power",
             FormatTemplate = "{gpu_power}W",
-            CompactFont = true,
+            CompactFont = false,
             FontScale = 1
         });
 
@@ -579,7 +802,7 @@ public sealed class OledLayout
             Y = 2,
             MetricKey = "cpu_load",
             FormatTemplate = "CPU {cpu_load}%",
-            CompactFont = true,
+            CompactFont = false,
             FontScale = 1
         });
 
@@ -591,7 +814,7 @@ public sealed class OledLayout
             Y = 12,
             MetricKey = "ram_percent",
             FormatTemplate = "RAM {ram_used}G",
-            CompactFont = true,
+            CompactFont = false,
             FontScale = 1
         });
 
@@ -627,7 +850,7 @@ public sealed class OledLayout
             Y = 2,
             MetricKey = "gpu_load",
             FormatTemplate = "VRM {gpu_vram_used}G",
-            CompactFont = true,
+            CompactFont = false,
             FontScale = 1
         });
 
@@ -638,7 +861,7 @@ public sealed class OledLayout
             X = 68,
             Y = 12,
             FormatTemplate = "{time_short}",
-            CompactFont = true,
+            CompactFont = false,
             FontScale = 1
         });
 
@@ -684,7 +907,7 @@ public sealed class OledLayout
             X = 14,
             Y = 17,
             FormatTemplate = "CPU:{cpu_load}%  GPU:{gpu_load}%",
-            CompactFont = true,
+            CompactFont = false,
             FontScale = 1
         });
 
@@ -732,7 +955,7 @@ public sealed class OledLayout
             Y = 2,
             MetricKey = "ping",
             FormatTemplate = "PING:{ping}ms",
-            CompactFont = true,
+            CompactFont = false,
             FontScale = 1
         });
 
@@ -744,7 +967,7 @@ public sealed class OledLayout
             Y = 12,
             MetricKey = "net_down",
             FormatTemplate = "D:{net_down}",
-            CompactFont = true,
+            CompactFont = false,
             FontScale = 1
         });
 
@@ -756,7 +979,7 @@ public sealed class OledLayout
             Y = 22,
             MetricKey = "net_up",
             FormatTemplate = "U:{net_up}",
-            CompactFont = true,
+            CompactFont = false,
             FontScale = 1
         });
 
@@ -793,7 +1016,7 @@ public sealed class OledLayout
             Y = 2,
             MetricKey = "gpu_temp",
             FormatTemplate = "GPU {gpu_temp}°C",
-            CompactFont = true,
+            CompactFont = false,
             FontScale = 1
         });
 
@@ -805,7 +1028,7 @@ public sealed class OledLayout
             Y = 12,
             MetricKey = "apm",
             FormatTemplate = "APM {apm}",
-            CompactFont = true,
+            CompactFont = false,
             FontScale = 1
         });
 
@@ -817,7 +1040,7 @@ public sealed class OledLayout
             Y = 22,
             MetricKey = "gpu_power",
             FormatTemplate = "{gpu_power}W",
-            CompactFont = true,
+            CompactFont = false,
             FontScale = 1
         });
 
@@ -863,7 +1086,7 @@ public sealed class OledLayout
             X = 2,
             Y = 14,
             FormatTemplate = "APM:{apm} · {time_short}",
-            CompactFont = true,
+            CompactFont = false,
             FontScale = 1
         });
 

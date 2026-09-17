@@ -256,6 +256,91 @@ public sealed class OledFrameBuffer
     }
 
     /// <summary>
+    /// Renders text stretched to exact target width and height in pixels using nearest-neighbor sampling.
+    /// Allows freely stretching text widgets to any pixel dimensions (e.g. 52x17, 120x35).
+    /// </summary>
+    public void DrawTextStretched(int x, int y, int targetWidth, int targetHeight, string text, bool compact = false, bool on = true, bool keepAspectRatio = false)
+    {
+        if (string.IsNullOrEmpty(text) || targetWidth <= 0 || targetHeight <= 0) return;
+
+        var font = compact ? OledFonts.Font3x5 : OledFonts.Font5x7;
+        int charW = compact ? 3 : 5;
+        int charH = compact ? 5 : 7;
+        int spacing = 1;
+
+        int charStride = charW + spacing;
+        int baseWidth = text.Length * charW + Math.Max(0, text.Length - 1) * spacing;
+        if (baseWidth <= 0) return;
+        int baseHeight = charH;
+
+        int actualW = targetWidth;
+        int actualH = targetHeight;
+
+        int offsetX = 0;
+        int offsetY = 0;
+
+        if (keepAspectRatio)
+        {
+            float scale = Math.Min((float)targetWidth / baseWidth, (float)targetHeight / baseHeight);
+            actualW = Math.Clamp((int)Math.Round(baseWidth * scale), 1, targetWidth);
+            actualH = Math.Clamp((int)Math.Round(baseHeight * scale), 1, targetHeight);
+            offsetY = (targetHeight - actualH) / 2;
+        }
+
+        // Cache glyph column arrays for the string to avoid dictionary lookups per pixel
+        byte[][] glyphs = new byte[text.Length][];
+        for (int i = 0; i < text.Length; i++)
+        {
+            char ch = text[i];
+            if (ch == ' ')
+            {
+                glyphs[i] = null!;
+                continue;
+            }
+
+            if (!font.TryGetValue(ch, out var cols))
+            {
+                if (!font.TryGetValue(char.ToUpperInvariant(ch), out cols))
+                {
+                    cols = font.TryGetValue('?', out var qm) ? qm : null!;
+                }
+            }
+            glyphs[i] = cols;
+        }
+
+        for (int dy = 0; dy < actualH; dy++)
+        {
+            int destY = y + offsetY + dy;
+            if (destY < 0 || destY >= Height) continue;
+
+            int sy = (dy * baseHeight) / actualH;
+            if (sy >= charH) sy = charH - 1;
+
+            for (int dx = 0; dx < actualW; dx++)
+            {
+                int destX = x + offsetX + dx;
+                if (destX < 0 || destX >= Width) continue;
+
+                int sx = (dx * baseWidth) / actualW;
+                int charIdx = sx / charStride;
+                if (charIdx >= text.Length) continue;
+
+                int colInChar = sx % charStride;
+                if (colInChar >= charW) continue; // In inter-character spacing
+
+                var cols = glyphs[charIdx];
+                if (cols == null || colInChar >= cols.Length) continue;
+
+                bool bitOn = (cols[colInChar] & (1 << sy)) != 0;
+                if (bitOn)
+                {
+                    SetPixel(destX, destY, on);
+                }
+            }
+        }
+    }
+
+    /// <summary>
     /// Encodes the 128x40 display into 640 raw row-major MSB bytes.
     /// Format: row by row (y=0..39), 16 bytes per row, MSB first (bit 7 = leftmost pixel).
     /// </summary>

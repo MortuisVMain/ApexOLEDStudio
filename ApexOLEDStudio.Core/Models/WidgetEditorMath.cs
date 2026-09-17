@@ -30,4 +30,30 @@ public static class WidgetEditorMath
         widget.Y = Snap(widget.Y, step);
         ClampToCanvas(widget, canvasWidth, canvasHeight);
     }
+
+    public static void Resize(OledWidget widget, int deltaWidth, int deltaHeight, int minW = 4, int minH = 4, int canvasWidth = 128, int canvasHeight = 40)
+    {
+        ArgumentNullException.ThrowIfNull(widget);
+        int availableW = canvasWidth - widget.X;
+        int availableH = canvasHeight - widget.Y;
+        widget.Width = Math.Clamp(widget.Width + deltaWidth, Math.Min(minW, availableW), availableW);
+        widget.Height = Math.Clamp(widget.Height + deltaHeight, Math.Min(minH, availableH), availableH);
+    }
+
+    public static void Nudge(OledWidget widget, int deltaX, int deltaY, int canvasWidth = 128, int canvasHeight = 40)
+    {
+        ArgumentNullException.ThrowIfNull(widget);
+        widget.X = ClampCoordinate(widget.X + deltaX, 0, canvasWidth - widget.Width);
+        widget.Y = ClampCoordinate(widget.Y + deltaY, 0, canvasHeight - widget.Height);
+    }
+
+    public static (int width, int height) CalculateTextBounds(string text, bool compact = false, int scale = 1)
+    {
+        if (string.IsNullOrEmpty(text)) return (0, 0);
+        int charW = (compact ? 3 : 5) * Math.Max(1, scale);
+        int charH = (compact ? 5 : 7) * Math.Max(1, scale);
+        int spacing = 1 * Math.Max(1, scale);
+        int width = text.Length * charW + Math.Max(0, text.Length - 1) * spacing;
+        return (width, charH);
+    }
 }

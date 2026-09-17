@@ -517,6 +517,11 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
             "power_gauge" => (22, 22, WidgetType.Gauge, "total_power", "{total_power}", $"Power Dial #{count}", false, false, false),
             "cpu_graph"   => (34, 16, WidgetType.Graph, "cpu_load", "{cpu_load}%", $"CPU Graph #{count}", false, false, false),
             "clock"       => (32, 10, WidgetType.Text, "time", "{time_short}", $"Clock #{count}", false, false, false),
+            "cpu_clock"   => (56, 10, WidgetType.Text, "cpu_clock", "{cpu_clock_ghz}G", $"CPU Clock #{count}", false, false, false),
+            "gpu_clock"   => (56, 10, WidgetType.Text, "gpu_clock", "GPU {gpu_clock}M", $"GPU Clock #{count}", false, false, false),
+            "ram_clock"   => (56, 10, WidgetType.Text, "ram_clock", "RAM {ram_clock}", $"RAM MT/s #{count}", false, false, false),
+            "vol"         => (44, 10, WidgetType.Text, "vol", "VOL {vol}%", $"Volume #{count}", false, false, false),
+            "weather"     => (44, 10, WidgetType.Text, "weather_temp", "{weather_temp}°C", $"Weather #{count}", false, false, false),
             "now_playing" => (74, 10, WidgetType.Text, "media_title", "{media_track}", $"Now Playing #{count}", true, false, true),
             "bongo_cat"   => (36, 24, WidgetType.Gif, "apm", "", $"Bongo Cat #{count}", false, false, false),
             "net_speed"   => (60, 10, WidgetType.Text, "ping", "{ping}ms {net_down}", $"Network #{count}", false, false, false),
@@ -613,12 +618,195 @@ public sealed partial class MainViewModel : ObservableObject, IDisposable
     }
 
     [RelayCommand]
+    public void UnifyAllFonts()
+    {
+        CurrentLayout.NormalizeTypography(WidgetTypography.BaseFontScale, unifyToStandardFont: true);
+        StatusMessage = "All widgets unified to standard 5x7 font (Scale 1)";
+    }
+
+    [RelayCommand]
+    public void NudgeWidth(object? parameter)
+    {
+        if (SelectedWidget == null || SelectedWidget.IsLocked) return;
+        if (SelectedWidget.Type == WidgetType.Text)
+            SelectedWidget.StretchText = true;
+        int delta = parameter is int i ? i : (int.TryParse(parameter?.ToString(), out int p) ? p : 1);
+        WidgetEditorMath.Resize(SelectedWidget, delta, 0);
+        NormalizeSelectedWidget();
+    }
+
+    [RelayCommand]
+    public void NudgeHeight(object? parameter)
+    {
+        if (SelectedWidget == null || SelectedWidget.IsLocked) return;
+        if (SelectedWidget.Type == WidgetType.Text)
+            SelectedWidget.StretchText = true;
+        int delta = parameter is int i ? i : (int.TryParse(parameter?.ToString(), out int p) ? p : 1);
+        WidgetEditorMath.Resize(SelectedWidget, 0, delta);
+        NormalizeSelectedWidget();
+    }
+
+    [RelayCommand]
+    public void NudgeX(object? parameter)
+    {
+        if (SelectedWidget == null || SelectedWidget.IsLocked) return;
+        int delta = parameter is int i ? i : (int.TryParse(parameter?.ToString(), out int p) ? p : 1);
+        WidgetEditorMath.Nudge(SelectedWidget, delta, 0);
+        NormalizeSelectedWidget();
+    }
+
+    [RelayCommand]
+    public void NudgeY(object? parameter)
+    {
+        if (SelectedWidget == null || SelectedWidget.IsLocked) return;
+        int delta = parameter is int i ? i : (int.TryParse(parameter?.ToString(), out int p) ? p : 1);
+        WidgetEditorMath.Nudge(SelectedWidget, 0, delta);
+        NormalizeSelectedWidget();
+    }
+
+    [RelayCommand]
+    public void ApplyStretchPreset(object? parameter)
+    {
+        if (SelectedWidget == null || SelectedWidget.IsLocked) return;
+        string preset = parameter?.ToString()?.ToLowerInvariant() ?? "";
+        SelectedWidget.StretchText = true;
+
+        switch (preset)
+        {
+            case "full_width":
+                SelectedWidget.Width = Math.Clamp(128 - SelectedWidget.X, 10, 128);
+                break;
+            case "fullscreen":
+                SelectedWidget.X = 0;
+                SelectedWidget.Y = 0;
+                SelectedWidget.Width = 128;
+                SelectedWidget.Height = 40;
+                break;
+            case "big_badge":
+                SelectedWidget.Width = Math.Clamp(60, 10, 128 - SelectedWidget.X);
+                SelectedWidget.Height = Math.Clamp(20, 8, 40 - SelectedWidget.Y);
+                break;
+            case "tall_side":
+                SelectedWidget.Width = Math.Clamp(30, 10, 128 - SelectedWidget.X);
+                SelectedWidget.Height = Math.Clamp(36, 8, 40 - SelectedWidget.Y);
+                break;
+        }
+        NormalizeSelectedWidget();
+        StatusMessage = $"Widget stretched: {SelectedWidget.Width}×{SelectedWidget.Height} px";
+    }
+
+    [RelayCommand]
+    public void SetStretchMode(object? parameter)
+    {
+        if (SelectedWidget == null || SelectedWidget.IsLocked) return;
+        string mode = parameter?.ToString()?.ToLowerInvariant() ?? "free";
+        switch (mode)
+        {
+            case "free":
+                SelectedWidget.StretchText = true;
+                SelectedWidget.KeepAspectRatio = false;
+                StatusMessage = "Mode: Free pixel stretch (W x H)";
+                break;
+            case "proportional":
+                SelectedWidget.StretchText = true;
+                SelectedWidget.KeepAspectRatio = true;
+                StatusMessage = "Mode: Proportional pixel stretch";
+                break;
+            case "fixed":
+                SelectedWidget.StretchText = false;
+                SelectedWidget.KeepAspectRatio = false;
+                StatusMessage = "Mode: Classic fixed 5x7 font";
+                break;
+        }
+        NormalizeSelectedWidget();
+    }
+
+    [RelayCommand]
+    public void SetTextScale(object? parameter)
+    {
+        if (SelectedWidget == null || SelectedWidget.IsLocked) return;
+        int scale = parameter is int i ? i : (int.TryParse(parameter?.ToString(), out int p) ? p : 1);
+        SelectedWidget.SetTextScale(scale);
+        NormalizeSelectedWidget();
+        StatusMessage = $"Text size set to {SelectedWidget.FontScaleDisplayName}";
+    }
+
+    [RelayCommand]
+    public void StepTextScale(object? parameter)
+    {
+        if (SelectedWidget == null || SelectedWidget.IsLocked) return;
+        int delta = parameter is int i ? i : (int.TryParse(parameter?.ToString(), out int p) ? p : 1);
+        int target = Math.Clamp(SelectedWidget.FontScale + delta, WidgetTypography.MinFontScale, WidgetTypography.MaxFontScale);
+        SelectedWidget.SetTextScale(target);
+        NormalizeSelectedWidget();
+        StatusMessage = $"Text size: {SelectedWidget.FontScaleDisplayName}";
+    }
+
+    [RelayCommand]
     public void ResetSelectedWidgetDefaults()
     {
         if (SelectedWidget == null) return;
         SelectedWidget.ResetEditorDefaults();
         NormalizeSelectedWidget();
         StatusMessage = $"Reset widget defaults: {SelectedWidget.Name}";
+    }
+
+    [RelayCommand]
+    public void AutoFitSelectedWidget()
+    {
+        if (SelectedWidget == null || SelectedWidget.IsLocked) return;
+        SelectedWidget.AutoFitToContent();
+        NormalizeSelectedWidget();
+        StatusMessage = $"Auto-fitted '{SelectedWidget.Name}' to {SelectedWidget.Width}×{SelectedWidget.Height} px";
+    }
+
+    [RelayCommand]
+    public void SetExactWidth(object? parameter)
+    {
+        if (SelectedWidget == null || SelectedWidget.IsLocked) return;
+        int target = parameter is int i ? i : (int.TryParse(parameter?.ToString(), out int p) ? p : 30);
+        int maxW = 128 - SelectedWidget.X;
+        SelectedWidget.Width = Math.Clamp(target, 4, Math.Max(4, maxW));
+        NormalizeSelectedWidget();
+    }
+
+    [RelayCommand]
+    public void SetExactHeight(object? parameter)
+    {
+        if (SelectedWidget == null || SelectedWidget.IsLocked) return;
+        int target = parameter is int i ? i : (int.TryParse(parameter?.ToString(), out int p) ? p : 10);
+        int maxH = 40 - SelectedWidget.Y;
+        SelectedWidget.Height = Math.Clamp(target, 4, Math.Max(4, maxH));
+        NormalizeSelectedWidget();
+    }
+
+    [RelayCommand]
+    public void AlignSelectedWidget(object? parameter)
+    {
+        if (SelectedWidget == null || SelectedWidget.IsLocked) return;
+        string align = parameter?.ToString()?.ToLowerInvariant() ?? "";
+        switch (align)
+        {
+            case "left":
+                SelectedWidget.X = 0;
+                break;
+            case "center_x":
+                SelectedWidget.X = Math.Max(0, (128 - SelectedWidget.Width) / 2);
+                break;
+            case "right":
+                SelectedWidget.X = Math.Max(0, 128 - SelectedWidget.Width);
+                break;
+            case "top":
+                SelectedWidget.Y = 0;
+                break;
+            case "center_y":
+                SelectedWidget.Y = Math.Max(0, (40 - SelectedWidget.Height) / 2);
+                break;
+            case "bottom":
+                SelectedWidget.Y = Math.Max(0, 40 - SelectedWidget.Height);
+                break;
+        }
+        NormalizeSelectedWidget();
     }
 
     [RelayCommand]
