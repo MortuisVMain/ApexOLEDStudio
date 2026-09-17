@@ -50,31 +50,24 @@
 
 ## 🚀 Запуск и сборка
 
-### Быстрый запуск:
+### Быстрый запуск готового приложения:
+В корне репозитория уже находится готовый скомпилированный исполняемый файл:
+* **`ApexOLEDStudio.exe`** — автономный бинарник для Windows 10/11 x64.
+* **`setup_admin_no_uac.cmd`** — скрипт 1-кликовой регистрации задачи в Планировщике Windows с наивысшими правами: создает ярлык на Рабочем столе и позволяет запускать приложение с полным доступом к датчикам ASUS WMI и CPU MSR **без единого запроса UAC**.
+* **`run.cmd`** — быстрый запуск из папки проекта.
+
+### Сборка EXE в один клик:
+Запустите скрипт:
 ```cmd
-run.cmd
+Build-EXE.bat
 ```
-или
+Он автоматически компилирует оптимизированный релизный бинарник и обновляет **`ApexOLEDStudio.exe`** в корне проекта.
+
+Или вручную через терминал:
 ```powershell
-dotnet run --project ApexOLEDStudio.UI
+dotnet publish ApexOLEDStudio.UI\ApexOLEDStudio.UI.csproj -c Release -r win-x64 --self-contained false -p:PublishSingleFile=true -o dist
+copy /y dist\ApexOLEDStudio.UI.exe ApexOLEDStudio.exe
 ```
-
-### Release EXE (Windows x64)
-
-Self-contained single-file публикация выполняется так:
-
-```powershell
-dotnet publish ApexOLEDStudio.UI\ApexOLEDStudio.UI.csproj `
-  -c Release -r win-x64 --self-contained true `
-  -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true `
-  -p:DebugType=None -p:DebugSymbols=false `
-  -o publish\win-x64
-```
-
-Готовый файл: `publish\win-x64\ApexOLEDStudio.UI.exe`. Папки `bin`, `obj`,
-`publish` и локальные пользовательские настройки исключены из Git через
-`.gitignore`; пользовательские настройки приложения хранятся в
-`%AppData%\ApexOLEDStudio`.
 
 ### Запуск тестов:
 ```powershell

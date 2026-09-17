@@ -18,15 +18,19 @@ if %ERRORLEVEL% NEQ 0 (
 )
 
 cd /d "%~dp0"
-set "EXE_PATH=%~dp0ApexOLEDStudio.UI\bin\Debug\net10.0-windows\ApexOLEDStudio.UI.exe"
+set "EXE_PATH=%~dp0ApexOLEDStudio.exe"
 
 if not exist "%EXE_PATH%" (
-    echo [СБОРКА] Исполняемый файл не найден. Выполняется компиляция...
-    dotnet build "ApexOLEDStudio.UI\ApexOLEDStudio.UI.csproj" -c Debug
+    if exist "%~dp0ApexOLEDStudio.UI\bin\Debug\net10.0-windows\ApexOLEDStudio.UI.exe" (
+        set "EXE_PATH=%~dp0ApexOLEDStudio.UI\bin\Debug\net10.0-windows\ApexOLEDStudio.UI.exe"
+    ) else (
+        echo [СБОРКА] Исполняемый файл не найден. Выполняется компиляция...
+        call "%~dp0Build-EXE.bat"
+    )
 )
 
 if not exist "%EXE_PATH%" (
-    echo [ОШИБКА] Не удалось найти или скомпилировать ApexOLEDStudio.UI.exe!
+    echo [ОШИБКА] Не удалось найти или скомпилировать ApexOLEDStudio.exe!
     pause
     exit /b 1
 )

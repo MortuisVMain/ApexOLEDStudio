@@ -33,7 +33,11 @@ if %ERRORLEVEL% EQU 0 (
     echo [INFO] Launching elevated via Task Scheduler without UAC prompt...
     schtasks /run /tn "ApexOLEDStudio" >nul
 ) else (
-    start "" "%~dp0ApexOLEDStudio.UI\bin\Debug\net10.0-windows\ApexOLEDStudio.UI.exe"
+    if exist "%~dp0ApexOLEDStudio.exe" (
+        start "" "%~dp0ApexOLEDStudio.exe"
+    ) else (
+        start "" "%~dp0ApexOLEDStudio.UI\bin\Debug\net10.0-windows\ApexOLEDStudio.UI.exe"
+    )
 )
 echo.
 echo [OK] Apex OLED Studio launched!

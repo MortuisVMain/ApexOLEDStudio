@@ -2,7 +2,11 @@
 [Bb]in/
 [Oo]bj/
 publish/
+dist/
 artifacts/
+
+# Release root executable
+!ApexOLEDStudio.exe
 
 # Visual Studio / Rider / VS Code user state
 .vs/
