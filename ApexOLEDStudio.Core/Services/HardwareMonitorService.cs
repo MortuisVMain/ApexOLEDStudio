@@ -27,6 +27,7 @@ public sealed class HardwareMonitorService : IHardwareMonitorService
     private readonly UpdateVisitor _visitor = new();
     private readonly AsusAcpiProvider _asusAcpi = new();
     private PerformanceCounter? _cpuUtilityCounter;
+    private PerformanceCounter? _cpuActualFreqCounter;
     private float _cachedRamSpeed = 5600f;
     private CancellationTokenSource? _cts;
     private bool _disposed;
@@ -147,12 +148,16 @@ public sealed class HardwareMonitorService : IHardwareMonitorService
             {
                 _cpuUtilityCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total");
                 _cpuUtilityCounter.NextValue();
+
+                _cpuActualFreqCounter = new PerformanceCounter("Processor Information", "Actual Frequency", "_Total");
+                _cpuActualFreqCounter.NextValue();
             }
         }
         catch (Exception ex)
         {
             Debug.WriteLine($"[HardwareMonitor] PerformanceCounter init notice: {ex.Message}");
             _cpuUtilityCounter = null;
+            _cpuActualFreqCounter = null;
         }
 
         // Cache DDR5 RAM configured speed once (e.g. 5600 MT/s)
@@ -336,6 +341,23 @@ public sealed class HardwareMonitorService : IHardwareMonitorService
             metrics.CpuLoad = perfCpuLoad;
         }
 
+        // CPU Frequency: Official Windows PerformanceCounter "Actual Frequency" (matches ASUS Armoury Crate)
+        if (_cpuActualFreqCounter != null)
+        {
+            try
+            {
+                float freq = _cpuActualFreqCounter.NextValue();
+                if (freq > 500f)
+                {
+                    metrics.CpuClock = (float)Math.Round(freq, 0);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[HardwareMonitor] Actual Frequency read error: {ex.Message}");
+            }
+        }
+
         // 3. ASUS ACPI WMI Telemetry (Direct from EC BIOS: exact values used by Armoury Crate)
         int? asusCpuTemp = null;
         int? asusGpuTemp = null;
@@ -414,23 +436,26 @@ public sealed class HardwareMonitorService : IHardwareMonitorService
                         }
                     }
 
-                    // CPU Frequency: Primary P-Core #1 (matches ASUS Armoury Crate & CPU-Z main gauge)
-                    // Fallback to first available core clock sensor, then system fallback
-                    var clockSensors = cpu.Sensors
-                        .Where(s => s.SensorType == SensorType.Clock && s.Value > 0 && !s.Name.Contains("Bus", StringComparison.OrdinalIgnoreCase))
-                        .ToList();
-
-                    var core1Clock = clockSensors.FirstOrDefault(s =>
-                        s.Name.Equals("CPU Core #1", StringComparison.OrdinalIgnoreCase) ||
-                        s.Name.Equals("Core #1", StringComparison.OrdinalIgnoreCase));
-
-                    if (core1Clock?.Value != null && core1Clock.Value.Value > 0)
+                    // CPU Frequency fallback if counter not available: active performance core clock
+                    if (metrics.CpuClock <= 0f)
                     {
-                        metrics.CpuClock = (float)Math.Round(core1Clock.Value.Value, 0);
-                    }
-                    else if (clockSensors.Count > 0)
-                    {
-                        metrics.CpuClock = (float)Math.Round(clockSensors.First().Value!.Value, 0);
+                        var clockSensors = cpu.Sensors
+                            .Where(s => s.SensorType == SensorType.Clock && s.Value > 0 && !s.Name.Contains("Bus", StringComparison.OrdinalIgnoreCase))
+                            .ToList();
+
+                        if (clockSensors.Count > 0)
+                        {
+                            // If performance cores are active (> 2000 MHz), take their average; otherwise highest clock
+                            var activeCores = clockSensors.Where(s => s.Value.HasValue && s.Value.Value > 2000f).ToList();
+                            if (activeCores.Count > 0)
+                            {
+                                metrics.CpuClock = (float)Math.Round(activeCores.Average(s => s.Value!.Value), 0);
+                            }
+                            else
+                            {
+                                metrics.CpuClock = (float)Math.Round(clockSensors.OrderByDescending(s => s.Value).First().Value!.Value, 0);
+                            }
+                        }
                     }
 
                     // Native Windows fallback: ensures CPU clock is available even when un-elevated or without Ring0
@@ -672,6 +697,8 @@ public sealed class HardwareMonitorService : IHardwareMonitorService
         {
             _cpuUtilityCounter?.Dispose();
             _cpuUtilityCounter = null;
+            _cpuActualFreqCounter?.Dispose();
+            _cpuActualFreqCounter = null;
         }
         catch { }
         try
