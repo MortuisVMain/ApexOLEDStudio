@@ -4,6 +4,7 @@
 publish/
 dist/
 artifacts/
+scratch/
 
 # Release root executable
 !ApexOLEDStudio.exe
