@@ -93,6 +93,10 @@ public sealed class HardwareMonitorService : IHardwareMonitorService
             int status = CallNtPowerInformation(11, IntPtr.Zero, 0, info, totalSize);
             if (status == 0)
             {
+                if (info.Length > 0 && info[0].CurrentMhz > 0)
+                {
+                    return info[0].CurrentMhz;
+                }
                 uint maxMhz = 0;
                 for (int i = 0; i < coreCount; i++)
                 {
@@ -141,7 +145,7 @@ public sealed class HardwareMonitorService : IHardwareMonitorService
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                _cpuUtilityCounter = new PerformanceCounter("Processor Information", "% Processor Utility", "_Total");
+                _cpuUtilityCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total");
                 _cpuUtilityCounter.NextValue();
             }
         }
@@ -303,7 +307,7 @@ public sealed class HardwareMonitorService : IHardwareMonitorService
             Debug.WriteLine($"[HardwareMonitor] GetSystemTimes error: {ex.Message}");
         }
 
-        // 2. CPU Load: Processor Utility (matches Windows Task Manager & Armoury Crate)
+        // 2. CPU Load: Win32 API GetSystemTimes & % Processor Time (matches Windows Task Manager & Armoury Crate)
         float perfCpuLoad = -1f;
         if (_cpuUtilityCounter != null)
         {
@@ -321,13 +325,15 @@ public sealed class HardwareMonitorService : IHardwareMonitorService
             }
         }
 
-        if (perfCpuLoad >= 0f)
-        {
-            metrics.CpuLoad = perfCpuLoad;
-        }
-        else if (win32CpuLoad >= 0f)
+        // Prefer win32CpuLoad (kernel32 GetSystemTimes) as it's the exact authoritative source used by Armoury Crate,
+        // followed by % Processor Time PerformanceCounter
+        if (win32CpuLoad >= 0f)
         {
             metrics.CpuLoad = win32CpuLoad;
+        }
+        else if (perfCpuLoad >= 0f)
+        {
+            metrics.CpuLoad = perfCpuLoad;
         }
 
         // 3. ASUS ACPI WMI Telemetry (Direct from EC BIOS: exact values used by Armoury Crate)
@@ -408,14 +414,23 @@ public sealed class HardwareMonitorService : IHardwareMonitorService
                         }
                     }
 
-                    // CPU Frequency (Highest active P-Core Clock)
-                    var clockSensor = cpu.Sensors
+                    // CPU Frequency: Primary P-Core #1 (matches ASUS Armoury Crate & CPU-Z main gauge)
+                    // Fallback to first available core clock sensor, then system fallback
+                    var clockSensors = cpu.Sensors
                         .Where(s => s.SensorType == SensorType.Clock && s.Value > 0 && !s.Name.Contains("Bus", StringComparison.OrdinalIgnoreCase))
-                        .OrderByDescending(s => s.Value)
-                        .FirstOrDefault();
-                    if (clockSensor?.Value != null && clockSensor.Value.Value > 0)
+                        .ToList();
+
+                    var core1Clock = clockSensors.FirstOrDefault(s =>
+                        s.Name.Equals("CPU Core #1", StringComparison.OrdinalIgnoreCase) ||
+                        s.Name.Equals("Core #1", StringComparison.OrdinalIgnoreCase));
+
+                    if (core1Clock?.Value != null && core1Clock.Value.Value > 0)
                     {
-                        metrics.CpuClock = (float)Math.Round(clockSensor.Value.Value, 0);
+                        metrics.CpuClock = (float)Math.Round(core1Clock.Value.Value, 0);
+                    }
+                    else if (clockSensors.Count > 0)
+                    {
+                        metrics.CpuClock = (float)Math.Round(clockSensors.First().Value!.Value, 0);
                     }
 
                     // Native Windows fallback: ensures CPU clock is available even when un-elevated or without Ring0
