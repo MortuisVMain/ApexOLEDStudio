@@ -27,7 +27,7 @@ public sealed class HardwareMonitorService : IHardwareMonitorService
     private readonly UpdateVisitor _visitor = new();
     private readonly AsusAcpiProvider _asusAcpi = new();
     private PerformanceCounter? _cpuUtilityCounter;
-
+    private PerformanceCounter? _cpuActualFreqCounter;
     private float _cachedRamSpeed = 5600f;
     private CancellationTokenSource? _cts;
     private bool _disposed;
@@ -149,13 +149,15 @@ public sealed class HardwareMonitorService : IHardwareMonitorService
                 _cpuUtilityCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total");
                 _cpuUtilityCounter.NextValue();
 
+                _cpuActualFreqCounter = new PerformanceCounter("Processor Information", "Actual Frequency", "_Total");
+                _cpuActualFreqCounter.NextValue();
             }
         }
         catch (Exception ex)
         {
             Debug.WriteLine($"[HardwareMonitor] PerformanceCounter init notice: {ex.Message}");
             _cpuUtilityCounter = null;
-
+            _cpuActualFreqCounter = null;
         }
 
         // Cache DDR5 RAM configured speed once (e.g. 5600 MT/s)
@@ -339,11 +341,31 @@ public sealed class HardwareMonitorService : IHardwareMonitorService
             metrics.CpuLoad = perfCpuLoad;
         }
 
-        // CPU Frequency: CallNtPowerInformation gives per-core CurrentMhz (works without admin, matches Armoury Crate)
-        float ntFreq = GetSystemCpuClockMhz();
-        if (ntFreq > 500f)
+        // CPU Frequency: Official Windows PerformanceCounter "Actual Frequency" (matches ASUS Armoury Crate)
+        if (_cpuActualFreqCounter != null)
         {
-            metrics.CpuClock = ntFreq;
+            try
+            {
+                float freq = _cpuActualFreqCounter.NextValue();
+                if (freq > 500f)
+                {
+                    metrics.CpuClock = (float)Math.Round(freq, 0);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[HardwareMonitor] Actual Frequency read error: {ex.Message}");
+            }
+        }
+        
+        // Native Windows fallback: if counter fails, CallNtPowerInformation returns base clock (at least it's non-zero)
+        if (metrics.CpuClock <= 0f)
+        {
+            float ntFreq = GetSystemCpuClockMhz();
+            if (ntFreq > 500f)
+            {
+                metrics.CpuClock = ntFreq;
+            }
         }
 
         // 3. ASUS ACPI WMI Telemetry (Direct from EC BIOS: exact values used by Armoury Crate)
@@ -488,13 +510,20 @@ public sealed class HardwareMonitorService : IHardwareMonitorService
                         metrics.GpuLoad = (float)Math.Round(coreLoadSensor.Value.Value, 0);
                     }
 
-                    // GPU Core Temperature: LHM is authoritative for NVIDIA/AMD GPU temp
+                    // GPU Core Temperature: LHM is authoritative for NVIDIA/AMD GPU temp if ASUS ACPI is unavailable
                     {
                         var coreTempSensor = primaryGpu.Sensors.FirstOrDefault(s => s.SensorType == SensorType.Temperature &&
                             (s.Name.Equals("GPU Core", StringComparison.OrdinalIgnoreCase) || s.Name.Equals("Core", StringComparison.OrdinalIgnoreCase)))
                             ?? primaryGpu.Sensors.FirstOrDefault(s => s.SensorType == SensorType.Temperature && s.Value > 0);
+                            
+                        var hotspotTempSensor = primaryGpu.Sensors.FirstOrDefault(s => s.SensorType == SensorType.Temperature &&
+                            (s.Name.Equals("GPU Hot Spot", StringComparison.OrdinalIgnoreCase) || s.Name.Equals("Hot Spot", StringComparison.OrdinalIgnoreCase)));
 
-                        if (coreTempSensor?.Value != null && coreTempSensor.Value.Value > 0)
+                        if (hotspotTempSensor?.Value != null && hotspotTempSensor.Value.Value > 0)
+                        {
+                            metrics.GpuTemp = (float)Math.Round(hotspotTempSensor.Value.Value, 0);
+                        }
+                        else if (coreTempSensor?.Value != null && coreTempSensor.Value.Value > 0)
                         {
                             metrics.GpuTemp = (float)Math.Round(coreTempSensor.Value.Value, 0);
                         }
@@ -643,7 +672,8 @@ public sealed class HardwareMonitorService : IHardwareMonitorService
         {
             _cpuUtilityCounter?.Dispose();
             _cpuUtilityCounter = null;
-
+            _cpuActualFreqCounter?.Dispose();
+            _cpuActualFreqCounter = null;
         }
         catch { }
         try
@@ -652,7 +682,6 @@ public sealed class HardwareMonitorService : IHardwareMonitorService
         }
         catch { }
     }
-
     private sealed class UpdateVisitor : IVisitor
     {
         public void VisitComputer(IComputer computer) => computer.Traverse(this);
