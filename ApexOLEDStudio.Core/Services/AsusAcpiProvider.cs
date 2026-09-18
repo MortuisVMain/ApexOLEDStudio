@@ -69,8 +69,10 @@ public sealed class AsusAcpiProvider
                     var inParams = obj.GetMethodParameters("DSTS");
                     inParams["Device_ID"] = deviceId;
                     var outParams = obj.InvokeMethod("DSTS", inParams, null);
-                    if (outParams?["device_status"] is uint status)
+                    var rawVal = outParams?["device_status"] ?? outParams?["Return_Value"];
+                    if (rawVal != null)
                     {
+                        uint status = Convert.ToUInt32(rawVal);
                         _wmiAvailable = true;
                         return status;
                     }
