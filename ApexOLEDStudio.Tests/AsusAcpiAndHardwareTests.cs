@@ -99,4 +99,32 @@ public class AsusAcpiAndHardwareTests
         Assert.Equal(5600f, metrics.GetNumericValue("ram_clock"));
         Assert.Equal(5000f, metrics.GetNumericValue("mid_fan"));
     }
+
+    [Fact]
+    public void HardwareMetrics_FormatTemplate_CorrectsUnitConflict_AndAliases()
+    {
+        var metrics = new HardwareMetrics
+        {
+            CpuClock = 5200f,
+            GpuClock = 1905f,
+            GpuMemoryClock = 14226f,
+            RamClock = 5600f
+        };
+
+        // If template accidentally has {cpu_clock_ghz}MHz or {cpu_clock}GHz
+        Assert.Equal("5200MHz", metrics.FormatTemplate("{cpu_clock_ghz}MHz"));
+        Assert.Equal("5200 MHz", metrics.FormatTemplate("{cpu_clock_ghz} MHz"));
+        Assert.Equal("5.2GHz", metrics.FormatTemplate("{cpu_clock}GHz"));
+        Assert.Equal("5.2 GHz", metrics.FormatTemplate("{cpu_clock} GHz"));
+
+        // Aliases
+        Assert.Equal("5200MHz", metrics.FormatTemplate("{cpu_clock_mhz}MHz"));
+        Assert.Equal("5200MHz", metrics.FormatTemplate("{cpu_freq}MHz"));
+        Assert.Equal("5200MHz", metrics.FormatTemplate("{cpu_mhz}MHz"));
+        Assert.Equal("5.2GHz", metrics.FormatTemplate("{cpu_ghz}GHz"));
+        Assert.Equal("1905MHz", metrics.FormatTemplate("{gpu_freq}MHz"));
+        Assert.Equal("14226MHz", metrics.FormatTemplate("{gpu_mem_clock_mhz}MHz"));
+        Assert.Equal("5600MT/s", metrics.FormatTemplate("{ram_freq}MT/s"));
+    }
 }
+

@@ -109,14 +109,45 @@ public sealed class HardwareMetrics
 
         string volText = IsVolumeMuted ? "MUTED" : $"{Math.Round(VolumeLevel)}%";
 
+        string cpuMhzStr = Math.Round(CpuClock).ToString();
+        string cpuGhzStr = (CpuClock / 1000f).ToString("0.0", inv);
+        string gpuMhzStr = Math.Round(GpuClock).ToString();
+        string gpuGhzStr = (GpuClock / 1000f).ToString("0.0", inv);
+        string gpuMemMhzStr = Math.Round(GpuMemoryClock).ToString();
+        string ramMhzStr = Math.Round(RamClock).ToString();
+
+        // 1. Intelligent unit conflict resolution:
+        // If a user types {cpu_clock_ghz}MHz or {cpu_clock}GHz, resolve to the requested physical unit.
+        template = template
+            .Replace("{cpu_clock_ghz}MHz",  cpuMhzStr + "MHz",  StringComparison.OrdinalIgnoreCase)
+            .Replace("{cpu_clock_ghz} MHz", cpuMhzStr + " MHz", StringComparison.OrdinalIgnoreCase)
+            .Replace("{cpu_freq_ghz}MHz",   cpuMhzStr + "MHz",  StringComparison.OrdinalIgnoreCase)
+            .Replace("{cpu_freq_ghz} MHz",  cpuMhzStr + " MHz", StringComparison.OrdinalIgnoreCase)
+            .Replace("{cpu_ghz}MHz",        cpuMhzStr + "MHz",  StringComparison.OrdinalIgnoreCase)
+            .Replace("{cpu_ghz} MHz",       cpuMhzStr + " MHz", StringComparison.OrdinalIgnoreCase)
+            .Replace("{cpu_clock}GHz",      cpuGhzStr + "GHz",  StringComparison.OrdinalIgnoreCase)
+            .Replace("{cpu_clock} GHz",     cpuGhzStr + " GHz", StringComparison.OrdinalIgnoreCase)
+            .Replace("{cpu_freq}GHz",       cpuGhzStr + "GHz",  StringComparison.OrdinalIgnoreCase)
+            .Replace("{cpu_freq} GHz",      cpuGhzStr + " GHz", StringComparison.OrdinalIgnoreCase)
+            .Replace("{gpu_clock_ghz}MHz",  gpuMhzStr + "MHz",  StringComparison.OrdinalIgnoreCase)
+            .Replace("{gpu_clock_ghz} MHz", gpuMhzStr + " MHz", StringComparison.OrdinalIgnoreCase)
+            .Replace("{gpu_clock}GHz",      gpuGhzStr + "GHz",  StringComparison.OrdinalIgnoreCase)
+            .Replace("{gpu_clock} GHz",     gpuGhzStr + " GHz", StringComparison.OrdinalIgnoreCase);
+
         return template
             .Replace("{time}",          Timestamp.ToString("HH:mm:ss"),                                        StringComparison.OrdinalIgnoreCase)
             .Replace("{time_short}",     Timestamp.ToString("HH:mm"),                                           StringComparison.OrdinalIgnoreCase)
             .Replace("{cpu_load}",       Math.Round(CpuLoad).ToString(),                                        StringComparison.OrdinalIgnoreCase)
             .Replace("{cpu_temp}",       Math.Round(CpuTemp > 0 ? CpuTemp : CpuPackageTemp).ToString(),        StringComparison.OrdinalIgnoreCase)
             .Replace("{cpu_power}",      Math.Round(CpuPower).ToString(),                                       StringComparison.OrdinalIgnoreCase)
-            .Replace("{cpu_clock}",      Math.Round(CpuClock).ToString(),                                       StringComparison.OrdinalIgnoreCase)
-            .Replace("{cpu_clock_ghz}",  (CpuClock / 1000f).ToString("0.0", inv),                               StringComparison.OrdinalIgnoreCase)
+            .Replace("{cpu_clock}",      cpuMhzStr,                                                             StringComparison.OrdinalIgnoreCase)
+            .Replace("{cpu_clock_mhz}",  cpuMhzStr,                                                             StringComparison.OrdinalIgnoreCase)
+            .Replace("{cpu_freq}",       cpuMhzStr,                                                             StringComparison.OrdinalIgnoreCase)
+            .Replace("{cpu_freq_mhz}",   cpuMhzStr,                                                             StringComparison.OrdinalIgnoreCase)
+            .Replace("{cpu_mhz}",        cpuMhzStr,                                                             StringComparison.OrdinalIgnoreCase)
+            .Replace("{cpu_clock_ghz}",  cpuGhzStr,                                                             StringComparison.OrdinalIgnoreCase)
+            .Replace("{cpu_freq_ghz}",   cpuGhzStr,                                                             StringComparison.OrdinalIgnoreCase)
+            .Replace("{cpu_ghz}",        cpuGhzStr,                                                             StringComparison.OrdinalIgnoreCase)
             .Replace("{cpu_volt}",       Math.Round(CpuVoltage).ToString(),                                     StringComparison.OrdinalIgnoreCase)
             .Replace("{cpu_fan}",        Math.Round(CpuFanRpm).ToString(),                                      StringComparison.OrdinalIgnoreCase)
             .Replace("{mid_fan}",        Math.Round(MidFanRpm).ToString(),                                      StringComparison.OrdinalIgnoreCase)
@@ -125,9 +156,14 @@ public sealed class HardwareMetrics
             .Replace("{gpu_hotspot}",    Math.Round(GpuHotspot > 0 ? GpuHotspot : GpuTemp).ToString(),         StringComparison.OrdinalIgnoreCase)
             .Replace("{gpu_delta}",      Math.Round(GpuDelta).ToString() + "°C",                                StringComparison.OrdinalIgnoreCase)
             .Replace("{gpu_power}",      Math.Round(GpuPower).ToString(),                                       StringComparison.OrdinalIgnoreCase)
-            .Replace("{gpu_clock}",      Math.Round(GpuClock).ToString(),                                       StringComparison.OrdinalIgnoreCase)
-            .Replace("{gpu_clock_ghz}",  (GpuClock / 1000f).ToString("0.0", inv),                               StringComparison.OrdinalIgnoreCase)
-            .Replace("{gpu_mem_clock}",  Math.Round(GpuMemoryClock).ToString(),                                StringComparison.OrdinalIgnoreCase)
+            .Replace("{gpu_clock}",      gpuMhzStr,                                                             StringComparison.OrdinalIgnoreCase)
+            .Replace("{gpu_clock_mhz}",  gpuMhzStr,                                                             StringComparison.OrdinalIgnoreCase)
+            .Replace("{gpu_freq}",       gpuMhzStr,                                                             StringComparison.OrdinalIgnoreCase)
+            .Replace("{gpu_freq_mhz}",   gpuMhzStr,                                                             StringComparison.OrdinalIgnoreCase)
+            .Replace("{gpu_clock_ghz}",  gpuGhzStr,                                                             StringComparison.OrdinalIgnoreCase)
+            .Replace("{gpu_ghz}",        gpuGhzStr,                                                             StringComparison.OrdinalIgnoreCase)
+            .Replace("{gpu_mem_clock}",  gpuMemMhzStr,                                                          StringComparison.OrdinalIgnoreCase)
+            .Replace("{gpu_mem_clock_mhz}", gpuMemMhzStr,                                                       StringComparison.OrdinalIgnoreCase)
             .Replace("{gpu_volt}",       Math.Round(GpuVoltage).ToString(),                                     StringComparison.OrdinalIgnoreCase)
             .Replace("{total_power}",    Math.Round(TotalPower).ToString(),                                      StringComparison.OrdinalIgnoreCase)
             .Replace("{power_source}",   PowerSource,                                                           StringComparison.OrdinalIgnoreCase)
@@ -137,7 +173,9 @@ public sealed class HardwareMetrics
             .Replace("{ram_percent}",    Math.Round(RamPercent).ToString(),                                     StringComparison.OrdinalIgnoreCase)
             .Replace("{ram_used}",       RamUsedGb.ToString("0.0", inv),                                         StringComparison.OrdinalIgnoreCase)
             .Replace("{ram_total}",      Math.Round(RamTotalGb).ToString(),                                     StringComparison.OrdinalIgnoreCase)
-            .Replace("{ram_clock}",      Math.Round(RamClock).ToString(),                                       StringComparison.OrdinalIgnoreCase)
+            .Replace("{ram_clock}",      ramMhzStr,                                                             StringComparison.OrdinalIgnoreCase)
+            .Replace("{ram_freq}",       ramMhzStr,                                                             StringComparison.OrdinalIgnoreCase)
+            .Replace("{ram_mhz}",        ramMhzStr,                                                             StringComparison.OrdinalIgnoreCase)
             .Replace("{ping}",           PingMs >= 0 ? PingMs.ToString() : "OFF",                               StringComparison.OrdinalIgnoreCase)
             .Replace("{net_down}",       netDown,                                                               StringComparison.OrdinalIgnoreCase)
             .Replace("{net_up}",         netUp,                                                                 StringComparison.OrdinalIgnoreCase)
@@ -161,28 +199,30 @@ public sealed class HardwareMetrics
     /// </summary>
     public float GetNumericValue(string metricKey) => metricKey?.ToLowerInvariant() switch
     {
-        "cpu_load"      => CpuLoad,
-        "cpu_temp"      => CpuTemp > 0 ? CpuTemp : CpuPackageTemp,
-        "cpu_power"     => CpuPower,
-        "cpu_clock"     => CpuClock,
-        "cpu_volt"      => CpuVoltage,
-        "cpu_fan"       => CpuFanRpm,
-        "mid_fan"       => MidFanRpm,
-        "gpu_load"      => GpuLoad,
-        "gpu_temp"      => GpuTemp,
-        "gpu_hotspot"   => GpuHotspot > 0 ? GpuHotspot : GpuTemp,
-        "gpu_delta"     => GpuDelta,
-        "gpu_power"     => GpuPower,
-        "gpu_clock"     => GpuClock,
-        "gpu_mem_clock" => GpuMemoryClock,
-        "gpu_volt"      => GpuVoltage,
-        "total_power"   => TotalPower,
-        "gpu_vram_temp" => GpuVramTemp,
-        "gpu_fan"       => GpuFanRpm,
-        "ram_percent"   => RamPercent,
-        "ram_clock"     => RamClock,
-        "ping"          => PingMs >= 0 ? PingMs : 0,
-        "net_down"      => DownloadSpeedKBs,
+        "cpu_load"                                                 => CpuLoad,
+        "cpu_temp"                                                 => CpuTemp > 0 ? CpuTemp : CpuPackageTemp,
+        "cpu_power"                                                => CpuPower,
+        "cpu_clock" or "cpu_clock_mhz" or "cpu_freq" or "cpu_mhz"  => CpuClock,
+        "cpu_clock_ghz" or "cpu_ghz"                               => CpuClock / 1000f,
+        "cpu_volt"                                                 => CpuVoltage,
+        "cpu_fan"                                                  => CpuFanRpm,
+        "mid_fan"                                                  => MidFanRpm,
+        "gpu_load"                                                 => GpuLoad,
+        "gpu_temp"                                                 => GpuTemp,
+        "gpu_hotspot"                                              => GpuHotspot > 0 ? GpuHotspot : GpuTemp,
+        "gpu_delta"                                                => GpuDelta,
+        "gpu_power"                                                => GpuPower,
+        "gpu_clock" or "gpu_clock_mhz" or "gpu_freq"               => GpuClock,
+        "gpu_clock_ghz" or "gpu_ghz"                               => GpuClock / 1000f,
+        "gpu_mem_clock" or "gpu_mem_clock_mhz"                     => GpuMemoryClock,
+        "gpu_volt"                                                 => GpuVoltage,
+        "total_power"                                              => TotalPower,
+        "gpu_vram_temp"                                            => GpuVramTemp,
+        "gpu_fan"                                                  => GpuFanRpm,
+        "ram_percent"                                              => RamPercent,
+        "ram_clock" or "ram_freq" or "ram_mhz"                     => RamClock,
+        "ping"                                                     => PingMs >= 0 ? PingMs : 0,
+        "net_down"                                                 => DownloadSpeedKBs,
         "net_up"        => UploadSpeedKBs,
         "apm"           => Apm,
         "key_count"     => KeystrokeCount,

@@ -483,7 +483,13 @@
                                             </Button>
 
                                             <!-- Row 3: Clocks, Frequencies & Volume -->
-                                            <Button Command="{Binding AddPresetWidgetCommand}" CommandParameter="cpu_clock" Style="{StaticResource TacticalPresetTileButton}" ToolTip="Add CPU Clock Frequency (GHz/MHz)">
+                                            <Button Command="{Binding AddPresetWidgetCommand}" CommandParameter="cpu_clock_mhz" Style="{StaticResource TacticalPresetTileButton}" ToolTip="Add CPU Clock in MHz (e.g. 5200MHz)">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Path Data="{StaticResource IconCpu}" Fill="{StaticResource BrushCyan}" Stretch="Uniform" Width="11" Height="11" Margin="0,0,5,0" />
+                                                    <TextBlock Text="CPU MHz" FontSize="10" />
+                                                </StackPanel>
+                                            </Button>
+                                            <Button Command="{Binding AddPresetWidgetCommand}" CommandParameter="cpu_clock_ghz" Style="{StaticResource TacticalPresetTileButton}" ToolTip="Add CPU Clock in GHz (e.g. 5.2GHz)">
                                                 <StackPanel Orientation="Horizontal">
                                                     <Path Data="{StaticResource IconCpu}" Fill="{StaticResource BrushCyan}" Stretch="Uniform" Width="11" Height="11" Margin="0,0,5,0" />
                                                     <TextBlock Text="CPU GHz" FontSize="10" />
@@ -493,6 +499,12 @@
                                                 <StackPanel Orientation="Horizontal">
                                                     <Path Data="{StaticResource IconGpu}" Fill="{StaticResource BrushAmberActual}" Stretch="Uniform" Width="11" Height="11" Margin="0,0,5,0" />
                                                     <TextBlock Text="GPU MHz" FontSize="10" />
+                                                </StackPanel>
+                                            </Button>
+                                            <Button Command="{Binding AddPresetWidgetCommand}" CommandParameter="gpu_mem_clock" Style="{StaticResource TacticalPresetTileButton}" ToolTip="Add GPU Memory VRAM Clock (MHz)">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <Path Data="{StaticResource IconGpu}" Fill="{StaticResource BrushCyan}" Stretch="Uniform" Width="11" Height="11" Margin="0,0,5,0" />
+                                                    <TextBlock Text="VRAM MHz" FontSize="10" />
                                                 </StackPanel>
                                             </Button>
                                             <Button Command="{Binding AddPresetWidgetCommand}" CommandParameter="ram_clock" Style="{StaticResource TacticalPresetTileButton}" ToolTip="Add RAM Frequency (MT/s)">
@@ -944,6 +956,7 @@
                                     <ComboBoxItem Content="🔥 GPU Delta (Paste Alert)"  Tag="gpu_delta"     />
                                     <ComboBoxItem Content="🔤 Caps Lock State"          Tag="caps"          />
                                     <ComboBoxItem Content="⚡ CPU Frequency (MHz)"     Tag="cpu_clock"     />
+                                    <ComboBoxItem Content="⚡ CPU Frequency (GHz)"     Tag="cpu_clock_ghz" />
                                     <ComboBoxItem Content="🔋 CPU Voltage (mV)"        Tag="cpu_volt"      />
                                     <ComboBoxItem Content="⚡ GPU Core Clock (MHz)"     Tag="gpu_clock"     />
                                     <ComboBoxItem Content="💾 GPU Memory Clock (MHz)"    Tag="gpu_mem_clock" />
@@ -964,13 +977,17 @@
                                         <!-- 1. Clocks & Volts -->
                                         <TextBlock Text="⚡ Частоты и Напряжение:" Foreground="{StaticResource BrushCyan}" FontSize="8" FontWeight="SemiBold" Margin="0,2,0,2" />
                                         <WrapPanel Margin="0,0,0,4">
-                                            <Button Style="{StaticResource CyanGhostButton}" Content="{}{cpu_clock}" Margin="0,0,2,2" Padding="5,2" FontSize="9" Click="OnInsertTokenClick" Tag="{}{cpu_clock}" ToolTip="Частота CPU в МГц (напр. 4810)" />
-                                            <Button Style="{StaticResource CyanGhostButton}" Content="{}{cpu_clock_ghz}" Margin="0,0,2,2" Padding="5,2" FontSize="9" Click="OnInsertTokenClick" Tag="{}{cpu_clock_ghz}" ToolTip="Частота CPU в ГГц (напр. 4.8)" />
-                                            <Button Style="{StaticResource CyanGhostButton}" Content="{}{cpu_volt}" Margin="0,0,2,2" Padding="5,2" FontSize="9" Click="OnInsertTokenClick" Tag="{}{cpu_volt}" ToolTip="Напряжение CPU в мВ" />
-                                            <Button Style="{StaticResource CyanGhostButton}" Content="{}{gpu_clock}" Margin="0,0,2,2" Padding="5,2" FontSize="9" Click="OnInsertTokenClick" Tag="{}{gpu_clock}" ToolTip="Частота ядра GPU в МГц" />
-                                            <Button Style="{StaticResource CyanGhostButton}" Content="{}{gpu_mem_clock}" Margin="0,0,2,2" Padding="5,2" FontSize="9" Click="OnInsertTokenClick" Tag="{}{gpu_mem_clock}" ToolTip="Частота памяти VRAM в МГц" />
-                                            <Button Style="{StaticResource CyanGhostButton}" Content="{}{gpu_volt}" Margin="0,0,2,2" Padding="5,2" FontSize="9" Click="OnInsertTokenClick" Tag="{}{gpu_volt}" ToolTip="Напряжение GPU в мВ" />
-                                            <Button Style="{StaticResource CyanGhostButton}" Content="{}{ram_clock}" Margin="0,0,2,2" Padding="5,2" FontSize="9" Click="OnInsertTokenClick" Tag="{}{ram_clock}" ToolTip="Частота RAM в MT/s (напр. 5600)" />
+                                            <Button Style="{StaticResource CyanGhostButton}" Content="{}{cpu_clock}MHz" Margin="0,0,2,2" Padding="5,2" FontSize="9" Click="OnInsertTokenClick" Tag="{}{cpu_clock}MHz" ToolTip="Частота CPU в МГц с суффиксом (напр. 5200MHz)" />
+                                            <Button Style="{StaticResource CyanGhostButton}" Content="{}{cpu_clock_ghz}GHz" Margin="0,0,2,2" Padding="5,2" FontSize="9" Click="OnInsertTokenClick" Tag="{}{cpu_clock_ghz}GHz" ToolTip="Частота CPU в ГГц с суффиксом (напр. 5.2GHz)" />
+                                            <Button Style="{StaticResource CyanGhostButton}" Content="{}{gpu_clock}MHz" Margin="0,0,2,2" Padding="5,2" FontSize="9" Click="OnInsertTokenClick" Tag="{}{gpu_clock}MHz" ToolTip="Частота ядра GPU в МГц (напр. 1905MHz)" />
+                                            <Button Style="{StaticResource CyanGhostButton}" Content="{}{gpu_mem_clock}MHz" Margin="0,0,2,2" Padding="5,2" FontSize="9" Click="OnInsertTokenClick" Tag="{}{gpu_mem_clock}MHz" ToolTip="Частота памяти VRAM в МГц (напр. 14226MHz)" />
+                                            <Button Style="{StaticResource CyanGhostButton}" Content="{}{ram_clock}MT/s" Margin="0,0,2,2" Padding="5,2" FontSize="9" Click="OnInsertTokenClick" Tag="{}{ram_clock}MT/s" ToolTip="Частота RAM в MT/s (напр. 5600MT/s)" />
+                                        </WrapPanel>
+                                        <WrapPanel Margin="0,0,0,4">
+                                            <Button Style="{StaticResource CyanGhostButton}" Content="{}{cpu_clock}" Margin="0,0,2,2" Padding="5,2" FontSize="9" Click="OnInsertTokenClick" Tag="{}{cpu_clock}" ToolTip="Частота CPU числом МГц (напр. 5200)" />
+                                            <Button Style="{StaticResource CyanGhostButton}" Content="{}{cpu_clock_ghz}" Margin="0,0,2,2" Padding="5,2" FontSize="9" Click="OnInsertTokenClick" Tag="{}{cpu_clock_ghz}" ToolTip="Частота CPU числом ГГц (напр. 5.2)" />
+                                            <Button Style="{StaticResource CyanGhostButton}" Content="{}{cpu_volt}mV" Margin="0,0,2,2" Padding="5,2" FontSize="9" Click="OnInsertTokenClick" Tag="{}{cpu_volt}mV" ToolTip="Напряжение CPU в мВ" />
+                                            <Button Style="{StaticResource CyanGhostButton}" Content="{}{gpu_volt}mV" Margin="0,0,2,2" Padding="5,2" FontSize="9" Click="OnInsertTokenClick" Tag="{}{gpu_volt}mV" ToolTip="Напряжение GPU в мВ" />
                                         </WrapPanel>
 
                                         <!-- 2. Temps & Power -->

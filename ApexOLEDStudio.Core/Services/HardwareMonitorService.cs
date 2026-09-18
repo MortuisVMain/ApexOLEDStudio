@@ -62,6 +62,55 @@ public sealed class HardwareMonitorService : IHardwareMonitorService
                                               out System.Runtime.InteropServices.ComTypes.FILETIME lpKernelTime,
                                               out System.Runtime.InteropServices.ComTypes.FILETIME lpUserTime);
 
+    [StructLayout(LayoutKind.Sequential)]
+    private struct PROCESSOR_POWER_INFORMATION
+    {
+        public uint Number;
+        public uint MaxMhz;
+        public uint CurrentMhz;
+        public uint MhzLimit;
+        public uint MaxIdleState;
+        public uint CurrentIdleState;
+    }
+
+    [DllImport("powrprof.dll")]
+    private static extern int CallNtPowerInformation(
+        int informationLevel,
+        IntPtr lpInputBuffer,
+        int nInputBufferSize,
+        [Out] PROCESSOR_POWER_INFORMATION[] lpOutputBuffer,
+        int nOutputBufferSize);
+
+    public static float GetSystemCpuClockMhz()
+    {
+        try
+        {
+            int coreCount = Environment.ProcessorCount;
+            if (coreCount <= 0) coreCount = 64;
+            var info = new PROCESSOR_POWER_INFORMATION[coreCount];
+            int structSize = Marshal.SizeOf<PROCESSOR_POWER_INFORMATION>();
+            int totalSize = structSize * coreCount;
+            int status = CallNtPowerInformation(11, IntPtr.Zero, 0, info, totalSize);
+            if (status == 0)
+            {
+                uint maxMhz = 0;
+                for (int i = 0; i < coreCount; i++)
+                {
+                    if (info[i].CurrentMhz > maxMhz)
+                    {
+                        maxMhz = info[i].CurrentMhz;
+                    }
+                }
+                if (maxMhz > 0) return maxMhz;
+            }
+        }
+        catch
+        {
+            // Fallback for non-Windows platforms or permission bounds
+        }
+        return 0f;
+    }
+
     public HardwareMetrics CurrentMetrics { get; private set; } = new();
     public event EventHandler<HardwareMetrics>? MetricsUpdated;
     public bool IsRunning => _cts != null && !_cts.IsCancellationRequested;
@@ -367,6 +416,12 @@ public sealed class HardwareMonitorService : IHardwareMonitorService
                     if (clockSensor?.Value != null && clockSensor.Value.Value > 0)
                     {
                         metrics.CpuClock = (float)Math.Round(clockSensor.Value.Value, 0);
+                    }
+
+                    // Native Windows fallback: ensures CPU clock is available even when un-elevated or without Ring0
+                    if (metrics.CpuClock <= 0f)
+                    {
+                        metrics.CpuClock = GetSystemCpuClockMhz();
                     }
 
                     // CPU Voltage (VCore / VID in mV)

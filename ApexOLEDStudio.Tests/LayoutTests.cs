@@ -669,7 +669,7 @@ public class LayoutTests
             Assert.Equal(3, vm.CurrentLayout.Widgets.Count);
             var w3 = vm.CurrentLayout.Widgets[2];
             Assert.Equal("cpu_clock", w3.MetricKey);
-            Assert.Equal("{cpu_clock_ghz}G", w3.FormatTemplate);
+            Assert.Equal("{cpu_clock}MHz", w3.FormatTemplate);
 
             vm.AddPresetWidget("gpu_clock");
             Assert.Equal(4, vm.CurrentLayout.Widgets.Count);
