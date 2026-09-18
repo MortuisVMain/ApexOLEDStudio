@@ -27,7 +27,7 @@ public sealed class HardwareMonitorService : IHardwareMonitorService
     private readonly UpdateVisitor _visitor = new();
     private readonly AsusAcpiProvider _asusAcpi = new();
     private PerformanceCounter? _cpuUtilityCounter;
-    private PerformanceCounter? _cpuActualFreqCounter;
+
     private float _cachedRamSpeed = 5600f;
     private CancellationTokenSource? _cts;
     private bool _disposed;
@@ -149,15 +149,13 @@ public sealed class HardwareMonitorService : IHardwareMonitorService
                 _cpuUtilityCounter = new PerformanceCounter("Processor", "% Processor Time", "_Total");
                 _cpuUtilityCounter.NextValue();
 
-                _cpuActualFreqCounter = new PerformanceCounter("Processor Information", "Actual Frequency", "_Total");
-                _cpuActualFreqCounter.NextValue();
             }
         }
         catch (Exception ex)
         {
             Debug.WriteLine($"[HardwareMonitor] PerformanceCounter init notice: {ex.Message}");
             _cpuUtilityCounter = null;
-            _cpuActualFreqCounter = null;
+
         }
 
         // Cache DDR5 RAM configured speed once (e.g. 5600 MT/s)
@@ -341,21 +339,11 @@ public sealed class HardwareMonitorService : IHardwareMonitorService
             metrics.CpuLoad = perfCpuLoad;
         }
 
-        // CPU Frequency: Official Windows PerformanceCounter "Actual Frequency" (matches ASUS Armoury Crate)
-        if (_cpuActualFreqCounter != null)
+        // CPU Frequency: CallNtPowerInformation gives per-core CurrentMhz (works without admin, matches Armoury Crate)
+        float ntFreq = GetSystemCpuClockMhz();
+        if (ntFreq > 500f)
         {
-            try
-            {
-                float freq = _cpuActualFreqCounter.NextValue();
-                if (freq > 500f)
-                {
-                    metrics.CpuClock = (float)Math.Round(freq, 0);
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"[HardwareMonitor] Actual Frequency read error: {ex.Message}");
-            }
+            metrics.CpuClock = ntFreq;
         }
 
         // 3. ASUS ACPI WMI Telemetry (Direct from EC BIOS: exact values used by Armoury Crate)
@@ -436,7 +424,7 @@ public sealed class HardwareMonitorService : IHardwareMonitorService
                         }
                     }
 
-                    // CPU Frequency fallback if counter not available: active performance core clock
+                    // CPU Frequency fallback: LHM per-core sensors (highest active core)
                     if (metrics.CpuClock <= 0f)
                     {
                         var clockSensors = cpu.Sensors
@@ -445,23 +433,8 @@ public sealed class HardwareMonitorService : IHardwareMonitorService
 
                         if (clockSensors.Count > 0)
                         {
-                            // If performance cores are active (> 2000 MHz), take their average; otherwise highest clock
-                            var activeCores = clockSensors.Where(s => s.Value.HasValue && s.Value.Value > 2000f).ToList();
-                            if (activeCores.Count > 0)
-                            {
-                                metrics.CpuClock = (float)Math.Round(activeCores.Average(s => s.Value!.Value), 0);
-                            }
-                            else
-                            {
-                                metrics.CpuClock = (float)Math.Round(clockSensors.OrderByDescending(s => s.Value).First().Value!.Value, 0);
-                            }
+                            metrics.CpuClock = (float)Math.Round(clockSensors.Max(s => s.Value!.Value), 0);
                         }
-                    }
-
-                    // Native Windows fallback: ensures CPU clock is available even when un-elevated or without Ring0
-                    if (metrics.CpuClock <= 0f)
-                    {
-                        metrics.CpuClock = GetSystemCpuClockMhz();
                     }
 
                     // CPU Voltage (VCore / VID in mV)
@@ -515,8 +488,7 @@ public sealed class HardwareMonitorService : IHardwareMonitorService
                         metrics.GpuLoad = (float)Math.Round(coreLoadSensor.Value.Value, 0);
                     }
 
-                    // GPU Core Temperature
-                    if (metrics.GpuTemp <= 0f)
+                    // GPU Core Temperature: LHM is authoritative for NVIDIA/AMD GPU temp
                     {
                         var coreTempSensor = primaryGpu.Sensors.FirstOrDefault(s => s.SensorType == SensorType.Temperature &&
                             (s.Name.Equals("GPU Core", StringComparison.OrdinalIgnoreCase) || s.Name.Equals("Core", StringComparison.OrdinalIgnoreCase)))
@@ -641,40 +613,14 @@ public sealed class HardwareMonitorService : IHardwareMonitorService
             metrics.GpuTemp = asusGpuTemp.Value;
         }
 
-        // 6. Non-Admin Fallbacks (Guarantees non-zero metrics in unprivileged unit tests & test environments)
-        if (metrics.GpuTemp <= 0f)
-        {
-            metrics.GpuTemp = (float)Math.Round(Math.Clamp(45f + (Math.Clamp(metrics.GpuLoad, 0f, 100f) / 100f) * 35f, 40f, 90f), 0);
-        }
-
+        // 6. GPU Hotspot estimate (only if we have real GPU temp but no hotspot sensor)
         if (metrics.GpuHotspot <= 0f && metrics.GpuTemp > 0f)
         {
             metrics.GpuHotspot = metrics.GpuTemp + 4f;
         }
 
-        // 6. Non-Admin Fallbacks (Guarantees non-zero metrics in unprivileged unit tests & test environments)
-        if (metrics.CpuTemp <= 0f)
-        {
-            // Modern gaming laptop CPU thermal curve (idle floor ~50°C up to 95°C under load)
-            float baseTemp = 50f;
-            float loadTemp = (Math.Clamp(metrics.CpuLoad, 0f, 100f) / 100f) * 40f;
-            float gpuBleed = metrics.GpuTemp > 50f ? (metrics.GpuTemp - 50f) * 0.25f : 0f;
-            metrics.CpuTemp = (float)Math.Round(Math.Clamp(baseTemp + loadTemp + gpuBleed, 45f, 98f), 0);
-            metrics.CpuPackageTemp = metrics.CpuTemp;
-        }
-
-        if (_powerMonitoringEnabled && metrics.CpuPower <= 0f)
-        {
-            // Realistic mobile HX CPU power scaling (25W idle up to ~95W under load)
-            float basePower = 25f;
-            float loadPower = (Math.Clamp(metrics.CpuLoad, 0f, 100f) / 100f) * 70f;
-            metrics.CpuPower = (float)Math.Round(basePower + loadPower, 1);
-        }
-
-        if (_powerMonitoringEnabled && metrics.GpuPower <= 0f)
-        {
-            metrics.GpuPower = (float)Math.Round(15f + (Math.Clamp(metrics.GpuLoad, 0f, 100f) / 100f) * 115f, 1);
-        }
+        // NOTE: No synthetic fallback values. Zero means "sensor unavailable" — the UI
+        // should display "--" or "N/A" for zero values rather than fake estimated data.
 
         // 7. Sensor Source Reporting
         metrics.PowerIsEstimated = _powerMonitoringEnabled && (!cpuPowerFromSensor || !gpuPowerFromSensor);
@@ -697,8 +643,7 @@ public sealed class HardwareMonitorService : IHardwareMonitorService
         {
             _cpuUtilityCounter?.Dispose();
             _cpuUtilityCounter = null;
-            _cpuActualFreqCounter?.Dispose();
-            _cpuActualFreqCounter = null;
+
         }
         catch { }
         try
